@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- 
+ *	This file is part of Transdroid Torrent Search 
+ *	<http://code.google.com/p/transdroid-search/>
+ *	
+ *	Transdroid is free software: you can redistribute it and/or modify
+ *	it under the terms of the GNU General Public License as published by
+ *	the Free Software Foundation, either version 3 of the License, or
+ *	(at your option) any later version.
+ *	
+ *	Transdroid is distributed in the hope that it will be useful,
+ *	but WITHOUT ANY WARRANTY; without even the implied warranty of
+ *	MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ *	GNU General Public License for more details.
+ *	
+ *	You should have received a copy of the GNU General Public License
+ *	along with Transdroid.  If not, see <http://www.gnu.org/licenses/>.
+ *	
+ -->
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	package="org.transdroid.search"
+	android:versionName="0.1"
+	android:versionCode="1">
+	
+	<uses-sdk android:minSdkVersion="3" android:targetSdkVersion="4" />
+	<supports-screens smallScreens="true" normalScreens="true" largeScreens="true" android:anyDensity="true" />
+	<uses-permission android:name="android.permission.INTERNET" />
+	
+	<application
+		android:icon="@drawable/icon" 
+		android:label="Transdroid Torrent Search"
+		android:description="@string/app_description"
+		android:debuggable="false">
+	
+		<provider
+			android:name="org.transdroid.search.TorrentSearchProvider"
+			android:authorities="org.transdroid.search.torrentsearchprovider" />
+	
+	</application>
+
+</manifest> 
