@@ -26,6 +26,7 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
+import android.util.Log;
 
 /**
  * Main entry point for Android applications that want to query for torrent
@@ -39,7 +40,7 @@ public class TorrentSearchProvider extends ContentProvider {
   public static final String PROVIDER_NAME = "org.transdroid.search.torrentsearchprovider";
 
   /** The content URI to use. Useful if the application have access to this class. Otherwise it must build the URI like<br/>
-   <code>Uri uri = Uri.parse("content://oorg.transdroid.search.torrentsearchprovider/search/mininova/eric%20Taix");</code><br/>
+   <code>Uri uri = Uri.parse("content://org.transdroid.search.torrentsearchprovider/search/mininova/eric%20Taix/BySeeders");</code><br/>
    And within an activity then call:<br/>
    <code>Cursor cur = managedQuery(uri, null, null, null, null);</code>
    **/
@@ -47,6 +48,7 @@ public class TorrentSearchProvider extends ContentProvider {
 
   private static final int SEARCH_TERM = 1;
   private static final int SITE_AND_SEARCH_TERM = 2;
+  private static final int SITE_SEARCH_TERM_AND_ORDER = 3;
 
   // Static intialization of the URI matcher
   private static final UriMatcher uriMatcher;
@@ -54,6 +56,7 @@ public class TorrentSearchProvider extends ContentProvider {
     uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
     uriMatcher.addURI(PROVIDER_NAME, "search/*", SEARCH_TERM);
     uriMatcher.addURI(PROVIDER_NAME, "search/*/*", SITE_AND_SEARCH_TERM);
+    uriMatcher.addURI(PROVIDER_NAME, "search/*/*/*", SITE_SEARCH_TERM_AND_ORDER);
   }
 
   /*
@@ -105,16 +108,25 @@ public class TorrentSearchProvider extends ContentProvider {
   @Override
   public Cursor query(Uri uriP, String[] projectionP, String selectionP, String[] selectionArgsP, String sortOrderP) {
     
-	String[] columnNames = new String[] { "NAME", "TORRENTURL", "DETAILSURL", "SIZE", "ADDED", "SEEDERS", "LEECHERS" };
+	//Log.d(TorrentSearchProvider.class.getName(), "Query for '" + uriP.toString() + "'");
+	
+	// The available columns; note that an _ID is a ContentProvider-requirement
+	String[] columnNames = new String[] { "_ID", "NAME", "TORRENTURL", "DETAILSURL", "SIZE", "ADDED", "SEEDERS", "LEECHERS" };
     MatrixCursor curs = new MatrixCursor(columnNames);
     
     String term = "";
-    // TODO: Allow the sort order as parameter
-    final SortOrder order = SortOrder.BySeeders;
+    SortOrder order = SortOrder.BySeeders; // Use BySeeders as default search order
     final int maxResults = 30;
-    TorrentSite site = TorrentSite.Mininova; // Use Mininova as default
+    TorrentSite site = TorrentSite.Mininova; // Use Mininova as default torrent site
     
-    // Retrieve the search term and possibly site
+    // Retrieve the search term, site and order
+    if (uriMatcher.match(uriP) == SITE_SEARCH_TERM_AND_ORDER) {
+    	String siteCode = uriP.getPathSegments().get(1);
+    	site = TorrentSite.fromCode(siteCode);
+    	term = uriP.getPathSegments().get(2);
+    	String orderCode = uriP.getPathSegments().get(3);
+    	order = SortOrder.fromCode(orderCode);
+    }
     if (uriMatcher.match(uriP) == SITE_AND_SEARCH_TERM) {
     	String siteCode = uriP.getPathSegments().get(1);
     	site = TorrentSite.fromCode(siteCode);
@@ -124,21 +136,24 @@ public class TorrentSearchProvider extends ContentProvider {
   	  term = uriP.getPathSegments().get(1);
     }
     
-    if (!term.equals("") && site != null) {
+    Log.d(TorrentSearchProvider.class.getName(), "Term: '" + term + "' Site: " + site.toString() + " Order: " + order.toString());
+	if (!term.equals("") && site != null && order != null) {
 	
       // Perform the actual search
       try {
     	  List<SearchResult> results = site.search(term, order, maxResults);
 	      // Return the results as MatrixCursor
+    	  int id = 0;
 	      for (SearchResult result : results) {
-	    	Object[] values = new Object[5];
-	        values[0] = result.getTitle();
-	        values[1] = result.getTorrentUrl();
-	        values[2] = result.getDetailsUrl();
-	        values[3] = result.getSize();
-	        values[4] = result.getAddedDate().toString(); // TODO: Can we add this as DateTime?
-	        values[5] = result.getSeeds();
-	        values[6] = result.getLeechers();
+	    	Object[] values = new Object[8];
+	    	values[0] = id++;
+	        values[1] = result.getTitle();
+	        values[2] = result.getTorrentUrl();
+	        values[3] = result.getDetailsUrl();
+	        values[4] = result.getSize();
+	        values[5] = result.getAddedDate();
+	        values[6] = result.getSeeds();
+	        values[7] = result.getLeechers();
 	        curs.addRow(values);
 	      }
 	  } catch (Exception e) {

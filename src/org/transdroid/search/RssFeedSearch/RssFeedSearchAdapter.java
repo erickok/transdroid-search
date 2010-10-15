@@ -27,6 +27,8 @@ import org.transdroid.search.ISearchAdapter;
 import org.transdroid.search.SearchResult;
 import org.transdroid.search.SortOrder;
 
+import android.util.Log;
+
 /**
  * An abstract class providing functionality to easily build search engine support for torrent sites that use RSS feeds.
  * The site should allow for a custom feed per search and the results should include at least the title and direct URL.
@@ -70,7 +72,7 @@ public abstract class RssFeedSearchAdapter implements ISearchAdapter {
 	@Override
 	public List<SearchResult> search(String query, SortOrder order, int maxResults) throws Exception {
 
-		// Parse the RSS feed
+		// Parse the RSS feeds
 		RssParser parser = getRssParser(getUrl(query, order));
 		parser.parse();
 		List<Item> items = parser.getChannel().getItems();

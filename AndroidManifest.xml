@@ -33,6 +33,10 @@
 		android:debuggable="false">
 	
 		<provider
+			android:name="org.transdroid.search.TorrentSitesProvider"
+			android:authorities="org.transdroid.search.torrentsitesprovider" />
+	
+		<provider
 			android:name="org.transdroid.search.TorrentSearchProvider"
 			android:authorities="org.transdroid.search.torrentsearchprovider" />
 	
