@@ -40,23 +40,20 @@ public class TorrentSearchProvider extends ContentProvider {
   public static final String PROVIDER_NAME = "org.transdroid.search.torrentsearchprovider";
 
   /** The content URI to use. Useful if the application have access to this class. Otherwise it must build the URI like<br/>
-   <code>Uri uri = Uri.parse("content://org.transdroid.search.torrentsearchprovider/search/mininova/eric%20Taix/BySeeders");</code><br/>
+   <code>Uri uri = Uri.parse("content://org.transdroid.search.torrentsearchprovider/search/ubuntu");</code><br/>
    And within an activity then call:<br/>
    <code>Cursor cur = managedQuery(uri, null, null, null, null);</code>
    **/
   public static final Uri CONTENT_URI = Uri.parse("content://" + PROVIDER_NAME + "/search");
+  public static final String SELECTION_SITE = "SITE = ?";
 
   private static final int SEARCH_TERM = 1;
-  private static final int SITE_AND_SEARCH_TERM = 2;
-  private static final int SITE_SEARCH_TERM_AND_ORDER = 3;
 
   // Static intialization of the URI matcher
   private static final UriMatcher uriMatcher;
   static {
     uriMatcher = new UriMatcher(UriMatcher.NO_MATCH);
     uriMatcher.addURI(PROVIDER_NAME, "search/*", SEARCH_TERM);
-    uriMatcher.addURI(PROVIDER_NAME, "search/*/*", SITE_AND_SEARCH_TERM);
-    uriMatcher.addURI(PROVIDER_NAME, "search/*/*/*", SITE_SEARCH_TERM_AND_ORDER);
   }
 
   /*
@@ -108,8 +105,6 @@ public class TorrentSearchProvider extends ContentProvider {
   @Override
   public Cursor query(Uri uriP, String[] projectionP, String selectionP, String[] selectionArgsP, String sortOrderP) {
     
-	//Log.d(TorrentSearchProvider.class.getName(), "Query for '" + uriP.toString() + "'");
-	
 	// The available columns; note that an _ID is a ContentProvider-requirement
 	String[] columnNames = new String[] { "_ID", "NAME", "TORRENTURL", "DETAILSURL", "SIZE", "ADDED", "SEEDERS", "LEECHERS" };
     MatrixCursor curs = new MatrixCursor(columnNames);
@@ -120,20 +115,15 @@ public class TorrentSearchProvider extends ContentProvider {
     TorrentSite site = TorrentSite.Mininova; // Use Mininova as default torrent site
     
     // Retrieve the search term, site and order
-    if (uriMatcher.match(uriP) == SITE_SEARCH_TERM_AND_ORDER) {
-    	String siteCode = uriP.getPathSegments().get(1);
-    	site = TorrentSite.fromCode(siteCode);
-    	term = uriP.getPathSegments().get(2);
-    	String orderCode = uriP.getPathSegments().get(3);
-    	order = SortOrder.fromCode(orderCode);
-    }
-    if (uriMatcher.match(uriP) == SITE_AND_SEARCH_TERM) {
-    	String siteCode = uriP.getPathSegments().get(1);
-    	site = TorrentSite.fromCode(siteCode);
-    	term = uriP.getPathSegments().get(2);
-    }
     if (uriMatcher.match(uriP) == SEARCH_TERM) {
   	  term = uriP.getPathSegments().get(1);
+    }
+    if (selectionP != null && selectionP.equals(SELECTION_SITE) && 
+    		selectionArgsP != null && selectionArgsP.length > 0) {
+    	site = TorrentSite.fromCode(selectionArgsP[0]);    	
+    }
+    if (sortOrderP != null) {
+    	order = SortOrder.fromCode(sortOrderP);
     }
     
     Log.d(TorrentSearchProvider.class.getName(), "Term: '" + term + "' Site: " + site.toString() + " Order: " + order.toString());
