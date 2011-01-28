@@ -52,4 +52,9 @@ public class BtjunkieAdapter extends RssFeedSearchAdapter {
 		return "http://btjunkie.org/rss.xml?query=" + URLEncoder.encode(query) + (order == SortOrder.BySeeders? "&o=22": "");
 	}
 
+	@Override
+	public String getSiteName() {
+		return "BTJunkie";
+	}
+	
 }

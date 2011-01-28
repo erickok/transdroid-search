@@ -97,4 +97,10 @@ public class ExtraTorrentAdapter extends RssFeedSearchAdapter {
 	    	}
 	    }
 	}
+
+	@Override
+	public String getSiteName() {
+		return "ExtraTorrent";
+	}
+	
 }

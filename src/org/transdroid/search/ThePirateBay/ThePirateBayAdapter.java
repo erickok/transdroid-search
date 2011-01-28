@@ -173,4 +173,9 @@ public class ThePirateBayAdapter implements ISearchAdapter {
 		return null;
 	}
 
+	@Override
+	public String getSiteName() {
+		return "The Pirate Bay";
+	}
+
 }

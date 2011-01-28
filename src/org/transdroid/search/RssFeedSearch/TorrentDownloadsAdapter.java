@@ -99,4 +99,10 @@ public class TorrentDownloadsAdapter extends RssFeedSearchAdapter {
 	    	}
 	    }
 	}
+
+	@Override
+	public String getSiteName() {
+		return "Torrent Downloads";
+	}
+	
 }

@@ -49,4 +49,9 @@ public class MininovaAdapter extends RssFeedSearchAdapter {
 		return "http://www.mininova.org/rss/" + URLEncoder.encode(query) + (order == SortOrder.BySeeders? "/seeds": "");
 	}
 
+	@Override
+	public String getSiteName() {
+		return "Mininova";
+	}
+	
 }

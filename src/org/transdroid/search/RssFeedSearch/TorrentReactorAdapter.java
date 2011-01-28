@@ -62,4 +62,9 @@ public class TorrentReactorAdapter extends RssFeedSearchAdapter {
 		return "http://www.torrentreactor.net/rss.php?search=" + URLEncoder.encode(query) + (order == SortOrder.BySeeders? "&orderby=a.seeds": "");
 	}
 
+	@Override
+	public String getSiteName() {
+		return "TorrentReactor";
+	}
+	
 }

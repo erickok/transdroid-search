@@ -151,5 +151,10 @@ public class IsohuntAdapter implements ISearchAdapter {
 
 		return "http://isohunt.com/js/rss/" + encodedQuery;
 	}
+
+	@Override
+	public String getSiteName() {
+		return "isoHunt";
+	}
 	
 }

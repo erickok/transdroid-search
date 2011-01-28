@@ -43,8 +43,7 @@ public class TorrentSitesProvider extends ContentProvider {
 	public static final Uri CONTENT_URI = Uri.parse("content://" + PROVIDER_NAME + "/sites");
 
 	/*
-	 * (non-Javadoc)
-	 * @see android.content.ContentProvider#delete(android.net.Uri, java.lang.String, java.lang.String[])
+	 * Not supported by this content provider
 	 */
 	@Override
 	public int delete(Uri uriP, String selectionP, String[] selectionArgsP) {
@@ -61,8 +60,7 @@ public class TorrentSitesProvider extends ContentProvider {
 	}
 
 	/*
-	 * (non-Javadoc)
-	 * @see android.content.ContentProvider#insert(android.net.Uri, android.content.ContentValues)
+	 * Not supported by this content provider
 	 */
 	@Override
 	public Uri insert(Uri uriP, ContentValues valuesP) {
@@ -89,16 +87,18 @@ public class TorrentSitesProvider extends ContentProvider {
 		Log.d(TorrentSitesProvider.class.toString(), "List all sites");
 		
 		// The available columns; note that an _ID is a ContentProvider-requirement
-		String[] columnNames = new String[] { "_ID", "CODE" };
+		String[] columnNames = new String[] { "_ID", "CODE", "NAME", "RSSURL" };
 		MatrixCursor curs = new MatrixCursor(columnNames);
 
 		TorrentSite[] sites = TorrentSite.values();
 		// Return the results as MatrixCursor
 		int id = 0;
 		for (TorrentSite site : sites) {
-			Object[] values = new Object[2];
+			Object[] values = new Object[4];
 			values[0] = id++;
 			values[1] = site.toString();
+			values[2] = site.getAdapter().getSiteName();
+			values[3] = site.getAdapter().buildRssFeedUrlFromSearch("%s", SortOrder.BySeeders);
 			curs.addRow(values);
 		}
 
@@ -108,9 +108,7 @@ public class TorrentSitesProvider extends ContentProvider {
 	}
 
 	/*
-	 * (non-Javadoc)
-	 * @see android.content.ContentProvider#update(android.net.Uri, android.content.ContentValues, java.lang.String,
-	 * java.lang.String[])
+	 * Not supported by this content provider
 	 */
 	@Override
 	public int update(Uri uriP, ContentValues valuesP, String selectionP, String[] selectionArgsP) {

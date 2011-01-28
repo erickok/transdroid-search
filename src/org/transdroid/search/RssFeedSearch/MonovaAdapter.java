@@ -74,4 +74,9 @@ public class MonovaAdapter extends RssFeedSearchAdapter {
 		return "http://www.monova.org/rss.php?type=search&term=" + URLEncoder.encode(query) + (order == SortOrder.BySeeders? "&order=seeds": "");
 	}
 
+	@Override
+	public String getSiteName() {
+		return "Monova";
+	}
+	
 }

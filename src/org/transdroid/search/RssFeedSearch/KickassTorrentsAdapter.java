@@ -103,4 +103,10 @@ public class KickassTorrentsAdapter extends RssFeedSearchAdapter {
 	    	}
 	    }
 	}
+
+	@Override
+	public String getSiteName() {
+		return "KickAssTorrents";
+	}
+	
 }

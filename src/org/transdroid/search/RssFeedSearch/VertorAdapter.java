@@ -60,4 +60,9 @@ public class VertorAdapter extends RssFeedSearchAdapter {
 		return "http://www.vertor.com/index.php?mod=rss_search&words=" + URLEncoder.encode(query) + "&search=1" + (order == SortOrder.BySeeders? "&orderby=a.seeds": "");
 	}
 
+	@Override
+	public String getSiteName() {
+		return "Vertor";
+	}
+	
 }

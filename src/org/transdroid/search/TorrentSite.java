@@ -39,57 +39,79 @@ import org.transdroid.search.ThePirateBay.ThePirateBayAdapter;
 public enum TorrentSite {
 
 	Btjunkie {
-		public List<SearchResult> search(String query, SortOrder order, int maxResults) throws Exception {
-			return new BtjunkieAdapter().search(query, order, maxResults);
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new BtjunkieAdapter();
 		}
 	},
 	ExtraTorrent {
-		public List<SearchResult> search(String query, SortOrder order, int maxResults) throws Exception {
-			return new ExtraTorrentAdapter().search(query, order, maxResults);
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new ExtraTorrentAdapter();
 		}
 	},
 	Isohunt {
-		public List<SearchResult> search(String query, SortOrder order, int maxResults) throws Exception {
-			return new IsohuntAdapter().search(query, order, maxResults);
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new IsohuntAdapter();
 		}
 	},
 	KickassTorents {
-		public List<SearchResult> search(String query, SortOrder order, int maxResults) throws Exception {
-			return new KickassTorrentsAdapter().search(query, order, maxResults);
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new KickassTorrentsAdapter();
 		}
 	},
 	Mininova {
-		public List<SearchResult> search(String query, SortOrder order, int maxResults) throws Exception {
-			return new MininovaAdapter().search(query, order, maxResults);
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new MininovaAdapter();
 		}
 	},
 	Monova {
-		public List<SearchResult> search(String query, SortOrder order, int maxResults) throws Exception {
-			return new MonovaAdapter().search(query, order, maxResults);
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new MonovaAdapter();
 		}
 	},
 	ThePirateBay {
-		public List<SearchResult> search(String query, SortOrder order, int maxResults) throws Exception {
-			return new ThePirateBayAdapter().search(query, order, maxResults);
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new ThePirateBayAdapter();
 		}
 	},
 	TorrentDownloads {
-		public List<SearchResult> search(String query, SortOrder order, int maxResults) throws Exception {
-			return new TorrentDownloadsAdapter().search(query, order, maxResults);
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new TorrentDownloadsAdapter();
 		}
 	},
 	TorrentReactor {
-		public List<SearchResult> search(String query, SortOrder order, int maxResults) throws Exception {
-			return new TorrentReactorAdapter().search(query, order, maxResults);
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new TorrentReactorAdapter();
 		}
 	},
 	Vertor {
-		public List<SearchResult> search(String query, SortOrder order, int maxResults) throws Exception {
-			return new VertorAdapter().search(query, order, maxResults);
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new VertorAdapter();
 		}
 	};
-	
-	public abstract List<SearchResult> search(String query, SortOrder order, int maxResults) throws Exception;
+
+	/**
+	 * Directly and synchronously perform the search for torrents matching the given query string.
+	 * @param query The raw (non-urlencoded) query to search for
+	 * @param order The preferred order in which results are sorted
+	 * @param maxResults Maximum number of results to return
+	 * @return The list of found torrents on the site matching the search query
+	 * @throws Exception When an exception occurred during the loading or parsing of the search results
+	 */
+	public List<SearchResult> search(String query, SortOrder order, int maxResults) throws Exception {
+		return getAdapter().search(query, order, maxResults);
+	}
+
+	public abstract ISearchAdapter getAdapter();
 
 	/**
 	 * Returns the TorrentSite corresponding to the Enum type name it 
@@ -105,5 +127,5 @@ public enum TorrentSite {
 			return null;
 		}
 	}
-	
+
 }
