@@ -53,6 +53,10 @@ public class Item implements Comparable<Item> {
     	this.enclosureUrl = enclosureUrl;
 	}
 
+    public void setEnclosureLength(long enclosureLength) {
+    	this.enclosureLength = enclosureLength;
+	}
+
     public void setEnclosureType(String enclosureType) {
     	this.enclosureType = enclosureType;
 	}
@@ -64,6 +68,10 @@ public class Item implements Comparable<Item> {
     public String getEnclosureType() {
         return this.enclosureType;
     }
+
+    public long getEnclosureLength() {
+        return this.enclosureLength;
+    }
    
     private int _id;
     private String title;
@@ -72,6 +80,7 @@ public class Item implements Comparable<Item> {
     private Date pubDate;
     private String enclosureUrl;
     private String enclosureType;
+    private long enclosureLength;
 
     /**
      * Returns 'the' item link, which preferably is the enclosure url, but otherwise the link (or null if that is empty too)

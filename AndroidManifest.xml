@@ -21,8 +21,8 @@
  -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="org.transdroid.search"
-	android:versionName="1.1"
-	android:versionCode="3">
+	android:versionName="1.2"
+	android:versionCode="4">
 	
 	<uses-sdk android:minSdkVersion="3" android:targetSdkVersion="4" />
 	<supports-screens smallScreens="true" normalScreens="true" largeScreens="true" android:anyDensity="true" />
@@ -30,7 +30,7 @@
 	
 	<application
 		android:icon="@drawable/icon" 
-		android:label="Transdroid Torrent Search"
+		android:label="Torrent Search (by Transdroid)"
 		android:description="@string/app_description"
 		android:debuggable="false">
 	

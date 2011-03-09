@@ -161,6 +161,11 @@ public class TorrentSearchProvider extends ContentProvider {
 					cursor.addRow(values);
 				}
 			} catch (Exception e) {
+				// Log the error and stack trace, but also throw an explicit run-time exception for clarity 
+				Log.d(TorrentSearchProvider.class.getName(), e.toString());
+				for (StackTraceElement stack : e.getStackTrace()) {
+					Log.d(TorrentSearchProvider.class.getName(), stack.toString());
+				}
 				throw new RuntimeException(e.toString());
 			}
 

@@ -114,6 +114,7 @@ public class RssParser extends DefaultHandler
             if (this.item != null && attributes != null && attributes.getLength() > 0) {
                 this.item.setEnclosureUrl(parseLink(attributes.getValue("url")));
                 this.item.setEnclosureType(attributes.getValue("type"));
+                this.item.setEnclosureLength(Long.parseLong(attributes.getValue("length")));
             }
         }
        
