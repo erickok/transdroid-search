@@ -25,18 +25,13 @@ import org.transdroid.search.SearchResult;
 import org.transdroid.search.SortOrder;
 
 /**
- * Search adapter for the Torrentreactor.to torrent site (based on custom search RSS feeds)
+ * Search adapter for the Torrentreactor.net torrent site (based on custom search RSS feeds)
  * 
  * @author Eric Kok
  */
 public class TorrentReactorAdapter extends RssFeedSearchAdapter {
 
 	protected SearchResult fromRssItemToSearchResult(Item item) {
-		// For a weblink: http://www.torrentreactor.net/torrents/<id>/<title>
-		// Torrent at:    http://dl5.torrentreactor.net/download.php?id=<id>&name=<title>
-		String link = item.getLink();
-		int iID = "http://www.torrentreactor.net/torrents/".length(); 
-		String sID = link.substring(iID, link.indexOf("/", iID));
 		// Description includes size...
 		String d = item.getDescription();
 		int sizeStart = d.indexOf("Size: ") + "Size: ".length();
@@ -49,7 +44,7 @@ public class TorrentReactorAdapter extends RssFeedSearchAdapter {
 		
 		return new SearchResult(
 				item.getTitle(), 
-				"http://dl5.torrentreactor.net/download.php?id=" + sID, 
+				item.getEnclosureUrl(), 
 				item.getLink(),  
 				size,
 				item.getPubdate(),

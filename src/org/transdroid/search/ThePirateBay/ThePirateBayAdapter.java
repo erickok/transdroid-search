@@ -38,6 +38,8 @@ import org.transdroid.search.SearchResult;
 import org.transdroid.search.SortOrder;
 import org.transdroid.util.HttpHelper;
 
+import android.util.Log;
+
 /**
  * An adapter that provides access to The Pirate Bay torrent searches by parsing
  * the raw HTML output.
@@ -78,6 +80,8 @@ public class ThePirateBayAdapter implements ISearchAdapter {
         HttpConnectionParams.setConnectionTimeout(httpparams, CONNECTION_TIMEOUT);
         HttpConnectionParams.setSoTimeout(httpparams, CONNECTION_TIMEOUT); 
         DefaultHttpClient httpclient = new DefaultHttpClient(httpparams);
+        // Spoof Firefox user agent to force a result from The Pirate Bay
+        httpclient.getParams().setParameter("http.useragent", "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
         HttpGet httpget = new HttpGet(url);
         
         // Make request
