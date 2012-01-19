@@ -21,10 +21,10 @@
  -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="org.transdroid.search"
-	android:versionName="1.3"
-	android:versionCode="5">
+	android:versionName="1.4"
+	android:versionCode="6">
 	
-	<uses-sdk android:minSdkVersion="3" android:targetSdkVersion="4" />
+	<uses-sdk android:minSdkVersion="3" android:targetSdkVersion="13" />
 	<supports-screens smallScreens="true" normalScreens="true" largeScreens="true" android:anyDensity="true" />
 	<uses-permission android:name="android.permission.INTERNET" />
 	

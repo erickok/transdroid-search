@@ -38,8 +38,6 @@ import org.transdroid.search.SearchResult;
 import org.transdroid.search.SortOrder;
 import org.transdroid.util.HttpHelper;
 
-import android.util.Log;
-
 /**
  * An adapter that provides access to The Pirate Bay torrent searches by parsing
  * the raw HTML output.
@@ -132,9 +130,16 @@ public class ThePirateBayAdapter implements ISearchAdapter {
 				details = prefixDetails + details;
 				int nameStart = html.indexOf(NAME, detailsStart) + NAME.length();
 				String name = html.substring(nameStart, html.indexOf(NAME_END, nameStart));
-				int linkStart = html.indexOf(LINK, nameStart) + LINK.length();
-				String link = html.substring(linkStart, html.indexOf(LINK_END, linkStart));
-				int dateStart = html.indexOf(DATE, linkStart) + DATE.length();
+				
+				// Magnet link is first
+				int magnetLinkStart = html.indexOf(LINK, nameStart) + LINK.length();
+				String magnetLink = html.substring(magnetLinkStart, html.indexOf(LINK_END, magnetLinkStart));
+				
+				// Link is the second, they may remove it later
+				int linkStart = html.indexOf(LINK, magnetLinkStart) + LINK.length();
+				String link = linkStart != -1 ? html.substring(linkStart, html.indexOf(LINK_END, linkStart)) : null;
+				
+				int dateStart = html.indexOf(DATE, linkStart != -1 ? linkStart : magnetLinkStart) + DATE.length();
 				String dateText = html.substring(dateStart, html.indexOf(DATE_END, dateStart));
 				dateText = dateText.replace("&nbsp;", " ");
 				Date date = null;
@@ -157,7 +162,7 @@ public class ThePirateBayAdapter implements ISearchAdapter {
 				String leechersText = html.substring(leechersStart, html.indexOf(LEECHERS_END, leechersStart));
 				int leechers = Integer.parseInt(leechersText);
 				
-				results.add(new SearchResult(name, link, details, size, date, seeders, leechers));
+				results.add(new SearchResult(name, link != null ? link : magnetLink, details, size, date, seeders, leechers));
 				
 				// Find new torrent
 				torStart = html.indexOf(TORRENT, leechersStart);
