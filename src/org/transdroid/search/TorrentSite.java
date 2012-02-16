@@ -21,7 +21,6 @@ package org.transdroid.search;
 import java.util.List;
 
 import org.transdroid.search.Isohunt.IsohuntAdapter;
-import org.transdroid.search.RssFeedSearch.BtjunkieAdapter;
 import org.transdroid.search.RssFeedSearch.ExtraTorrentAdapter;
 import org.transdroid.search.RssFeedSearch.EzrssAdapter;
 import org.transdroid.search.RssFeedSearch.KickassTorrentsAdapter;
@@ -39,12 +38,6 @@ import org.transdroid.search.ThePirateBay.ThePirateBayAdapter;
  */
 public enum TorrentSite {
 
-	Btjunkie {
-		@Override
-		public ISearchAdapter getAdapter() {
-			return new BtjunkieAdapter();
-		}
-	},
 	ExtraTorrent {
 		@Override
 		public ISearchAdapter getAdapter() {

@@ -39,7 +39,7 @@ public class ExtraTorrentAdapter extends RssFeedSearchAdapter {
 				item.getTitle(), 
 				item.getEnclosureUrl(),
 				item.getLink(),
-				FileSizeConverter.getSize(theItem.getSize()),  
+				theItem.getSize() == -1? "": FileSizeConverter.getSize(theItem.getSize()),  
 				item.getPubdate(),
 				theItem.getSeeders(), 
 				theItem.getLeechers());
@@ -48,7 +48,7 @@ public class ExtraTorrentAdapter extends RssFeedSearchAdapter {
 	@Override
 	protected String getUrl(String query, SortOrder order) {
 		// Note: doesn't support different list sortings
-		return "http://extratorrent.com/rss.xml?type=search&search=" + URLEncoder.encode(query);
+		return "http://extratorrent.ws/rss.xml?type=search&search=" + URLEncoder.encode(query);
 	}
 
 	@Override
@@ -87,13 +87,25 @@ public class ExtraTorrentAdapter extends RssFeedSearchAdapter {
 	    public void addAdditionalData(String localName, Item item, String text) {
 	    	ExtraTorrentsItem theItem = (ExtraTorrentsItem) item;
 	    	if (localName.equalsIgnoreCase("size")) {
-	    		theItem.setSize(Long.parseLong(text.trim()));
+	    		try {
+	    			theItem.setSize(Long.parseLong(text.trim()));
+	    		} catch (Exception e) {
+	    			theItem.setSize(-1);
+				}
 	    	}
 	    	if (localName.equalsIgnoreCase("seeders")) {
-	    		theItem.setSeeders(Integer.parseInt(text.trim()));
+	    		try {
+	    			theItem.setSeeders(Integer.parseInt(text.trim()));
+	    		} catch (Exception e) {
+	    			theItem.setSeeders(0);
+				}
 	    	}
 	    	if (localName.equalsIgnoreCase("leechers")) {
-	    		theItem.setLeechers(Integer.parseInt(text.trim()));
+	    		try {
+	    			theItem.setLeechers(Integer.parseInt(text.trim()));
+	    		} catch (Exception e) {
+	    			theItem.setSeeders(0);
+				}
 	    	}
 	    }
 	}
