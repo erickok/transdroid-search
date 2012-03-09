@@ -32,9 +32,10 @@ import org.transdroid.search.SortOrder;
 public class VertorAdapter extends RssFeedSearchAdapter {
 	
 	protected SearchResult fromRssItemToSearchResult(Item item) {
-		// Web links in format http://www.vertor.com/index.php?mod=view&id=<torrent-id>
-		int torIDStart = "http://www.vertor.com/index.php?mod=view&id=".length();
-		String torID = item.getLink().substring(torIDStart);
+		// Web links in format http://www.vertor.com/torrents/<torrent-id>/<torrent-name>
+		int torIDStart = "http://www.vertor.com/torrents/".length();
+		int torIDEnd = item.getLink().indexOf("/", torIDStart);
+		String torID = item.getLink().substring(torIDStart,torIDEnd);
 		String d = item.getDescription();
 		// Description includes size...
 		int sizeStart = d.indexOf("Size: ") + "Size: ".length();

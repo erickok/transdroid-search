@@ -38,9 +38,9 @@ public class EzrssAdapter extends RssFeedSearchAdapter {
 
 		EzrssItem theItem = (EzrssItem) item;
 		return new SearchResult(
-				item.getTitle(), 
-				theItem.comments,
+				item.getTitle(),
 				item.getLink(),
+				theItem.comments,
 				FileSizeConverter.getSize(item.getEnclosureLength()), 
 				item.getPubdate(), 
 				0, 

@@ -16,7 +16,7 @@
  *	You should have received a copy of the GNU Lesser General Public 
  *	License along with Transdroid.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.transdroid.search.ThePirateBay;
+package org.transdroid.search.Demonoid;
 
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
@@ -39,17 +39,19 @@ import org.transdroid.search.SortOrder;
 import org.transdroid.util.HttpHelper;
 
 /**
- * An adapter that provides access to The Pirate Bay torrent searches by parsing
+ * An adapter that provides access to demonoid torrent searches by parsing
  * the raw HTML output.
  * 
- * @author Eric Kok
+ * @author Gabor Tanka
  */
-public class ThePirateBayAdapter implements ISearchAdapter {
+public class DemonoidAdapter implements ISearchAdapter {
 
-	private static final String QUERYURL = "http://thepiratebay.org/search/%s/%s/%s/100,200,300,400,600/";
-	private static final String SORT_COMPOSITE = "99";
-	private static final String SORT_SEEDS = "7";
-	private static final int CONNECTION_TIMEOUT = 20000;
+	private static final String QUERYURL = "http://www.demonoid.me/files/?to=0&uid=0&category=0&subcategory=0&language=0&seeded=2&quality=0&external=2&query=%s&sort=%s&page=0";
+	private static final String SORT_COMPOSITE = "H";
+	private static final String SORT_SEEDS = "S";
+	private static final int CONNECTION_TIMEOUT = 10000;
+	
+	private int maxResults;
 
 	@Override
 	public List<SearchResult> search(String query, SortOrder order, int maxResults) throws Exception {
@@ -57,6 +59,8 @@ public class ThePirateBayAdapter implements ISearchAdapter {
 		if (query == null) {
 			return null;
 		}
+		
+		this.maxResults = maxResults;
 		
 		// Build a search request parameters
 		String encodedQuery = "";
@@ -66,10 +70,7 @@ public class ThePirateBayAdapter implements ISearchAdapter {
 			throw e;
 		}
 
-		// Build full URL string
-		final int startAt = 0; // In the future, this would allow for paged results parsing
-		final int pageNr = (startAt - 1) / 30; // 30 results per page, startAt is 1-based (not 0-based)
-		final String url = String.format(QUERYURL, encodedQuery, String.valueOf(pageNr), (order == SortOrder.BySeeders? SORT_SEEDS: SORT_COMPOSITE));
+		final String url = String.format(QUERYURL, encodedQuery, (order == SortOrder.BySeeders? SORT_SEEDS: SORT_COMPOSITE));
 		
 		// Start synchronous search
 
@@ -78,7 +79,7 @@ public class ThePirateBayAdapter implements ISearchAdapter {
         HttpConnectionParams.setConnectionTimeout(httpparams, CONNECTION_TIMEOUT);
         HttpConnectionParams.setSoTimeout(httpparams, CONNECTION_TIMEOUT); 
         DefaultHttpClient httpclient = new DefaultHttpClient(httpparams);
-        // Spoof Firefox user agent to force a result from The Pirate Bay
+        // Spoof Firefox user agent to force a result
         httpclient.getParams().setParameter("http.useragent", "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
         HttpGet httpget = new HttpGet(url);
         
@@ -98,15 +99,15 @@ public class ThePirateBayAdapter implements ISearchAdapter {
 		try {
 			
 			// Texts to find subsequently
-			final String RESULTS = "<table id=\"searchResult\">";
-			final String TORRENT = "<div class=\"detName\">";
+			final String RESULTS = "<td class=\"torrent_header_2\">";
+			final String TORRENT = "<!-- tstart -->";
 			
 			// Parse the search results from HTML by looking for the identifying texts
 			List<SearchResult> results = new ArrayList<SearchResult>();
 			int resultsStart = html.indexOf(RESULTS)+ RESULTS.length();
 			
 			int torStart = html.indexOf(TORRENT,resultsStart);
-			while (torStart >= 0) {
+			while (torStart >= 0 && results.size() < maxResults) {
 				int nextTorrentIndex = html.indexOf(TORRENT,torStart + TORRENT.length());
 				if(nextTorrentIndex>=0) {
 					results.add(parseHtmlItem(html.substring(torStart + TORRENT.length(), nextTorrentIndex)));
@@ -132,64 +133,42 @@ public class ThePirateBayAdapter implements ISearchAdapter {
 
 	@Override
 	public String getSiteName() {
-		return "The Pirate Bay";
+		return "Demonoid";
 	}
 	
 	private SearchResult parseHtmlItem(String htmlItem) {
 		
 		// Texts to find subsequently
-		final String DETAILS = "<a href=\"";
-		final String DETAILS_END = "\" class=\"detLink\"";
+		final String DETAILS = "><a href=\"";
+		final String DETAILS_END = "\" target=\"_blank";
 		final String NAME = "\">";
 		final String NAME_END = "</a>";
-		final String MAGNET_LINK = "<a href=\"";
-		final String MAGNET_LINK_END = "\" title=\"Download this torrent using magnet";
-		final String LINK = "<a href=\"";
-		final String LINK_END = "\" title=\"Download this torrent\"";
-		final String DATE = "detDesc\">Uploaded ";
-		final String DATE_END = ", Size ";
-		final String SIZE = ", Size ";
-		final String SIZE_END = ", ULed by";
-		final String SEEDERS = "<td align=\"right\">";
-		final String SEEDERS_END = "</td>";
-		final String LEECHERS = "<td align=\"right\">";
-		final String LEECHERS_END = "</td>";
-		String prefixDetails = "http://thepiratebay.org";
-		String prefixYear = (new Date().getYear() + 1900) + " "; // Date.getYear() gives the current year - 1900
-		SimpleDateFormat df1 = new SimpleDateFormat("yyyy MM-dd HH:mm");
-		SimpleDateFormat df2 = new SimpleDateFormat("MM-dd yyyy");
+		final String LINK = "align=\"center\"><a href=\"";
+		final String LINK_END = "\"><img src=\"/images/dmi.gif\"";
+		final String SIZE = "align=\"right\">";
+		final String SIZE_END = "</td>";
+		final String SEEDERS = "class=\"green\">";
+		final String SEEDERS_END = "</font>";
+		final String LEECHERS = "class=\"red\">";
+		final String LEECHERS_END = "</font>";
+		final String DATE = ">Added on ";
+		final String DATE_END = "</td>";
+		String prefix = "http://www.demonoid.me";
+		SimpleDateFormat df = new SimpleDateFormat("EEEE, MMM dd, yyyy");
 		
 		int detailsStart = htmlItem.indexOf(DETAILS) + DETAILS.length();
 		String details = htmlItem.substring(detailsStart, htmlItem.indexOf(DETAILS_END, detailsStart));
-		details = prefixDetails + details;
+		details = prefix + details;
 		int nameStart = htmlItem.indexOf(NAME, detailsStart) + NAME.length();
 		String name = htmlItem.substring(nameStart, htmlItem.indexOf(NAME_END, nameStart));
 		
-		// Magnet link is first
-		int magnetLinkStart = htmlItem.indexOf(MAGNET_LINK, nameStart) + MAGNET_LINK.length();
-		String magnetLink = htmlItem.substring(magnetLinkStart, htmlItem.indexOf(MAGNET_LINK_END, magnetLinkStart));
+		int linkStart = htmlItem.indexOf(LINK, nameStart) + LINK.length();
+		String link = htmlItem.substring(linkStart, htmlItem.indexOf(LINK_END, linkStart));
+		link = prefix + link;
 		
-		// Link is the second, they may remove it later
-		int linkStart = htmlItem.indexOf(LINK, magnetLinkStart);
-		int linkEnd = htmlItem.indexOf(LINK_END, magnetLinkStart);
-		String link = linkEnd >=0 && linkStart < linkEnd ? htmlItem.substring(linkStart + LINK.length(), linkEnd) : null;
-		
-		int dateStart = htmlItem.indexOf(DATE, magnetLinkStart) + DATE.length();
-		String dateText = htmlItem.substring(dateStart, htmlItem.indexOf(DATE_END, dateStart));
-		dateText = dateText.replace("&nbsp;", " ");
-		Date date = null;
-		try {
-			date = df1.parse(prefixYear + dateText);
-		} catch (ParseException e) {
-			try {
-				date = df2.parse(dateText);
-			} catch (ParseException e1) {
-				// Not parsable at all; just leave it at null
-			}
-		}
-		int sizeStart = htmlItem.indexOf(SIZE, dateStart) + SIZE.length();
+		int sizeStart = htmlItem.indexOf(SIZE, linkStart) + SIZE.length();
 		String size = htmlItem.substring(sizeStart, htmlItem.indexOf(SIZE_END, sizeStart));
-		size = size.replace("&nbsp;", " ");
+		
 		int seedersStart = htmlItem.indexOf(SEEDERS, sizeStart) + SEEDERS.length();
 		String seedersText = htmlItem.substring(seedersStart, htmlItem.indexOf(SEEDERS_END, seedersStart));
 		int seeders = Integer.parseInt(seedersText);
@@ -197,7 +176,17 @@ public class ThePirateBayAdapter implements ISearchAdapter {
 		String leechersText = htmlItem.substring(leechersStart, htmlItem.indexOf(LEECHERS_END, leechersStart));
 		int leechers = Integer.parseInt(leechersText);
 		
-		return new SearchResult(name, link != null ? link : magnetLink, details, size, date, seeders, leechers);
+		int dateStart = htmlItem.indexOf(DATE, leechersStart) + DATE.length();
+		String dateText = htmlItem.substring(dateStart, htmlItem.indexOf(DATE_END, dateStart));
+		Date date = null;
+		try {
+			date = df.parse(dateText);
+		} catch (ParseException e) {			
+			// Not parsable; just leave it at null
+		}
+		
+		return new SearchResult(name, link, details, size, date, seeders, leechers);
 	}
 
 }
+
