@@ -25,6 +25,7 @@ import org.transdroid.search.Isohunt.IsohuntAdapter;
 import org.transdroid.search.RssFeedSearch.ExtraTorrentAdapter;
 import org.transdroid.search.RssFeedSearch.EzrssAdapter;
 import org.transdroid.search.RssFeedSearch.KickassTorrentsAdapter;
+import org.transdroid.search.RssFeedSearch.LimeTorrentsAdapter;
 import org.transdroid.search.RssFeedSearch.MininovaAdapter;
 import org.transdroid.search.RssFeedSearch.MonovaAdapter;
 import org.transdroid.search.RssFeedSearch.TorrentDownloadsAdapter;
@@ -66,6 +67,12 @@ public enum TorrentSite {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new KickassTorrentsAdapter();
+		}
+	},
+	LimeTorrents {
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new LimeTorrentsAdapter();
 		}
 	},
 	Mininova {

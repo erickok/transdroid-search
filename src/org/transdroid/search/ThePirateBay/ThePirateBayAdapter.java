@@ -144,8 +144,6 @@ public class ThePirateBayAdapter implements ISearchAdapter {
 		final String NAME_END = "</a>";
 		final String MAGNET_LINK = "<a href=\"";
 		final String MAGNET_LINK_END = "\" title=\"Download this torrent using magnet";
-		final String LINK = "<a href=\"";
-		final String LINK_END = "\" title=\"Download this torrent\"";
 		final String DATE = "detDesc\">Uploaded ";
 		final String DATE_END = ", Size ";
 		final String SIZE = ", Size ";
@@ -168,11 +166,6 @@ public class ThePirateBayAdapter implements ISearchAdapter {
 		// Magnet link is first
 		int magnetLinkStart = htmlItem.indexOf(MAGNET_LINK, nameStart) + MAGNET_LINK.length();
 		String magnetLink = htmlItem.substring(magnetLinkStart, htmlItem.indexOf(MAGNET_LINK_END, magnetLinkStart));
-		
-		// Link is the second, they may remove it later
-		int linkStart = htmlItem.indexOf(LINK, magnetLinkStart);
-		int linkEnd = htmlItem.indexOf(LINK_END, magnetLinkStart);
-		String link = linkEnd >=0 && linkStart < linkEnd ? htmlItem.substring(linkStart + LINK.length(), linkEnd) : null;
 		
 		int dateStart = htmlItem.indexOf(DATE, magnetLinkStart) + DATE.length();
 		String dateText = htmlItem.substring(dateStart, htmlItem.indexOf(DATE_END, dateStart));
@@ -197,7 +190,7 @@ public class ThePirateBayAdapter implements ISearchAdapter {
 		String leechersText = htmlItem.substring(leechersStart, htmlItem.indexOf(LEECHERS_END, leechersStart));
 		int leechers = Integer.parseInt(leechersText);
 		
-		return new SearchResult(name, link != null ? link : magnetLink, details, size, date, seeders, leechers);
+		return new SearchResult(name, magnetLink, details, size, date, seeders, leechers);
 	}
 
 }
