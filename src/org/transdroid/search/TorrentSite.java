@@ -23,7 +23,6 @@ import java.util.List;
 import org.transdroid.search.Demonoid.DemonoidAdapter;
 import org.transdroid.search.Isohunt.IsohuntAdapter;
 import org.transdroid.search.RssFeedSearch.ExtraTorrentAdapter;
-import org.transdroid.search.RssFeedSearch.EzrssAdapter;
 import org.transdroid.search.RssFeedSearch.KickassTorrentsAdapter;
 import org.transdroid.search.RssFeedSearch.LimeTorrentsAdapter;
 import org.transdroid.search.RssFeedSearch.MininovaAdapter;
@@ -49,12 +48,6 @@ public enum TorrentSite {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new ExtraTorrentAdapter();
-		}
-	},
-	EzRss {
-		@Override
-		public ISearchAdapter getAdapter() {
-			return new EzrssAdapter();
 		}
 	},
 	Isohunt {
