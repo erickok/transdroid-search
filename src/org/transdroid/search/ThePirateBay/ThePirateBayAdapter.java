@@ -46,7 +46,7 @@ import org.transdroid.util.HttpHelper;
  */
 public class ThePirateBayAdapter implements ISearchAdapter {
 
-	private static final String QUERYURL = "http://thepiratebay.org/search/%s/%s/%s/100,200,300,400,600/";
+	private static final String QUERYURL = "http://thepiratebay.se/search/%s/%s/%s/100,200,300,400,600/";
 	private static final String SORT_COMPOSITE = "99";
 	private static final String SORT_SEEDS = "7";
 	private static final int CONNECTION_TIMEOUT = 20000;
