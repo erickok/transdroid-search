@@ -20,8 +20,8 @@ package org.transdroid.search;
 
 import java.util.List;
 
-import org.transdroid.search.Demonoid.DemonoidAdapter;
 import org.transdroid.search.Isohunt.IsohuntAdapter;
+import org.transdroid.search.RssFeedSearch.BitSnoopAdapter;
 import org.transdroid.search.RssFeedSearch.ExtraTorrentAdapter;
 import org.transdroid.search.RssFeedSearch.KickassTorrentsAdapter;
 import org.transdroid.search.RssFeedSearch.LimeTorrentsAdapter;
@@ -38,10 +38,10 @@ import org.transdroid.search.ThePirateBay.ThePirateBayAdapter;
  * @author Eric Kok
  */
 public enum TorrentSite {
-	Demonoid {
+	BitSnoop {
 		@Override
 		public ISearchAdapter getAdapter() {
-			return new DemonoidAdapter();
+			return new BitSnoopAdapter();
 		}
 	},
 	ExtraTorrent {

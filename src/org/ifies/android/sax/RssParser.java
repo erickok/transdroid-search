@@ -66,7 +66,7 @@ public class RssParser extends DefaultHandler
 	 * @return 
 	 * @throws DaemonException On conflicting or missing settings
 	 */
-	private DefaultHttpClient initialise() {
+	protected DefaultHttpClient initialise() {
 
 		SchemeRegistry registry = new SchemeRegistry();
 		registry.register(new Scheme("http", new PlainSocketFactory(), 80));
@@ -76,7 +76,7 @@ public class RssParser extends DefaultHandler
 		HttpConnectionParams.setConnectionTimeout(httpparams, 5000);
 		HttpConnectionParams.setSoTimeout(httpparams, 5000); 
 		DefaultHttpClient httpclient = new DefaultHttpClient(new ThreadSafeClientConnManager(httpparams, registry), httpparams);
-
+        
 		return httpclient;
 		
 	}

@@ -20,6 +20,7 @@ package org.transdroid.search.RssFeedSearch;
 
 import java.net.URLEncoder;
 
+import org.apache.http.impl.client.DefaultHttpClient;
 import org.ifies.android.sax.Item;
 import org.ifies.android.sax.RssParser;
 import org.transdroid.search.SearchResult;
@@ -27,14 +28,16 @@ import org.transdroid.search.SortOrder;
 import org.transdroid.util.FileSizeConverter;
 
 /**
- * Search adapter for the KickassTorrents torrent site (based on custom search RSS feeds)
+ * Search adapter for the Bitsnoop torrent site (based on custom search
+ * RSS feeds)
  * 
- * @author Eric Kok
+ * @author Gabor Tanka
  */
-public class KickassTorrentsAdapter extends RssFeedSearchAdapter {
+public class BitSnoopAdapter extends RssFeedSearchAdapter {
 
+	@Override
 	protected SearchResult fromRssItemToSearchResult(Item item) {
-		KickassTorrentsItem theItem = (KickassTorrentsItem) item;
+		BitSnoopItem theItem = (BitSnoopItem) item;
 		return new SearchResult(
 				item.getTitle(), 
 				theItem.getEnclosureUrl(),
@@ -44,69 +47,70 @@ public class KickassTorrentsAdapter extends RssFeedSearchAdapter {
 				theItem.getSeeders(), 
 				theItem.getLeechers());
 	}
+	
+	@Override
+	public String getSiteName() {
+		return "BitSnoop";
+	}
 
 	@Override
 	protected String getUrl(String query, SortOrder order) {
-		// Note: doesn't support different list sortings
-		return "http://www.kickasstorrents.com/search/" + URLEncoder.encode(query) + "/?rss=1";
+		return "http://bitsnoop.com/search/all/" + URLEncoder.encode(query)
+				+ "/c/d/1/?fmt=rss";
 	}
 
 	@Override
 	protected RssParser getRssParser(String url) {
-		return new KickassTorrentsRssParser(url);
+		return new BitSnoopRssParser(url);
 	}
-	
+
 	/**
-	 * Custom Item with addition torrentLink. size, seeders and leechers data properties
+	 * Custom Item with addition size, seeders and leechers data
+	 * properties
 	 */
-	public class KickassTorrentsItem extends Item {
-		private String torrentLink;
+	public class BitSnoopItem extends Item {
 		private long size;
 		private int seeders;
 		private int leechers;
-		public void setTorrentLink(String torrentLink) { this.torrentLink = torrentLink; }
 		public void setSize(long size) { this.size = size; }
 		public void setSeeders(int seeders) { this.seeders = seeders; }
-		public void setLeechers(int leechers) { this.leechers = leechers; }
-		public String getTorrentLink() { return torrentLink; }
-		public long getSize() { return size; }
+		public void setLeechers(int leechers) {	this.leechers = leechers; }
+		public long getSize() {	return size; }
 		public int getSeeders() { return seeders; }
-		public int getLeechers() { return leechers; }
+		public int getLeechers() { return leechers;	}
 	}
-	
-	/**
-	 * Custom parser to parse the additional torrentLink. size, seeders and leechers data properties
-	 */
-	public class KickassTorrentsRssParser extends RssParser {
 
-		public KickassTorrentsRssParser(String url) {
+	public class BitSnoopRssParser extends RssParser {
+
+		public BitSnoopRssParser(String url) {
 			super(url);
 		}
-		
+
 		public Item createNewItem() {
-			return new KickassTorrentsItem();
+			return new BitSnoopItem();
 		}
 
-	    public void addAdditionalData(String localName, Item item, String text) {
-	    	KickassTorrentsItem theItem = (KickassTorrentsItem) item;
-	    	if (localName.equalsIgnoreCase("torrentLink")) {
-	    		theItem.setTorrentLink(text.trim());
-	    	}
-	    	if (localName.equalsIgnoreCase("size")) {
-	    		theItem.setSize(Long.parseLong(text.trim()));
-	    	}
-	    	if (localName.equalsIgnoreCase("seeds")) {
-	    		theItem.setSeeders(Integer.parseInt(text.trim()));
-	    	}
-	    	if (localName.equalsIgnoreCase("leechs")) {
-	    		theItem.setLeechers(Integer.parseInt(text.trim()));
-	    	}
-	    }
+		public void addAdditionalData(String localName, Item item, String text) {
+			BitSnoopItem theItem = (BitSnoopItem) item;
+			if (localName.equalsIgnoreCase("size")) {
+				theItem.setSize(Long.parseLong(text.trim()));
+			}
+			if (localName.equalsIgnoreCase("numSeeders")) {
+				theItem.setSeeders(Integer.parseInt(text.trim()));
+			}
+			if (localName.equalsIgnoreCase("numLeechers")) {
+				theItem.setLeechers(Integer.parseInt(text.trim()));
+			}
+		}
+		
+		@Override
+		protected DefaultHttpClient initialise() {
+			DefaultHttpClient client = super.initialise();	
+			// Spoof Firefox user agent to force a result from BitSnoop
+	        client.getParams().setParameter("http.useragent", "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
+	        return client;
+		}
+
 	}
 
-	@Override
-	public String getSiteName() {
-		return "KickAssTorrents";
-	}
-	
 }
