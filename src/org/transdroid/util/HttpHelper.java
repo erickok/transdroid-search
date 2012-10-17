@@ -23,6 +23,18 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
+import java.util.zip.GZIPInputStream;
+
+import org.apache.http.Header;
+import org.apache.http.HeaderElement;
+import org.apache.http.HttpEntity;
+import org.apache.http.HttpException;
+import org.apache.http.HttpRequest;
+import org.apache.http.HttpRequestInterceptor;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpResponseInterceptor;
+import org.apache.http.entity.HttpEntityWrapper;
+import org.apache.http.protocol.HttpContext;
 
 /**
  * Provides a set of general helper methods that can be used in web-based communication.
@@ -31,6 +43,64 @@ import java.io.UnsupportedEncodingException;
  *
  */
 public class HttpHelper {
+
+	/**
+	 * HTTP request interceptor to allow for GZip-encoded data transfer 
+	 */
+	public static HttpRequestInterceptor gzipRequestInterceptor = new HttpRequestInterceptor() {
+        public void process(final HttpRequest request, final HttpContext context) throws HttpException, IOException {
+            if (!request.containsHeader("Accept-Encoding")) {
+                request.addHeader("Accept-Encoding", "gzip");
+            }
+        }
+    };
+    
+    /**
+     * HTTP response interceptor that decodes GZipped data
+     */
+    public static HttpResponseInterceptor gzipResponseInterceptor = new HttpResponseInterceptor() {
+        public void process(final HttpResponse response, final HttpContext context) throws HttpException, IOException {
+            HttpEntity entity = response.getEntity();
+            Header ceheader = entity.getContentEncoding();
+            if (ceheader != null) {
+                HeaderElement[] codecs = ceheader.getElements();
+                for (int i = 0; i < codecs.length; i++) {
+                	
+                    if (codecs[i].getName().equalsIgnoreCase("gzip")) {
+                        response.setEntity(new HttpHelper.GzipDecompressingEntity(response.getEntity())); 
+                        return;
+                    }
+                }
+            }
+        }
+        
+    };
+
+    /**
+     * HTTP entity wrapper to decompress GZipped HTTP responses
+     */
+	private static class GzipDecompressingEntity extends HttpEntityWrapper {
+	
+	    public GzipDecompressingEntity(final HttpEntity entity) {
+	        super(entity);
+	    }
+	
+	    @Override
+	    public InputStream getContent() throws IOException, IllegalStateException {
+	
+	        // the wrapped entity's getContent() decides about repeatability
+	        InputStream wrappedin = wrappedEntity.getContent();
+	
+	        return new GZIPInputStream(wrappedin);
+	    }
+	
+	    @Override
+	    public long getContentLength() {
+	        // length of ungzipped content is not known
+	        return -1;
+	    }
+	
+	}
 
     /*
      * To convert the InputStream to String we use the BufferedReader.readLine()
