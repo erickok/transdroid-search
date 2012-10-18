@@ -98,16 +98,7 @@ public class IsohuntAdapter implements ISearchAdapter {
 
         // Read JSON response
         InputStream instream = response.getEntity().getContent();
-        String result = HttpHelper.ConvertStreamToString(instream);
-        
-        // Filter the raw string result with the incorrect quotes filtered
-		// Damn you, isoHunt API...
-        // TODO: Is this still needed?
-		result = result.replace(query, encodedQuery);
-	
-        
-        // Return JSON response object
-        JSONObject json = new JSONObject(result);
+        JSONObject json = new JSONObject(HttpHelper.ConvertStreamToString(instream));
         instream.close();
         
 		// Empty result set?
