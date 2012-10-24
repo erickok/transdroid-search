@@ -47,8 +47,7 @@ public class KickassTorrentsAdapter extends RssFeedSearchAdapter {
 
 	@Override
 	protected String getUrl(String query, SortOrder order) {
-		// Note: doesn't support different list sortings
-		return "http://www.kickasstorrents.com/search/" + URLEncoder.encode(query) + "/?rss=1";
+		return "http://www.kickasstorrents.com/search/" + URLEncoder.encode(query) + "/?rss=1" + (order == SortOrder.BySeeders? "&field=seeders&sorder=desc": "");
 	}
 
 	@Override

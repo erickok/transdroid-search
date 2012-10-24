@@ -21,8 +21,8 @@
  -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	package="org.transdroid.search"
-	android:versionName="1.9"
-	android:versionCode="11">
+	android:versionName="1.10"
+	android:versionCode="12">
 	
 	<uses-sdk android:minSdkVersion="3" android:targetSdkVersion="13" />
 	<supports-screens smallScreens="true" normalScreens="true" largeScreens="true" android:anyDensity="true" />
