@@ -69,7 +69,7 @@ public class ThePirateBayAdapter implements ISearchAdapter {
 		// Build full URL string
 		final int startAt = 0; // In the future, this would allow for paged results parsing
 		final int pageNr = (startAt - 1) / 30; // 30 results per page, startAt is 1-based (not 0-based)
-		final String url = String.format(QUERYURL, encodedQuery, String.valueOf(pageNr), (order == SortOrder.BySeeders? SORT_SEEDS: SORT_COMPOSITE));
+		final String url = String.format(getQueryUrl(), encodedQuery, String.valueOf(pageNr), (order == SortOrder.BySeeders? SORT_SEEDS: SORT_COMPOSITE));
 		
 		// Start synchronous search
 
@@ -91,6 +91,10 @@ public class ThePirateBayAdapter implements ISearchAdapter {
         instream.close();
         return parseHtml(html);
         
+	}
+
+	protected String getQueryUrl() {
+		return QUERYURL;
 	}
 
 	protected List<SearchResult> parseHtml(String html) throws Exception {

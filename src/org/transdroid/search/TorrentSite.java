@@ -31,6 +31,7 @@ import org.transdroid.search.RssFeedSearch.TorrentDownloadsAdapter;
 import org.transdroid.search.RssFeedSearch.TorrentReactorAdapter;
 import org.transdroid.search.RssFeedSearch.VertorAdapter;
 import org.transdroid.search.ThePirateBay.ThePirateBayAdapter;
+import org.transdroid.search.ThePirateBay.ThePirateBayMirrorAdapter;
 
 /**
  * Provides factory-like access to all the torrent site search adapters.
@@ -84,6 +85,12 @@ public enum TorrentSite {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new ThePirateBayAdapter();
+		}
+	},
+	ThePirateBayMirror {
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new ThePirateBayMirrorAdapter();
 		}
 	},
 	TorrentDownloads {
