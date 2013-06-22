@@ -35,11 +35,11 @@ public class TorrentReactorAdapter extends RssFeedSearchAdapter {
 		// Description includes size...
 		String d = item.getDescription();
 		int sizeStart = d.indexOf("Size: ") + "Size: ".length();
-		String size = d.substring(sizeStart, d.indexOf(" MB", sizeStart) + " MB".length());
+		String size = d.substring(sizeStart, d.indexOf(",", sizeStart) + ",".length());
 		// ... and seeders/leechers
 		int statusStart = d.indexOf("Status: ") + "Status: ".length();
 		int seeders = Integer.parseInt(d.substring(statusStart, d.indexOf(" ", statusStart)));
-		int leechersStart = d.indexOf("seeders, ", statusStart) + "seeders, ".length();
+		int leechersStart = d.indexOf("seeder, ", statusStart) + "seeder, ".length();
 		int leechers = Integer.parseInt(d.substring(leechersStart, d.indexOf(" ", leechersStart)));
 		
 		return new SearchResult(
@@ -54,7 +54,8 @@ public class TorrentReactorAdapter extends RssFeedSearchAdapter {
 
 	@Override
 	protected String getUrl(String query, SortOrder order) {
-		return "http://www.torrentreactor.net/rss.php?search=" + URLEncoder.encode(query) + (order == SortOrder.BySeeders? "&orderby=a.seeds": "");
+		// NOTE: Torrent Reactor doesn't support sorting in the RSS feed
+		return "http://www.torrentreactor.net/rss.php?search=" + URLEncoder.encode(query);
 	}
 
 	@Override
