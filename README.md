@@ -30,10 +30,10 @@ Customizing search results
 --------------------------
 
 You have control over the search results that are returned. A specific site may be queried and the preferred sort order can be given:
-{{{
+```
 Uri uri = Uri.parse("content://org.transdroid.search.torrentsearchprovider/search/" + query);
 Cursor results = managedQuery(uri, null, "SITE = ?", new String[] { siteCode }, sortOrder)
-}}}
+```
 Here, siteCode is the code of one of the supported torrent sites. The default is Mininova. The orderCode is either !BySeeders (default) or Combined. Note that no errors are returned when a site or sort order doesn't exist; an null Cursor is returned instead. (This is a limitation of !ContentResolvers.)
 
 Supported torrent sites
@@ -61,23 +61,22 @@ Developed By
 License
 =======
 
-Copyright 2010-2013 Eric Kok et al.
 
-Transdroid Torrent Search is free software: you can redistribute 
-it and/or modify it under the terms of the GNU Lesser General 
-Public License as published by the Free Software Foundation, 
-either version 3 of the License, or (at your option) any later 
-version.
+    Copyright 2010-2013 Eric Kok et al.
+    
+    Transdroid Torrent Search is free software: you can redistribute 
+    it and/or modify it under the terms of the GNU Lesser General 
+    Public License as published by the Free Software Foundation, 
+    either version 3 of the License, or (at your option) any later 
+    version.
 
-Transdroid Torrent Search is distributed in the hope that it will 
-be useful, but WITHOUT ANY WARRANTY; without even the implied 
-warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
-See the GNU Lesser General Public License for more details.
-
-You should have received a copy of the GNU Lesser General Public 
-License along with Transdroid.  If not, see <http://www.gnu.org/licenses/>.
-
----
+    Transdroid Torrent Search is distributed in the hope that it will 
+    be useful, but WITHOUT ANY WARRANTY; without even the implied 
+    warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+    See the GNU Lesser General Public License for more details.
+    
+    You should have received a copy of the GNU Lesser General Public 
+    License along with Transdroid.  If not, see <http://www.gnu.org/licenses/>.
 
 Some code/libraries are used in the project:
 
