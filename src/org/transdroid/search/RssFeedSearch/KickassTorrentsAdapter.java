@@ -47,7 +47,7 @@ public class KickassTorrentsAdapter extends RssFeedSearchAdapter {
 
 	@Override
 	protected String getUrl(String query, SortOrder order) {
-		return "http://www.kickasstorrents.com/search/" + URLEncoder.encode(query) + "/?rss=1" + (order == SortOrder.BySeeders? "&field=seeders&sorder=desc": "");
+		return "http://kickass.to/search/" + URLEncoder.encode(query) + "/?rss=1" + (order == SortOrder.BySeeders? "&field=seeders&sorder=desc": "");
 	}
 
 	@Override
@@ -91,13 +91,13 @@ public class KickassTorrentsAdapter extends RssFeedSearchAdapter {
 	    	if (localName.equalsIgnoreCase("torrentLink")) {
 	    		theItem.setTorrentLink(text.trim());
 	    	}
-	    	if (localName.equalsIgnoreCase("size")) {
+	    	if (localName.equalsIgnoreCase("contentLength")) {
 	    		theItem.setSize(Long.parseLong(text.trim()));
 	    	}
 	    	if (localName.equalsIgnoreCase("seeds")) {
 	    		theItem.setSeeders(Integer.parseInt(text.trim()));
 	    	}
-	    	if (localName.equalsIgnoreCase("leechs")) {
+	    	if (localName.equalsIgnoreCase("peers")) {
 	    		theItem.setLeechers(Integer.parseInt(text.trim()));
 	    	}
 	    }

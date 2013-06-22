@@ -125,6 +125,7 @@ public class TorrentSearchProvider extends ContentProvider {
 		}
 		if (selectionP != null && selectionP.equals(SELECTION_SITE) && selectionArgsP != null
 			&& selectionArgsP.length > 0) {
+			// TODO: Support searching multiple sites at once
 			site = TorrentSite.fromCode(selectionArgsP[0]);
 			if (site == null) {
 				throw new RuntimeException(selectionArgsP[0] + " is not a valid torrent site. " + 
