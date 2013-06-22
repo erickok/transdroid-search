@@ -26,6 +26,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -154,7 +155,7 @@ public class DemonoidAdapter implements ISearchAdapter {
 		final String DATE = ">Added on ";
 		final String DATE_END = "</td>";
 		String prefix = "http://www.demonoid.me";
-		SimpleDateFormat df = new SimpleDateFormat("EEEE, MMM dd, yyyy");
+		SimpleDateFormat df = new SimpleDateFormat("EEEE, MMM dd, yyyy", Locale.US);
 		
 		int detailsStart = htmlItem.indexOf(DETAILS) + DETAILS.length();
 		String details = htmlItem.substring(detailsStart, htmlItem.indexOf(DETAILS_END, detailsStart));

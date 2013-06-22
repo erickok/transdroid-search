@@ -20,12 +20,14 @@
  */
  -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+	xmlns:tools="http://schemas.android.com/tools"
 	package="org.transdroid.search"
-	android:versionName="1.10"
-	android:versionCode="12">
+	android:versionName="1.11"
+	android:versionCode="13">
 	
-	<uses-sdk android:minSdkVersion="3" android:targetSdkVersion="13" />
-	<supports-screens smallScreens="true" normalScreens="true" largeScreens="true" android:anyDensity="true" />
+	<uses-sdk android:minSdkVersion="3" android:targetSdkVersion="17" />
+	<supports-screens android:smallScreens="true" android:normalScreens="true" android:largeScreens="true" 
+		android:anyDensity="true" />
 	<uses-permission android:name="android.permission.INTERNET" />
 	
 	<application
@@ -35,11 +37,15 @@
 	
 		<provider
 			android:name="org.transdroid.search.TorrentSitesProvider"
-			android:authorities="org.transdroid.search.torrentsitesprovider" />
+			android:authorities="org.transdroid.search.torrentsitesprovider"
+			android:exported="true"
+			tools:ignore="ExportedContentProvider" />
 	
 		<provider
 			android:name="org.transdroid.search.TorrentSearchProvider"
-			android:authorities="org.transdroid.search.torrentsearchprovider" />
+			android:authorities="org.transdroid.search.torrentsearchprovider"
+			android:exported="true"
+			tools:ignore="ExportedContentProvider" />
 	
 	</application>
 
