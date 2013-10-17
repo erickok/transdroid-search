@@ -22,16 +22,16 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools"
 	package="org.transdroid.search"
-	android:versionName="1.11"
-	android:versionCode="13">
+	android:versionName="1.12"
+	android:versionCode="14">
 	
-	<uses-sdk android:minSdkVersion="3" android:targetSdkVersion="17" />
+	<uses-sdk android:minSdkVersion="3" android:targetSdkVersion="18" />
 	<supports-screens android:smallScreens="true" android:normalScreens="true" android:largeScreens="true" 
 		android:anyDensity="true" />
 	<uses-permission android:name="android.permission.INTERNET" />
 	
 	<application
-		android:icon="@drawable/icon" 
+		android:icon="@drawable/ic_launcher" 
 		android:label="Torrent Search (by Transdroid)"
 		android:description="@string/app_description">
 	
