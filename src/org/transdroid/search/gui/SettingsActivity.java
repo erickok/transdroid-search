@@ -25,13 +25,18 @@ import android.os.Bundle;
 import android.preference.PreferenceActivity;
 import android.preference.PreferenceCategory;
 
+/**
+ * An activity that shows all public and private torrent sites supported and allows to enter settings for each site (if
+ * approprate) as well as to enable/disable a site.
+ * @author Eric Kok
+ */
 public class SettingsActivity extends PreferenceActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 	}
-	
+
 	@SuppressWarnings("deprecation")
 	@Override
 	protected void onResume() {
@@ -41,7 +46,7 @@ public class SettingsActivity extends PreferenceActivity {
 		if (getPreferenceScreen() != null)
 			getPreferenceScreen().removeAll();
 		addPreferencesFromResource(R.xml.pref_settings);
-		
+
 		// Retrieve all torrent sites and build a preference object for them
 		int publicCounter = 101;
 		int privateCounter = 201;
@@ -51,10 +56,10 @@ public class SettingsActivity extends PreferenceActivity {
 		for (TorrentSite torrentSite : sites) {
 			if (torrentSite.getAdapter().isPrivateSite())
 				privateGroup.addPreference(new PrivateSitePreference(this, privateCounter++, torrentSite));
-			else 
+			else
 				publicGroup.addPreference(new PublicSitePreference(this, publicCounter++, torrentSite));
 		}
 
 	}
-	
+
 }
