@@ -18,6 +18,7 @@
  */
 package org.transdroid.search.RssFeedSearch;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import org.ifies.android.sax.Item;
@@ -47,7 +48,12 @@ public class KickassTorrentsAdapter extends RssFeedSearchAdapter {
 
 	@Override
 	protected String getUrl(String query, SortOrder order) {
-		return "http://kickass.to/search/" + URLEncoder.encode(query) + "/?rss=1" + (order == SortOrder.BySeeders? "&field=seeders&sorder=desc": "");
+		try {
+			return "http://kickass.to/search/" + URLEncoder.encode(query, "UTF-8") + "/?rss=1" + (order == SortOrder.BySeeders? "&field=seeders&sorder=desc": "");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	@Override
@@ -106,6 +112,11 @@ public class KickassTorrentsAdapter extends RssFeedSearchAdapter {
 	@Override
 	public String getSiteName() {
 		return "KickAssTorrents";
+	}
+
+	@Override
+	public boolean isPrivateSite() {
+		return false;
 	}
 	
 }

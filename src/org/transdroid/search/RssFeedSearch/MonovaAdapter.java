@@ -18,6 +18,7 @@
  */
 package org.transdroid.search.RssFeedSearch;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import org.ifies.android.sax.Item;
@@ -71,12 +72,22 @@ public class MonovaAdapter extends RssFeedSearchAdapter {
 
 	@Override
 	protected String getUrl(String query, SortOrder order) {
-		return "http://www.monova.org/rss.php?type=search&term=" + URLEncoder.encode(query) + (order == SortOrder.BySeeders? "&order=seeds": "");
+		try {
+			return "http://www.monova.org/rss.php?type=search&term=" + URLEncoder.encode(query, "UTF-8") + (order == SortOrder.BySeeders? "&order=seeds": "");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	@Override
 	public String getSiteName() {
 		return "Monova";
+	}
+
+	@Override
+	public boolean isPrivateSite() {
+		return false;
 	}
 	
 }

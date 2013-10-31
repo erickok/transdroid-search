@@ -18,6 +18,7 @@
  */
 package org.transdroid.search.RssFeedSearch;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import org.ifies.android.sax.Item;
@@ -50,7 +51,12 @@ public class TorrentDownloadsAdapter extends RssFeedSearchAdapter {
 	@Override
 	protected String getUrl(String query, SortOrder order) {
 		// Note: doesn't support different list sortings
-		return "http://www.torrentdownloads.net/rss.xml?type=search&search=" + URLEncoder.encode(query);
+		try {
+			return "http://www.torrentdownloads.net/rss.xml?type=search&search=" + URLEncoder.encode(query, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	@Override
@@ -103,6 +109,11 @@ public class TorrentDownloadsAdapter extends RssFeedSearchAdapter {
 	@Override
 	public String getSiteName() {
 		return "Torrent Downloads";
+	}
+
+	@Override
+	public boolean isPrivateSite() {
+		return false;
 	}
 	
 }

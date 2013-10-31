@@ -136,7 +136,7 @@ public enum TorrentSite {
 	/**
 	 * Returns the TorrentSite corresponding to the Enum type name it 
 	 * has, e.g. <code>TorrentSite.fromCode("Mininova")</code> returns 
-	 * the <code>TorrentSite.Isohunt</code> enumeration value
+	 * the <code>TorrentSite.Mininova</code> enumeration value
 	 * @param siteCode The name of the enum type value
 	 * @return The corresponding enum type value of a torrent site
 	 */

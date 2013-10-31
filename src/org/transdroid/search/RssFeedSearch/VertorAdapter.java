@@ -18,6 +18,7 @@
  */
 package org.transdroid.search.RssFeedSearch;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import org.ifies.android.sax.Item;
@@ -58,12 +59,22 @@ public class VertorAdapter extends RssFeedSearchAdapter {
 
 	@Override
 	protected String getUrl(String query, SortOrder order) {
-		return "http://www.vertor.com/index.php?mod=rss_search&words=" + URLEncoder.encode(query) + "&search=1" + (order == SortOrder.BySeeders? "&orderby=a.seeds": "");
+		try {
+			return "http://www.vertor.com/index.php?mod=rss_search&words=" + URLEncoder.encode(query, "UTF-8") + "&search=1" + (order == SortOrder.BySeeders? "&orderby=a.seeds": "");
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	@Override
 	public String getSiteName() {
 		return "Vertor";
+	}
+
+	@Override
+	public boolean isPrivateSite() {
+		return false;
 	}
 	
 }

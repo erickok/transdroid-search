@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+
+    <PreferenceCategory
+        android:key="header_publicsites"
+        android:order="100"
+        android:title="@string/pref_publicsites" >
+    </PreferenceCategory>
+    
+    <PreferenceCategory
+        android:key="header_privatesites"
+        android:order="200"
+        android:title="@string/pref_privatesites" >
+    </PreferenceCategory>
+    
+</PreferenceScreen>

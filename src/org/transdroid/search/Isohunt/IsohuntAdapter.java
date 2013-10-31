@@ -148,4 +148,9 @@ public class IsohuntAdapter implements ISearchAdapter {
 		return "isoHunt";
 	}
 	
+	@Override
+	public boolean isPrivateSite() {
+		return false;
+	}
+
 }

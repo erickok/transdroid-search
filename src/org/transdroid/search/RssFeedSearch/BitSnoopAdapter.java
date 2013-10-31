@@ -18,6 +18,7 @@
  */
 package org.transdroid.search.RssFeedSearch;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -55,8 +56,12 @@ public class BitSnoopAdapter extends RssFeedSearchAdapter {
 
 	@Override
 	protected String getUrl(String query, SortOrder order) {
-		return "http://bitsnoop.com/search/all/" + URLEncoder.encode(query)
-				+ "/c/d/1/?fmt=rss";
+		try {
+			return "http://bitsnoop.com/search/all/" + URLEncoder.encode(query, "UTF-8") + "/c/d/1/?fmt=rss";
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	@Override
@@ -113,4 +118,9 @@ public class BitSnoopAdapter extends RssFeedSearchAdapter {
 
 	}
 
+	@Override
+	public boolean isPrivateSite() {
+		return false;
+	}
+	
 }

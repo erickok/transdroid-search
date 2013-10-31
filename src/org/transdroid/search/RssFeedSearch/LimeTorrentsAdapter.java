@@ -18,6 +18,7 @@
  */
 package org.transdroid.search.RssFeedSearch;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import org.ifies.android.sax.Item;
@@ -49,7 +50,12 @@ public class LimeTorrentsAdapter extends RssFeedSearchAdapter {
 
 	@Override
 	protected String getUrl(String query, SortOrder order) {
-		return "http://www.limetorrents.com/searchrss/" + URLEncoder.encode(query) + "/";
+		try {
+			return "http://www.limetorrents.com/searchrss/" + URLEncoder.encode(query, "UTF-8") + "/";
+		} catch (UnsupportedEncodingException e) {
+			e.printStackTrace();
+			return null;
+		}
 	}
 
 	@Override
@@ -110,6 +116,11 @@ public class LimeTorrentsAdapter extends RssFeedSearchAdapter {
 	@Override
 	public String getSiteName() {
 		return "LimeTorrents";
+	}
+
+	@Override
+	public boolean isPrivateSite() {
+		return false;
 	}
 	
 }

@@ -46,7 +46,16 @@
 			android:authorities="org.transdroid.search.torrentsearchprovider"
 			android:exported="true"
 			tools:ignore="ExportedContentProvider" />
-	
-	</application>
+		
+		<activity
+			android:name="org.transdroid.search.gui.SettingsActivity"
+			android:label="@string/pref_settingslabel">
+			<intent-filter>
+				<action android:name="android.intent.action.MAIN" />
+				<category android:name="android.intent.category.LAUNCHER" />
+			</intent-filter>
+		</activity>
+		
+</application>
 
 </manifest> 

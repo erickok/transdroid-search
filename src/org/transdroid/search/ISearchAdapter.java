@@ -21,15 +21,15 @@ package org.transdroid.search;
 import java.util.List;
 
 /**
- * Interface with the required methods for a search adapter that
- * synchronously gets torrent search results from some website.
- * 
+ * Interface with the required methods for a search adapter that synchronously gets torrent search results from some
+ * website.
  * @author Eric Kok
  */
 public interface ISearchAdapter {
 
 	/**
-	 * Implementing search providers should synchronously perform the search for torrents matching the given query string.
+	 * Implementing search providers should synchronously perform the search for torrents matching the given query
+	 * string.
 	 * @param query The raw (non-urlencoded) query to search for
 	 * @param order The preferred order in which results are sorted
 	 * @param maxResults Maximum number of results to return
@@ -51,5 +51,12 @@ public interface ISearchAdapter {
 	 * @return The name of the torrent site
 	 */
 	public String getSiteName();
-	
+
+	/**
+	 * Implementing search providers should return whether this is a private site, that is, whether this site requires
+	 * user credentials before it can be searched.
+	 * @return True if this is an adapter to a private site, false otherwise.
+	 */
+	public boolean isPrivateSite();
+
 }

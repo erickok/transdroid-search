@@ -18,6 +18,8 @@
  */
 package org.transdroid.search;
 
+import org.transdroid.search.gui.SettingsHelper;
+
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -35,7 +37,7 @@ public class TorrentSitesProvider extends ContentProvider {
 
 	public static final String PROVIDER_NAME = "org.transdroid.search.torrentsitesprovider";
 
-	/** The content URI to use. Useful if the application have access to this class. Otherwise it must build the URI like<br/>
+	/** The content URI to use. Useful if the application has access to this class. Otherwise it must build the URI like<br/>
 	   <code>Uri uri = Uri.parse("content://org.transdroid.search.torrentsitesprovider/sites");</code><br/>
 	   And within an activity then call:<br/>
 	   <code>Cursor cur = managedQuery(uri, null, null, null, null);</code>
@@ -84,22 +86,29 @@ public class TorrentSitesProvider extends ContentProvider {
 	@Override
 	public Cursor query(Uri uriP, String[] projectionP, String selectionP, String[] selectionArgsP, String sortOrderP) {
 
-		Log.d(TorrentSitesProvider.class.toString(), "List all sites");
+		Log.d(TorrentSitesProvider.class.toString(), "List all enabled sites");
 		
 		// The available columns; note that an _ID is a ContentProvider-requirement
 		String[] columnNames = new String[] { "_ID", "CODE", "NAME", "RSSURL" };
 		MatrixCursor curs = new MatrixCursor(columnNames);
 
 		TorrentSite[] sites = TorrentSite.values();
-		// Return the results as MatrixCursor
+		
+		// Return the enabled results as MatrixCursor
 		int id = 0;
 		for (TorrentSite site : sites) {
+			
+			// Don't include this site if the user disabled it (or it is private and no credentials are specified)
+			if (!SettingsHelper.isSiteEnabled(getContext(), site))
+				continue;
+			
 			Object[] values = new Object[4];
 			values[0] = id++;
 			values[1] = site.toString();
 			values[2] = site.getAdapter().getSiteName();
 			values[3] = site.getAdapter().buildRssFeedUrlFromSearch("%s", SortOrder.BySeeders);
 			curs.addRow(values);
+			
 		}
 
 		// Register to watch a content URI for changes (don't really know what it means ?)
