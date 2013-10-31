@@ -23,6 +23,7 @@ import org.transdroid.search.TorrentSite;
 
 import android.os.Bundle;
 import android.preference.PreferenceActivity;
+import android.preference.PreferenceCategory;
 
 public class SettingsActivity extends PreferenceActivity {
 
@@ -45,11 +46,13 @@ public class SettingsActivity extends PreferenceActivity {
 		int publicCounter = 101;
 		int privateCounter = 201;
 		TorrentSite[] sites = TorrentSite.values();
+		PreferenceCategory publicGroup = (PreferenceCategory) findPreference("header_publicsites");
+		PreferenceCategory privateGroup = (PreferenceCategory) findPreference("header_privatesites");
 		for (TorrentSite torrentSite : sites) {
 			if (torrentSite.getAdapter().isPrivateSite())
-				getPreferenceScreen().addPreference(new PrivateSitePreference(this, privateCounter++, torrentSite));
+				privateGroup.addPreference(new PrivateSitePreference(this, privateCounter++, torrentSite));
 			else 
-				getPreferenceScreen().addPreference(new PrivateSitePreference(this, publicCounter++, torrentSite));
+				publicGroup.addPreference(new PublicSitePreference(this, publicCounter++, torrentSite));
 		}
 
 	}

@@ -39,6 +39,8 @@ import org.transdroid.search.SearchResult;
 import org.transdroid.search.SortOrder;
 import org.transdroid.util.HttpHelper;
 
+import android.content.Context;
+
 /**
  * An adapter that provides access to The Pirate Bay torrent searches by parsing
  * the raw HTML output.
@@ -53,7 +55,7 @@ public class ThePirateBayAdapter implements ISearchAdapter {
 	private static final int CONNECTION_TIMEOUT = 20000;
 
 	@Override
-	public List<SearchResult> search(String query, SortOrder order, int maxResults) throws Exception {
+	public List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception {
 		
 		if (query == null) {
 			return null;

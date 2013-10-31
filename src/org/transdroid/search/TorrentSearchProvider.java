@@ -146,7 +146,7 @@ public class TorrentSearchProvider extends ContentProvider {
 
 			// Perform the actual search
 			try {
-				List<SearchResult> results = site.search(term, order, maxResults);
+				List<SearchResult> results = site.search(getContext(), term, order, maxResults);
 				// Return the results as MatrixCursor
 				int id = 0;
 				for (SearchResult result : results) {

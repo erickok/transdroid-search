@@ -21,6 +21,7 @@ package org.transdroid.search;
 import java.util.List;
 
 import org.transdroid.search.Fenopy.FenopyAdapter;
+import org.transdroid.search.IpTorrents.IpTorrentsAdapter;
 import org.transdroid.search.Isohunt.IsohuntAdapter;
 import org.transdroid.search.RssFeedSearch.BitSnoopAdapter;
 import org.transdroid.search.RssFeedSearch.ExtraTorrentAdapter;
@@ -33,6 +34,8 @@ import org.transdroid.search.RssFeedSearch.TorrentReactorAdapter;
 import org.transdroid.search.RssFeedSearch.VertorAdapter;
 import org.transdroid.search.ThePirateBay.ThePirateBayAdapter;
 import org.transdroid.search.ThePirateBay.ThePirateBayMirrorAdapter;
+
+import android.content.Context;
 
 /**
  * Provides factory-like access to all the torrent site search adapters.
@@ -62,6 +65,12 @@ public enum TorrentSite {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new IsohuntAdapter();
+		}
+	},
+	IpTorrents {
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new IpTorrentsAdapter();
 		}
 	},
 	KickassTorents {
@@ -127,8 +136,8 @@ public enum TorrentSite {
 	 * @return The list of found torrents on the site matching the search query
 	 * @throws Exception When an exception occurred during the loading or parsing of the search results
 	 */
-	public List<SearchResult> search(String query, SortOrder order, int maxResults) throws Exception {
-		return getAdapter().search(query, order, maxResults);
+	public List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception {
+		return getAdapter().search(context, query, order, maxResults);
 	}
 
 	public abstract ISearchAdapter getAdapter();

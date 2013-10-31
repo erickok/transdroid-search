@@ -38,6 +38,8 @@ import org.transdroid.search.SearchResult;
 import org.transdroid.search.SortOrder;
 import org.transdroid.util.HttpHelper;
 
+import android.content.Context;
+
 /**
  * An adapter that provides easy access to isoHunt torrent searches. Communication
  * is handled via the isoHunt JSON REST API.
@@ -63,7 +65,7 @@ public class IsohuntAdapter implements ISearchAdapter {
 	private static final String RPC_ITEM_PUBDATE = "pubDate";
 
 	@Override
-	public List<SearchResult> search(String query, SortOrder order, int maxResults) throws Exception {
+	public List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception {
 		
 		if (query == null) {
 			return null;

@@ -4,7 +4,7 @@
     <string name="app_description">Cross-application torrent search provider</string>
     
     <string name="pref_settingslabel">Torrent Search Settings</string>
-    <string name="pref_publicsites">Public sties</string>
+    <string name="pref_publicsites">Public sites</string>
     <string name="pref_privatesites">Private sites</string>
 
 </resources>

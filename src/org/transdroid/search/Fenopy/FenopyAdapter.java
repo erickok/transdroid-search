@@ -38,6 +38,8 @@ import org.transdroid.search.SortOrder;
 import org.transdroid.util.FileSizeConverter;
 import org.transdroid.util.HttpHelper;
 
+import android.content.Context;
+
 /**
  * An adapter that provides easy access to Fenopy torrent searches. Communication is handled via the Fenopy JSON REST
  * API.
@@ -51,7 +53,7 @@ public class FenopyAdapter implements ISearchAdapter {
 	private static final int CONNECTION_TIMEOUT = 5000;
 
 	@Override
-	public List<SearchResult> search(String query, SortOrder order, int maxResults) throws Exception {
+	public List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception {
 
 		if (query == null) {
 			return null;
