@@ -18,6 +18,7 @@
  */
 package org.transdroid.search.RssFeedSearch;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import org.ifies.android.sax.Item;
@@ -47,7 +48,11 @@ public class KickassTorrentsAdapter extends RssFeedSearchAdapter {
 
 	@Override
 	protected String getUrl(String query, SortOrder order) {
-		return "http://kickass.to/search/" + URLEncoder.encode(query) + "/?rss=1" + (order == SortOrder.BySeeders? "&field=seeders&sorder=desc": "");
+		try {
+			return "http://kickass.to/search/" + URLEncoder.encode(query, "UTF-8").replace("+", "%20") + "/?rss=1" + (order == SortOrder.BySeeders? "&field=seeders&sorder=desc": "");
+		} catch (UnsupportedEncodingException e) {
+			throw new AssertionError("UTF-8 not supported");
+		}
 	}
 
 	@Override
