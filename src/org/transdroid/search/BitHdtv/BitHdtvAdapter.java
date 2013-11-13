@@ -16,15 +16,19 @@
  *	You should have received a copy of the GNU Lesser General Public 
  *	License along with Transdroid.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.transdroid.search.IpTorrents;
+package org.transdroid.search.BitHdtv;
 
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.InvalidParameterException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -46,23 +50,24 @@ import org.transdroid.util.HttpHelper;
 import android.content.Context;
 
 /**
- * An adapter that provides access to IPTorrents searches by parsing the raw HTML output.
+ * An adapter that provides access to BitHDTV searches by parsing the raw HTML output.
  */
-public class IpTorrentsAdapter implements ISearchAdapter {
+public class BitHdtvAdapter implements ISearchAdapter {
 
 	private static final String LOGIN_USER = "username";
 	private static final String LOGIN_PASS = "password";
-	private static final String LOGINURL = "http://www.iptorrents.com/torrents/";
-	private static final String QUERYURL = "http://www.iptorrents.com/torrents/?q=%1$s%2$s";
+	private static final String LOGINURL = "http://www.bit-hdtv.com/takelogin.php";
+	private static final String QUERYURL = "http://www.bit-hdtv.com/torrents.php?search=%1$s&cat=0%2$s";
 	private static final String SORT_COMPOSITE = "";
-	private static final String SORT_SEEDS = ";o=seeders";
+	private static final String SORT_SEEDS = "&sort=7&type=desc";
 	private static final int CONNECTION_TIMEOUT = 8000;
+	private final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 
 	@Override
 	public List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception {
 
-		String username = SettingsHelper.getSiteUser(context, TorrentSite.IpTorrents);
-		String password = SettingsHelper.getSitePass(context, TorrentSite.IpTorrents);
+		String username = SettingsHelper.getSiteUser(context, TorrentSite.BitHdtv);
+		String password = SettingsHelper.getSitePass(context, TorrentSite.BitHdtv);
 		if (username == null || password == null) {
 			throw new InvalidParameterException(
 					"No username or password was provided, while this is required for this private site.");
@@ -94,7 +99,7 @@ public class IpTorrentsAdapter implements ISearchAdapter {
 		HttpResponse loginResult = httpclient.execute(loginPost);
 		if (loginResult.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
 			// Failed to sign in
-			throw new Exception("Login failure for IPTorrents with user " + username);
+			throw new Exception("Login failure for BIT-HDTV with user " + username);
 		}
 
 		// Make request
@@ -114,15 +119,15 @@ public class IpTorrentsAdapter implements ISearchAdapter {
 		try {
 
 			// Texts to find subsequently
-			final String RESULTS = "<table class=torrents align=center border=1>";
-			final String NOTORRENTS = "No Torrents Found";
-			final String TORRENT = "<td class=ac style=\"padding: 0\"><a href=\"";
+			final String NOMATCH = "No match!";
+			final String RESULTS = "<!-- uj rendezes kezdodik -->";
+			final String TORRENT = "<td class=detail align=center><p><a href='";
 
 			// Parse the search results from HTML by looking for the identifying texts
 			List<SearchResult> results = new ArrayList<SearchResult>();
+			if (html.indexOf(NOMATCH) >= 0)
+				return results; // Success, but no result for this query
 			int resultsStart = html.indexOf(RESULTS) + RESULTS.length();
-			if (html.indexOf(NOTORRENTS) >= 0)
-				return results; // Success, but results for this query
 
 			int torStart = html.indexOf(TORRENT, resultsStart);
 			while (torStart >= 0 && results.size() < maxResults) {
@@ -146,64 +151,73 @@ public class IpTorrentsAdapter implements ISearchAdapter {
 	private SearchResult parseHtmlItem(String htmlItem) {
 
 		// Texts to find subsequently
-		final String DETAILS = "<a class=\"t_title\" href=\"";
+		final String LINK_END = "'><img src=/pic/dwnld.gif";
+		final String NAME = "<a title=\"";
+		final String NAME_END = "\" href=\"";
+		final String DETAILS = "\" href=\"/";
 		final String DETAILS_END = "\">";
-		final String NAME_END = "</a>";
-		final String LINK = "Bookmark it!\"></a></td><td class=ac><a href=\"";
-		final String LINK_END = "\">";
-		final String COMMENTS = "#startcomments\">";
-		final String SIZE = "</a></td><td class=ac>";
+		final String DATE = "<td class=detail align=center>";
+		final String DATE_END = "</td>";
+		final String SIZE = "<td class=detail align=center>";
 		final String SIZE_END = "</td>";
-		final String SEEDERS = "ac t_seeders\">";
-		final String SEEDERS_END = "</td>";
-		final String LEECHERS = "ac t_leechers\">";
-		final String LEECHERS_END = "</td>";
-		String prefix = "http://www.iptorrents.com";
+		final String SEEDERS = "#seeders\">";
+		final String SEEDERS_END = "</a>";
+		final String LEECHERS = "#leechers\">";
+		final String LEECHERS_END = "</a>";
+		String prefix = "http://www.bit-hdtv.com/";
 
-		int detailsStart = htmlItem.indexOf(DETAILS) + DETAILS.length();
+		// Link starts right at the beginning of an item
+		String link = htmlItem.substring(0, htmlItem.indexOf(LINK_END));
+
+		int nameStart = htmlItem.indexOf(NAME, 0) + NAME.length();
+		String name = htmlItem.substring(nameStart, htmlItem.indexOf(NAME_END, nameStart));
+
+		int detailsStart = htmlItem.indexOf(DETAILS, nameStart) + DETAILS.length();
 		String details = htmlItem.substring(detailsStart, htmlItem.indexOf(DETAILS_END, detailsStart));
 		details = prefix + details;
 
-		// Name starts right after the link of an item
-		int nameStart = htmlItem.indexOf(DETAILS_END, detailsStart) + DETAILS_END.length();
-		String name = htmlItem.substring(nameStart, htmlItem.indexOf(NAME_END, nameStart));
+		int dateStart = htmlItem.indexOf(DATE, detailsStart) + DATE.length();
+		String dateText = htmlItem.substring(dateStart, htmlItem.indexOf(DATE_END, dateStart));
+		Date date = null;
+		try {
+			date = df.parse(dateText);
+		} catch (ParseException e) {
+			// Not parsable; just leave it at null
+		}
 
-		int linkStart = htmlItem.indexOf(LINK, nameStart) + LINK.length();
-		String link = htmlItem.substring(linkStart, htmlItem.indexOf(LINK_END, linkStart));
-		link = prefix + link;
-		
-		int commentsStart = htmlItem.indexOf(COMMENTS, linkStart) + COMMENTS.length();
-		
-		int sizeStart = htmlItem.indexOf(SIZE, commentsStart) + SIZE.length();
+		int sizeStart = htmlItem.indexOf(SIZE, dateStart) + SIZE.length();
 		String size = htmlItem.substring(sizeStart, htmlItem.indexOf(SIZE_END, sizeStart));
+		size = size.replace("<br>", "");
 
-		int seedersStart = htmlItem.indexOf(SEEDERS, sizeStart) + SEEDERS.length();
+		int seedersStart = htmlItem.indexOf(SEEDERS, dateStart);
 		int seeders = 0;
 		if (seedersStart >= 0) {
+			seedersStart +=  SEEDERS.length();
 			String seedersText = htmlItem.substring(seedersStart, htmlItem.indexOf(SEEDERS_END, seedersStart));
 			seeders = Integer.parseInt(seedersText);
 		}
 
-		int leechersStart = htmlItem.indexOf(LEECHERS, seedersStart) + LEECHERS.length();
+		int leechersStart = htmlItem.indexOf(LEECHERS, dateStart);
 		int leechers = 0;
 		if (leechersStart >= 0) {
+			leechersStart +=  LEECHERS.length();
 			String leechersText = htmlItem.substring(leechersStart, htmlItem.indexOf(LEECHERS_END, leechersStart));
 			leechers = Integer.parseInt(leechersText);
 		}
 
-		return new SearchResult(name, link, details, size, null, seeders, leechers);
+		return new SearchResult(name, link, details, size, date, seeders, leechers);
 
 	}
 
 	@Override
 	public String buildRssFeedUrlFromSearch(String query, SortOrder order) {
-		// IPTorrents doesn't support RSS feed-based searches
+		// BIT-HDTV doesn't support RSS feed-based searches
 		return null;
 	}
 
 	@Override
 	public String getSiteName() {
-		return "IPTorrents";
+		return "BIT-HDTV";
 	}
 
 	@Override

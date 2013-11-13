@@ -20,6 +20,7 @@ package org.transdroid.search;
 
 import java.util.List;
 
+import org.transdroid.search.BitHdtv.BitHdtvAdapter;
 import org.transdroid.search.Fenopy.FenopyAdapter;
 import org.transdroid.search.IpTorrents.IpTorrentsAdapter;
 import org.transdroid.search.Isohunt.IsohuntAdapter;
@@ -47,6 +48,12 @@ public enum TorrentSite {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new BitSnoopAdapter();
+		}
+	},
+	BitHdtv {
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new BitHdtvAdapter();
 		}
 	},
 	ExtraTorrent {
