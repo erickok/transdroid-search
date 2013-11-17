@@ -46,7 +46,7 @@ import org.transdroid.util.HttpHelper;
  */
 public class IsohuntAdapter implements ISearchAdapter {
 
-	private static final String RPC_QUERYURL = "http://isohunt.com/js/json.php?ihq=%s&start=%s&rows=%s";
+	private static final String RPC_QUERYURL = "http://isohunt.to/js/json.php?ihq=%s&start=%s&rows=%s";
 	private static final String RPC_SORT_COMPOSITE = ""; // Empty because it shouldn't append a sort string to the URL
 	private static final String RPC_SORT_SEEDS = "&sort=seeds"; // Will be appended to URL
 	private static final int CONNECTION_TIMEOUT = 10000;

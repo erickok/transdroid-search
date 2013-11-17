@@ -95,7 +95,7 @@ public class FenopyAdapter implements ISearchAdapter {
 
 	@Override
 	public String getSiteName() {
-		return "isoHunt";
+		return "Fenopy";
 	}
 
 }
