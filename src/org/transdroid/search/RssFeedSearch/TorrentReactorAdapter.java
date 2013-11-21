@@ -26,7 +26,9 @@ import org.transdroid.search.SearchResult;
 import org.transdroid.search.SortOrder;
 
 /**
- * Search adapter for the Torrentreactor.net torrent site (based on custom search RSS feeds)
+ * Search adapter for the Torrentreactor.net torrent site (based on custom search RSS feeds).
+ * 
+ * NOTE: Currently doesn't provides a direct .torrent link, so it is disabled.
  * 
  * @author Eric Kok
  */

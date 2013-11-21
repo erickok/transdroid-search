@@ -45,6 +45,8 @@ import android.content.Context;
  * An adapter that provides access to demonoid torrent searches by parsing
  * the raw HTML output.
  * 
+ * NOTE: Currently disabled since the site is on (permanent?) hiatus.
+ * 
  * @author Gabor Tanka
  */
 public class DemonoidAdapter implements ISearchAdapter {

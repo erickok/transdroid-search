@@ -31,7 +31,6 @@ import org.transdroid.search.RssFeedSearch.LimeTorrentsAdapter;
 import org.transdroid.search.RssFeedSearch.MininovaAdapter;
 import org.transdroid.search.RssFeedSearch.MonovaAdapter;
 import org.transdroid.search.RssFeedSearch.TorrentDownloadsAdapter;
-import org.transdroid.search.RssFeedSearch.TorrentReactorAdapter;
 import org.transdroid.search.RssFeedSearch.VertorAdapter;
 import org.transdroid.search.ThePirateBay.ThePirateBayAdapter;
 import org.transdroid.search.ThePirateBay.ThePirateBayMirrorAdapter;
@@ -120,12 +119,6 @@ public enum TorrentSite {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new TorrentDownloadsAdapter();
-		}
-	},
-	TorrentReactor {
-		@Override
-		public ISearchAdapter getAdapter() {
-			return new TorrentReactorAdapter();
 		}
 	},
 	Vertor {
