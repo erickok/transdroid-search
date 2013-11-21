@@ -35,13 +35,13 @@ import org.transdroid.util.FileSizeConverter;
 public class TorrentDownloadsAdapter extends RssFeedSearchAdapter {
 	
 	protected SearchResult fromRssItemToSearchResult(Item item) {
-		// Direct .torrent file download in style http://www.torrentdownloads.net/torrent/<id>/<title>
-		// Web links (as appearing in the RSS item) in style http://www.torrentdownloads.net/download/<id>/<title>
+		// Direct .torrent file download in style http://www.torrentdownloads.me/torrent/<id>/<title>
+		// Web links (as appearing in the RSS item) in style http://www.torrentdownloads.me/download/<id>/<title>
 		TorrentDownloadsItem theItem = (TorrentDownloadsItem) item;
 		return new SearchResult(
 				item.getTitle(), 
-				item.getLink().replace("/torrent/", "/download/"),
-				item.getLink(),
+				"http://www.torrentdownloads.me" + item.getLink().replace("/torrent/", "/download/"),
+				"http://www.torrentdownloads.me" + item.getLink(),
 				FileSizeConverter.getSize(theItem.getSize()),  
 				item.getPubdate(),
 				theItem.getSeeders(), 
@@ -52,7 +52,7 @@ public class TorrentDownloadsAdapter extends RssFeedSearchAdapter {
 	protected String getUrl(String query, SortOrder order) {
 		// Note: doesn't support different list sortings
 		try {
-			return "http://www.torrentdownloads.net/rss.xml?type=search&search=" + URLEncoder.encode(query, "UTF-8");
+			return "http://www.torrentdownloads.me/rss.xml?type=search&search=" + URLEncoder.encode(query, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 			return null;
