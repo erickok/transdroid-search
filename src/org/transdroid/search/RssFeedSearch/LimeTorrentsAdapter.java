@@ -18,6 +18,7 @@
  */
 package org.transdroid.search.RssFeedSearch;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import org.ifies.android.sax.Item;
@@ -48,8 +49,8 @@ public class LimeTorrentsAdapter extends RssFeedSearchAdapter {
 	}
 
 	@Override
-	protected String getUrl(String query, SortOrder order) {
-		return "http://www.limetorrents.com/searchrss/" + URLEncoder.encode(query) + "/";
+	protected String getUrl(String query, SortOrder order) throws UnsupportedEncodingException {
+		return "http://www.limetorrents.com/searchrss/" + URLEncoder.encode(query, "UTF-8") + "/";
 	}
 
 	@Override

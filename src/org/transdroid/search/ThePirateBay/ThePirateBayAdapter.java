@@ -24,6 +24,7 @@ import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -158,7 +159,7 @@ public class ThePirateBayAdapter implements ISearchAdapter {
 		final String LEECHERS = "<td align=\"right\">";
 		final String LEECHERS_END = "</td>";
 		String prefixDetails = "http://thepiratebay.org";
-		String prefixYear = (new Date().getYear() + 1900) + " "; // Date.getYear() gives the current year - 1900
+		String prefixYear = (Calendar.getInstance().get(Calendar.YEAR) + 1900) + " "; // Date.getYear() gives the current year - 1900
 		SimpleDateFormat df1 = new SimpleDateFormat("yyyy MM-dd HH:mm", Locale.US);
 		SimpleDateFormat df2 = new SimpleDateFormat("MM-dd yyyy", Locale.US);
 		

@@ -18,6 +18,8 @@
  */
 package org.transdroid.search;
 
+import java.io.UnsupportedEncodingException;
+
 import android.content.ContentProvider;
 import android.content.ContentValues;
 import android.database.Cursor;
@@ -98,7 +100,14 @@ public class TorrentSitesProvider extends ContentProvider {
 			values[0] = id++;
 			values[1] = site.toString();
 			values[2] = site.getAdapter().getSiteName();
-			values[3] = site.getAdapter().buildRssFeedUrlFromSearch("%s", SortOrder.BySeeders);
+			try {
+				values[3] = site.getAdapter().buildRssFeedUrlFromSearch("%s", SortOrder.BySeeders);
+			} catch (UnsupportedEncodingException e) {
+				/*
+				 * If there is a parsing problem set the rss value to null
+				 */
+				values[2] = null;
+			}
 			curs.addRow(values);
 		}
 

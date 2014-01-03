@@ -18,6 +18,7 @@
  */
 package org.transdroid.search.RssFeedSearch;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import org.ifies.android.sax.Item;
@@ -46,9 +47,9 @@ public class ExtraTorrentAdapter extends RssFeedSearchAdapter {
 	}
 
 	@Override
-	protected String getUrl(String query, SortOrder order) {
+	protected String getUrl(String query, SortOrder order) throws UnsupportedEncodingException {
 		// Note: doesn't support different list sortings
-		return "http://extratorrent.ws/rss.xml?type=search&search=" + URLEncoder.encode(query);
+		return "http://extratorrent.ws/rss.xml?type=search&search=" + URLEncoder.encode(query, "UTF-8");
 	}
 
 	@Override

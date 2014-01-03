@@ -18,6 +18,7 @@
  */
 package org.transdroid.search;
 
+import java.io.UnsupportedEncodingException;
 import java.util.List;
 
 /**
@@ -43,8 +44,9 @@ public interface ISearchAdapter {
 	 * @param query The raw (non-urlencoded) query for which the RSS feed should provide torrents
 	 * @param order The preferred order in which the RSS items are sorted
 	 * @return The RSS feed URL, or null if this is not supported by the site
+	 * @throws UnsupportedEncodingException When an exception occurred parsing the search results
 	 */
-	public String buildRssFeedUrlFromSearch(String query, SortOrder order);
+	public String buildRssFeedUrlFromSearch(String query, SortOrder order) throws UnsupportedEncodingException;
 
 	/**
 	 * Implementing search providers should return the real name of the site they work on.
