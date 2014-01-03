@@ -19,6 +19,7 @@
 package org.transdroid.search.Fenopy;
 
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
@@ -57,7 +58,7 @@ public class FenopyAdapter implements ISearchAdapter {
 		}
 
 		// Build search URL
-		String url = String.format(RPC_QUERYURL, URLEncoder.encode(query),
+		String url = String.format(RPC_QUERYURL, URLEncoder.encode(query, "UTF-8"),
 				order == SortOrder.BySeeders ? RPC_SORT_SEEDS : RPC_SORT_COMPOSITE, String.valueOf(maxResults));
 
 		// Setup HTTP client
@@ -89,8 +90,8 @@ public class FenopyAdapter implements ISearchAdapter {
 	}
 
 	@Override
-	public String buildRssFeedUrlFromSearch(String query, SortOrder order) {
-		return "http://fenopy.se/rss.xml?keyword=test" + URLEncoder.encode(query);
+	public String buildRssFeedUrlFromSearch(String query, SortOrder order) throws UnsupportedEncodingException {
+		return "http://fenopy.se/rss.xml?keyword=test" + URLEncoder.encode(query, "UTF-8");
 	}
 
 	@Override

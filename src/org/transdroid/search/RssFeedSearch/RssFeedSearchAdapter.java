@@ -18,6 +18,7 @@
  */
 package org.transdroid.search.RssFeedSearch;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -49,8 +50,9 @@ public abstract class RssFeedSearchAdapter implements ISearchAdapter {
 	 * @param query The plain search term the user gave
 	 * @param order 
 	 * @return The full URL of the custom search RSS feed
+	 * @throws UnsupportedEncodingException When an exception occurred parsing the search results
 	 */
-	protected abstract String getUrl(String query, SortOrder order);
+	protected abstract String getUrl(String query, SortOrder order) throws UnsupportedEncodingException;
 
 	/**
 	 * Returns the RSS parser to use. When not overriden the default parser will be
@@ -63,7 +65,7 @@ public abstract class RssFeedSearchAdapter implements ISearchAdapter {
 	}
 	
 	@Override
-	public String buildRssFeedUrlFromSearch(String query, SortOrder order) {
+	public String buildRssFeedUrlFromSearch(String query, SortOrder order) throws UnsupportedEncodingException {
 		return getUrl(query, order);
 	}
 

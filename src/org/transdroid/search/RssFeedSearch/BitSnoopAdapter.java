@@ -18,6 +18,7 @@
  */
 package org.transdroid.search.RssFeedSearch;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import org.apache.http.impl.client.DefaultHttpClient;
@@ -54,8 +55,8 @@ public class BitSnoopAdapter extends RssFeedSearchAdapter {
 	}
 
 	@Override
-	protected String getUrl(String query, SortOrder order) {
-		return "http://bitsnoop.com/search/all/" + URLEncoder.encode(query)
+	protected String getUrl(String query, SortOrder order) throws UnsupportedEncodingException {
+		return "http://bitsnoop.com/search/all/" + URLEncoder.encode(query, "UTF-8")
 				+ "/c/d/1/?fmt=rss";
 	}
 

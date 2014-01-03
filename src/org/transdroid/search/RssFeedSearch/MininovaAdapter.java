@@ -18,6 +18,7 @@
  */
 package org.transdroid.search.RssFeedSearch;
 
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
 import org.ifies.android.sax.Item;
@@ -45,8 +46,8 @@ public class MininovaAdapter extends RssFeedSearchAdapter {
 	}
 
 	@Override
-	protected String getUrl(String query, SortOrder order) {
-		return "http://www.mininova.org/rss/" + URLEncoder.encode(query) + (order == SortOrder.BySeeders? "/seeds": "");
+	protected String getUrl(String query, SortOrder order) throws UnsupportedEncodingException {
+		return "http://www.mininova.org/rss/" + URLEncoder.encode(query, "UTF-8") + (order == SortOrder.BySeeders? "/seeds": "");
 	}
 
 	@Override
