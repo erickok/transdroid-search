@@ -132,6 +132,19 @@ public class IsohuntAdapter implements ISearchAdapter {
 	}
 
 	@Override
+	public InputStream getTorrentFile(Context context, String url) throws Exception {
+
+		// Provide a simple file handle to the requested url
+		HttpParams httpparams = new BasicHttpParams();
+		HttpConnectionParams.setConnectionTimeout(httpparams, CONNECTION_TIMEOUT);
+		HttpConnectionParams.setSoTimeout(httpparams, CONNECTION_TIMEOUT);
+		DefaultHttpClient httpclient = new DefaultHttpClient(httpparams);
+		HttpResponse response = httpclient.execute(new HttpGet(url));
+		return response.getEntity().getContent();
+		
+	}
+	
+	@Override
 	public String buildRssFeedUrlFromSearch(String query, SortOrder order) {
 
 		// Build a search request parameters

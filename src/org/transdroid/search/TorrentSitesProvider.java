@@ -89,7 +89,7 @@ public class TorrentSitesProvider extends ContentProvider {
 		Log.d(TorrentSitesProvider.class.toString(), "List all enabled sites");
 		
 		// The available columns; note that an _ID is a ContentProvider-requirement
-		String[] columnNames = new String[] { "_ID", "CODE", "NAME", "RSSURL" };
+		String[] columnNames = new String[] { "_ID", "CODE", "NAME", "RSSURL", "ISPRIVATE" };
 		MatrixCursor curs = new MatrixCursor(columnNames);
 
 		TorrentSite[] sites = TorrentSite.values();
@@ -107,6 +107,7 @@ public class TorrentSitesProvider extends ContentProvider {
 			values[1] = site.toString();
 			values[2] = site.getAdapter().getSiteName();
 			values[3] = site.getAdapter().buildRssFeedUrlFromSearch("%s", SortOrder.BySeeders);
+			values[4] = (site.getAdapter().isPrivateSite()? 1: 0);
 			curs.addRow(values);
 			
 		}

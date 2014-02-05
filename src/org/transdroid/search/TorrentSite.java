@@ -18,6 +18,7 @@
  */
 package org.transdroid.search;
 
+import java.io.InputStream;
 import java.util.List;
 
 import org.transdroid.search.BitHdtv.BitHdtvAdapter;
@@ -39,7 +40,6 @@ import android.content.Context;
 
 /**
  * Provides factory-like access to all the torrent site search adapters.
- * 
  * @author Eric Kok
  */
 public enum TorrentSite {
@@ -130,6 +130,7 @@ public enum TorrentSite {
 
 	/**
 	 * Directly and synchronously perform the search for torrents matching the given query string.
+	 * @param context The Android activity/provider context from which the shared preferences can be accessed
 	 * @param query The raw (non-urlencoded) query to search for
 	 * @param order The preferred order in which results are sorted
 	 * @param maxResults Maximum number of results to return
@@ -140,12 +141,24 @@ public enum TorrentSite {
 		return getAdapter().search(context, query, order, maxResults);
 	}
 
+	/**
+	 * Synchronously set up a connection to download a specific torrent file and return an input stream to this.
+	 * Authentication and authorization is off-loaded to the implementing torrent site.
+	 * @param context The Android activity/provider context from which the shared preferences can be accessed
+	 * @param url The full url of the torrent file to download
+	 * @return An InputStream handle to the requested file so it can be further downloaded, or null if no connection is
+	 *         possible (like when the device is offline or when the user is not authorized)
+	 * @throws Exception When an exception occurred during the retrieval of the request url 
+	 */
+	public InputStream getTorrentFile(Context context, String url) throws Exception {
+		return getAdapter().getTorrentFile(context, url);
+	}
+
 	public abstract ISearchAdapter getAdapter();
 
 	/**
-	 * Returns the TorrentSite corresponding to the Enum type name it 
-	 * has, e.g. <code>TorrentSite.fromCode("Mininova")</code> returns 
-	 * the <code>TorrentSite.Mininova</code> enumeration value
+	 * Returns the TorrentSite corresponding to the Enum type name it has, e.g.
+	 * <code>TorrentSite.fromCode("Mininova")</code> returns the <code>TorrentSite.Mininova</code> enumeration value
 	 * @param siteCode The name of the enum type value
 	 * @return The corresponding enum type value of a torrent site
 	 */

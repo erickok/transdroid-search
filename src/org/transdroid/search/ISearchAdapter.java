@@ -18,6 +18,7 @@
  */
 package org.transdroid.search;
 
+import java.io.InputStream;
 import java.util.List;
 
 import android.content.Context;
@@ -61,5 +62,16 @@ public interface ISearchAdapter {
 	 * @return True if this is an adapter to a private site, false otherwise.
 	 */
 	public boolean isPrivateSite();
+
+	/**
+	 * Implement search providers should set up an HTTP request for the specified torrent file uri and, possibly after
+	 * setting authentication credentials, return a handle to the file content stream.
+	 * @param context The Android activity/provider context from which the shared preferences can be accessed
+	 * @param url The full url of the torrent file to download
+	 * @return An InputStream handle to the requested file so it can be further downloaded, or null if no connection is
+	 *         possible (like when the device is offline or when the user is not authorized)
+	 * @throws Exception When an exception occurred during the retrieval of the request url
+	 */
+	public InputStream getTorrentFile(Context context, String url) throws Exception;
 
 }

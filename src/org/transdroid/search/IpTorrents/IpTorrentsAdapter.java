@@ -58,8 +58,7 @@ public class IpTorrentsAdapter implements ISearchAdapter {
 	private static final String SORT_SEEDS = ";o=seeders";
 	private static final int CONNECTION_TIMEOUT = 8000;
 
-	@Override
-	public List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception {
+	private DefaultHttpClient prepareRequest(Context context) throws Exception {
 
 		String username = SettingsHelper.getSiteUser(context, TorrentSite.IpTorrents);
 		String password = SettingsHelper.getSitePass(context, TorrentSite.IpTorrents);
@@ -67,19 +66,6 @@ public class IpTorrentsAdapter implements ISearchAdapter {
 			throw new InvalidParameterException(
 					"No username or password was provided, while this is required for this private site.");
 		}
-
-		// Build a search request parameters
-		String encodedQuery = "";
-		try {
-			encodedQuery = URLEncoder.encode(query, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			throw e;
-		}
-
-		final String url = String.format(QUERYURL, encodedQuery, (order == SortOrder.BySeeders ? SORT_SEEDS
-				: SORT_COMPOSITE));
-
-		// Start synchronous search
 
 		// Setup request using GET
 		HttpParams httpparams = new BasicHttpParams();
@@ -96,6 +82,28 @@ public class IpTorrentsAdapter implements ISearchAdapter {
 			// Failed to sign in
 			throw new Exception("Login failure for IPTorrents with user " + username);
 		}
+		
+		return httpclient;
+
+	}
+	
+	@Override
+	public List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception {
+
+		DefaultHttpClient httpclient = prepareRequest(context);
+		
+		// Build a search request parameters
+		String encodedQuery = "";
+		try {
+			encodedQuery = URLEncoder.encode(query, "UTF-8");
+		} catch (UnsupportedEncodingException e) {
+			throw e;
+		}
+
+		final String url = String.format(QUERYURL, encodedQuery, (order == SortOrder.BySeeders ? SORT_SEEDS
+				: SORT_COMPOSITE));
+
+		// Start synchronous search
 
 		// Make request
 		HttpGet httpget = new HttpGet(url);
@@ -107,6 +115,16 @@ public class IpTorrentsAdapter implements ISearchAdapter {
 		instream.close();
 		return parseHtml(html, maxResults);
 
+	}
+
+	@Override
+	public InputStream getTorrentFile(Context context, String url) throws Exception {
+
+		// Provide an authenticated file handle to the requested url
+		DefaultHttpClient httpclient = prepareRequest(context);
+		HttpResponse response = httpclient.execute(new HttpGet(url));
+		return response.getEntity().getContent();
+		
 	}
 
 	protected List<SearchResult> parseHtml(String html, int maxResults) throws Exception {
