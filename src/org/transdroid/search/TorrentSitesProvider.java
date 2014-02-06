@@ -102,7 +102,7 @@ public class TorrentSitesProvider extends ContentProvider {
 			if (!SettingsHelper.isSiteEnabled(getContext(), site))
 				continue;
 			
-			Object[] values = new Object[4];
+			Object[] values = new Object[5];
 			values[0] = id++;
 			values[1] = site.toString();
 			values[2] = site.getAdapter().getSiteName();

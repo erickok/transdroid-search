@@ -23,8 +23,6 @@ import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.net.URLDecoder;
 import java.util.List;
 
 import android.content.ContentProvider;
@@ -155,7 +153,7 @@ public class TorrentSearchProvider extends ContentProvider {
 		}
 		if (sortOrderP != null) {
 			order = SortOrder.fromCode(sortOrderP);
-			if (site == null) {
+			if (order == null) {
 				throw new RuntimeException(sortOrderP + " is not a valid sort order. "
 						+ "Only BySeeders and Combined are supported.");
 			}
@@ -211,14 +209,8 @@ public class TorrentSearchProvider extends ContentProvider {
 	public ParcelFileDescriptor openFile(Uri uri, String mode) throws FileNotFoundException {
 		if (uriMatcher.match(uri) == ENCODED_TORRENTURL) {
 
-			// Get the torrent site and url to download from the Uri specifier
-			String encodedUrl = uri.getPathSegments().get(2);
-			String url = encodedUrl;
-			try {
-				url = URLDecoder.decode(encodedUrl, "UTF-8");
-			} catch (UnsupportedEncodingException e) {
-				// Ignore
-			}
+			// Get the torrent site and url to download from the Uri specifier (which is URL-decoded by the Uri class)
+			String url = uri.getPathSegments().get(2);
 			TorrentSite site = TorrentSite.fromCode(uri.getPathSegments().get(1));
 
 			// Download the requested file and store it locally

@@ -134,13 +134,13 @@ public class IpTorrentsAdapter implements ISearchAdapter {
 			// Texts to find subsequently
 			final String RESULTS = "<table class=torrents align=center border=1>";
 			final String NOTORRENTS = "No Torrents Found";
-			final String TORRENT = "<td class=ac style=\"padding: 0\"><a href=\"";
+			final String TORRENT = "class=ac style=\"padding: 0\"><a href=\"";
 
 			// Parse the search results from HTML by looking for the identifying texts
 			List<SearchResult> results = new ArrayList<SearchResult>();
 			int resultsStart = html.indexOf(RESULTS) + RESULTS.length();
 			if (html.indexOf(NOTORRENTS) >= 0)
-				return results; // Success, but results for this query
+				return results; // Success, but no results for this query
 
 			int torStart = html.indexOf(TORRENT, resultsStart);
 			while (torStart >= 0 && results.size() < maxResults) {
@@ -169,13 +169,13 @@ public class IpTorrentsAdapter implements ISearchAdapter {
 		final String NAME_END = "</a>";
 		final String LINK = "Bookmark it!\"></a></td><td class=ac><a href=\"";
 		final String LINK_END = "\">";
-		final String COMMENTS = "#startcomments\">";
+		final String COMMENTS = "#startcomments";
 		final String SIZE = "</a></td><td class=ac>";
 		final String SIZE_END = "</td>";
-		final String SEEDERS = "ac t_seeders\">";
-		final String SEEDERS_END = "</td>";
-		final String LEECHERS = "ac t_leechers\">";
-		final String LEECHERS_END = "</td>";
+		final String SEEDERS = "c_ratio\">";
+		final String SEEDERS_END = "</b>";
+		final String LEECHERS = "class=ac><b>";
+		final String LEECHERS_END = "</b>";
 		String prefix = "http://www.iptorrents.com";
 
 		int detailsStart = htmlItem.indexOf(DETAILS) + DETAILS.length();
