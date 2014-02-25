@@ -82,16 +82,16 @@ public class IpTorrentsAdapter implements ISearchAdapter {
 			// Failed to sign in
 			throw new Exception("Login failure for IPTorrents with user " + username);
 		}
-		
+
 		return httpclient;
 
 	}
-	
+
 	@Override
 	public List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception {
 
 		DefaultHttpClient httpclient = prepareRequest(context);
-		
+
 		// Build a search request parameters
 		String encodedQuery = "";
 		try {
@@ -124,7 +124,7 @@ public class IpTorrentsAdapter implements ISearchAdapter {
 		DefaultHttpClient httpclient = prepareRequest(context);
 		HttpResponse response = httpclient.execute(new HttpGet(url));
 		return response.getEntity().getContent();
-		
+
 	}
 
 	protected List<SearchResult> parseHtml(String html, int maxResults) throws Exception {
@@ -134,7 +134,7 @@ public class IpTorrentsAdapter implements ISearchAdapter {
 			// Texts to find subsequently
 			final String RESULTS = "<table class=torrents align=center border=1>";
 			final String NOTORRENTS = "No Torrents Found";
-			final String TORRENT = "class=ac style=\"padding: 0\"><a href=\"";
+			final String TORRENT = "<tr><td class=t_label>";
 
 			// Parse the search results from HTML by looking for the identifying texts
 			List<SearchResult> results = new ArrayList<SearchResult>();
@@ -172,10 +172,10 @@ public class IpTorrentsAdapter implements ISearchAdapter {
 		final String COMMENTS = "#startcomments";
 		final String SIZE = "</a></td><td class=ac>";
 		final String SIZE_END = "</td>";
-		final String SEEDERS = "c_ratio\">";
-		final String SEEDERS_END = "</b>";
-		final String LEECHERS = "class=ac><b>";
-		final String LEECHERS_END = "</b>";
+		final String SEEDERS = "t_seeders\">";
+		final String SEEDERS_END = "</td>";
+		final String LEECHERS = "t_leechers\">";
+		final String LEECHERS_END = "</td>";
 		String prefix = "http://www.iptorrents.com";
 
 		int detailsStart = htmlItem.indexOf(DETAILS) + DETAILS.length();
@@ -189,24 +189,32 @@ public class IpTorrentsAdapter implements ISearchAdapter {
 		int linkStart = htmlItem.indexOf(LINK, nameStart) + LINK.length();
 		String link = htmlItem.substring(linkStart, htmlItem.indexOf(LINK_END, linkStart));
 		link = prefix + link;
-		
+
 		int commentsStart = htmlItem.indexOf(COMMENTS, linkStart) + COMMENTS.length();
-		
+
 		int sizeStart = htmlItem.indexOf(SIZE, commentsStart) + SIZE.length();
 		String size = htmlItem.substring(sizeStart, htmlItem.indexOf(SIZE_END, sizeStart));
 
 		int seedersStart = htmlItem.indexOf(SEEDERS, sizeStart) + SEEDERS.length();
 		int seeders = 0;
 		if (seedersStart >= 0) {
-			String seedersText = htmlItem.substring(seedersStart, htmlItem.indexOf(SEEDERS_END, seedersStart));
-			seeders = Integer.parseInt(seedersText);
+			try {
+				String seedersText = htmlItem.substring(seedersStart, htmlItem.indexOf(SEEDERS_END, seedersStart));
+				seeders = Integer.parseInt(seedersText);
+			} catch (Exception e) {
+				// Number of seeders not found; ignore
+			}
 		}
 
 		int leechersStart = htmlItem.indexOf(LEECHERS, seedersStart) + LEECHERS.length();
 		int leechers = 0;
 		if (leechersStart >= 0) {
-			String leechersText = htmlItem.substring(leechersStart, htmlItem.indexOf(LEECHERS_END, leechersStart));
-			leechers = Integer.parseInt(leechersText);
+			try {
+				String leechersText = htmlItem.substring(leechersStart, htmlItem.indexOf(LEECHERS_END, leechersStart));
+				leechers = Integer.parseInt(leechersText);
+			} catch (Exception e) {
+				// Number of seeders not found; ignore
+			}
 		}
 
 		return new SearchResult(name, link, details, size, null, seeders, leechers);
