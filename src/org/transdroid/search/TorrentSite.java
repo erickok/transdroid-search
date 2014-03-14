@@ -21,6 +21,7 @@ package org.transdroid.search;
 import java.io.InputStream;
 import java.util.List;
 
+import org.transdroid.search.AsiaTorrents.AsiaTorrentsAdapter;
 import org.transdroid.search.BitHdtv.BitHdtvAdapter;
 import org.transdroid.search.Fenopy.FenopyAdapter;
 import org.transdroid.search.IpTorrents.IpTorrentsAdapter;
@@ -77,6 +78,12 @@ public enum TorrentSite {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new IpTorrentsAdapter();
+		}
+	},
+	AsiaTorrents {
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new AsiaTorrentsAdapter();
 		}
 	},
 	KickassTorents {
