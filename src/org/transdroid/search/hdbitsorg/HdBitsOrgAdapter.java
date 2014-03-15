@@ -18,19 +18,17 @@
  */
 package org.transdroid.search.hdbitsorg;
 
-import java.io.BufferedReader;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -50,6 +48,7 @@ import org.transdroid.search.gui.SettingsHelper;
 import org.transdroid.util.HttpHelper;
 
 import android.content.Context;
+import android.text.format.Time;
 import android.util.Log;
 
 /**
@@ -64,21 +63,26 @@ public class HdBitsOrgAdapter implements ISearchAdapter {
 	private static final String LOGIN_FORM_URL = "https://hdbits.org/login";
 	private static final String LOGIN_URL = "https://hdbits.org/login/doLogin";
 
-	// note java escaped quotes in regex string
-	private static final String TOKEN_REGEX = "<input[^>]*name=\"lol\"[^>]*value=\"([^\"]+)\"[^>]*>"; 
+	private static final String LOGIN_TOKEN_REGEX = "<input[^>]*name=\"lol\"[^>]*value=\"([^\"]+)\"[^>]*>"; 
+	// without escapes                               <input[^>]*name="lol"[^>]*value="([^"]+)"[^>]*>
 
-	private static final String POST_USERNAME = "uname";
-	private static final String POST_PASSWORD = "password";
-	private static final String POST_TOKEN = "lol";
+	private static final String LOGIN_POST_USERNAME = "uname";
+	private static final String LOGIN_POST_PASSWORD = "password";
+	private static final String LOGIN_POST_TOKEN = "lol";
+		
+	
+	private static final String SEARCH_URL = "http://hdbits.org/browse.php?search=%1$s";
+	private static final String SEARCH_SORT_BY_SEEDERS_SUFFIX = "&sort=seeders&d=DESC";
+	
+	private static final String SEARCH_REGEX = "<tr id='t[^']+'[^>]*>.*?href=\"/(details.php?[^\"]+)\"[^>]*?>([^<]*?)<.*?href=\"(download.php/[^\"]*?)\".*?<td[^>]*>(\\d*)\\W(day|month).*?<br />(\\d*)\\W*(day|hour).*?>([^<]*)<br>(GB|MB).*?toseeders=1\"><[^>]*>([^<]*).*?<td[^>]+.*?>(\\d+)"; 
+	// without escapes:                         <tr id='t[^']+'[^>]*>.*?href="/(details.php?[^"]+)"[^>]*?>([^<]*?)<.*?href="(download.php/[^"]*?)".*?<td[^>]*>(\d*)\W(day|month).*?<br />(\d*)\W*(day|hour).*?>([^<]*)<br>(GB|MB).*?toseeders=1"><[^>]*>([^<]*).*?<td[^>]+.*?>(\d+)
 
-	// bleh
-	private static final String QUERYURL = "http://www.iptorrents.com/torrents/?q=%1$s%2$s";
-	private static final String SORT_COMPOSITE = "";
-	private static final String SORT_SEEDS = ";o=seeders";
+	private static final String URL_PREFIX = "https://hdbits.org/";
+	
 	private static final int CONNECTION_TIMEOUT = 8000;
 
 	// =========================================================
-	// ISearchAdapter   rewrite all this
+	// ISearchAdapter
 	// =========================================================
 
 	@Override
@@ -92,31 +96,21 @@ public class HdBitsOrgAdapter implements ISearchAdapter {
 	}
 
 	@Override
-	public List<SearchResult> search(Context context, String query,
-			SortOrder order, int maxResults) throws Exception {
-		DefaultHttpClient httpclient = prepareRequest(context);
+	public List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception {
+		DefaultHttpClient client = prepareRequest(context);
 
-		// Build a search request parameters
-		String encodedQuery = "";
-		try {
-			encodedQuery = URLEncoder.encode(query, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			throw e;
-		}
+		// build search query
+		String encodedQuery = URLEncoder.encode(query, "UTF-8");
+		String url = String.format(SEARCH_URL, encodedQuery);
+		if (order == SortOrder.BySeeders) url += SEARCH_SORT_BY_SEEDERS_SUFFIX;
 
-		final String url = String.format(QUERYURL, encodedQuery,
-				(order == SortOrder.BySeeders ? SORT_SEEDS : SORT_COMPOSITE));
+		// make request
+		Log.d(LOG_TAG, "Executing search request from: " + url);
+		HttpGet request = new HttpGet(url);
+		HttpResponse response = client.execute(request);
 
-		// Start synchronous search
-
-		// Make request
-		HttpGet httpget = new HttpGet(url);
-		HttpResponse response = httpclient.execute(httpget);
-
-		// Read HTML response
-		InputStream instream = response.getEntity().getContent();
-		String html = HttpHelper.ConvertStreamToString(instream);
-		instream.close();
+		// parse HTML response into a list of torrents
+		String html = HttpHelper.ConvertStreamToString(response.getEntity().getContent());
 		return parseHtml(html, maxResults);
 
 	}
@@ -124,34 +118,29 @@ public class HdBitsOrgAdapter implements ISearchAdapter {
 	@Override
 	public String buildRssFeedUrlFromSearch(String query, SortOrder order) {
 		// no rss based search for hdbits. there is a live RSS feed for all
-		// torrents
-		// on the site but it does not provide search capability
+		// torrents on the site but it does not provide search capability
 		return null;
 	}
 
 	@Override
-	public InputStream getTorrentFile(Context context, String url)
-			throws Exception {
-
+	public InputStream getTorrentFile(Context context, String url) throws Exception {
 		// Provide an authenticated file handle to the requested url
-		DefaultHttpClient httpclient = prepareRequest(context);
-		HttpResponse response = httpclient.execute(new HttpGet(url));
+		DefaultHttpClient client = prepareRequest(context);
+		HttpResponse response = client.execute(new HttpGet(url));
 		return response.getEntity().getContent();
 
 	}
 
 	// =========================================================
-	// LOGIN LOGIC     done
+	// LOGIN LOGIC
 	// =========================================================
 
 	private DefaultHttpClient prepareRequest(Context context) throws Exception {
-		Log.i(LOG_TAG, "preparing login attempt");
+		Log.d(LOG_TAG, "Preparing login attempt.");
 
 		// retrieve stored login info
-		String username = SettingsHelper.getSiteUser(context,
-				TorrentSite.HdBitsOrg);
-		String password = SettingsHelper.getSitePass(context,
-				TorrentSite.HdBitsOrg);
+		String username = SettingsHelper.getSiteUser(context, TorrentSite.HdBitsOrg);
+		String password = SettingsHelper.getSitePass(context, TorrentSite.HdBitsOrg);
 
 		// verify we have login credentials. does this ever get hit?
 		if (username == null || password == null) {
@@ -170,7 +159,6 @@ public class HdBitsOrgAdapter implements ISearchAdapter {
 
 		// login to hdbits populating the HttpClient with the required cookies
 		login(client, username, password, token);
-		Log.i(LOG_TAG, "login success?");
 		return client;
 	}
 
@@ -178,7 +166,7 @@ public class HdBitsOrgAdapter implements ISearchAdapter {
 	 * Retrieves a hidden token from the hdbits.org login form.
 	 */
 	private String grabToken(DefaultHttpClient client) throws Exception {
-		Log.i(LOG_TAG, "attempting to grab token");
+		Log.d(LOG_TAG, "Retrieving login token.");
 
 		// grab html
 		HttpGet post = new HttpGet(LOGIN_FORM_URL);
@@ -188,16 +176,13 @@ public class HdBitsOrgAdapter implements ISearchAdapter {
 
 		// try to find the hidden parameter on the login form
 		String html = HttpHelper.ConvertStreamToString(response.getEntity().getContent());
-		Pattern tokenRegexParser = Pattern.compile(TOKEN_REGEX);
+		Pattern tokenRegexParser = Pattern.compile(LOGIN_TOKEN_REGEX);
 		Matcher match = tokenRegexParser.matcher(html);
 		boolean success = match.find();
-		if (!success)
-			throw new Exception(
-					"Unable to find hdbits.org login token. Has website HTML changed?");
+		if (!success) throw new Exception("Unable to find hdbits.org login token. Has website HTML changed?");
 
 		// success!
 		String token = match.group(1);
-		Log.i(LOG_TAG, "login token: " + token);
 		return match.group(1);
 	}
 
@@ -206,164 +191,102 @@ public class HdBitsOrgAdapter implements ISearchAdapter {
 	 * the given DefaultHttpClient should hold all required cookies to access
 	 * the site.
 	 */
-	private void login(DefaultHttpClient client, String username,
-			String password, String token) throws Exception {
-		Log.i(LOG_TAG, "attempting to login");
+	private void login(DefaultHttpClient client, String username, String password, String token) throws Exception {
+		Log.d(LOG_TAG, "Attempting to login.");
 
 		HttpPost request = new HttpPost(LOGIN_URL);
 		request.setEntity(new UrlEncodedFormEntity(Arrays
 				.asList(new BasicNameValuePair[] {
-						new BasicNameValuePair(POST_USERNAME, username),
-						new BasicNameValuePair(POST_PASSWORD, password),
-						new BasicNameValuePair(POST_TOKEN, token),
+						new BasicNameValuePair(LOGIN_POST_USERNAME, username),
+						new BasicNameValuePair(LOGIN_POST_PASSWORD, password),
+						new BasicNameValuePair(LOGIN_POST_TOKEN, token),
 						new BasicNameValuePair("returnto", "%2F") })));
 
 		HttpResponse response = client.execute(request);
 
-		Log.e(LOG_TAG, "login status: ");
-		for (Header line : response.getAllHeaders()) {
-			Log.i(LOG_TAG, line.toString());
+		// verify we have the cookies needed to log in
+		boolean success = false, uid = false, pass = false, hash = false;
+		for (Cookie cookie : client.getCookieStore().getCookies()) {
+			if ("uid".equals(cookie.getName())) uid = true;
+			if ("pass".equals(cookie.getName())) pass = true;
+			if ("hash".equals(cookie.getName())) hash = true;			
 		}
-
-		Log.e(LOG_TAG, "client cookies: ");
-		for (Cookie line : client.getCookieStore().getCookies()) {
-			Log.e(LOG_TAG, line.toString());
+		
+		// bail if we don't have the cookies we need. if hdbits.org used response codes properly we 
+		// could just check that rather than scan the cookies (which may change in the future!)
+		success = uid && pass && hash;
+		if (!success) {
+			Log.e(LOG_TAG, "Failed to log into hdbits.org as '" + username + "'. Did not receive expected login cookies!");
+			throw new Exception("Failed to log into hdbits.org as '" + username + "'. Did not receive expected login cookies!");
 		}
-
-		/*
-		 * // returns a 302 MOVED TEMPORARILY on success and a 200 OK with error
-		 * text on failure if (response.getStatusLine().getStatusCode() !=
-		 * HttpStatus.SC_MOVED_TEMPORARILY) { // login failure Log.e(LOG_TAG,
-		 * "login failure: "); for(Cookie line:
-		 * client.getCookieStore().getCookies()) { Log.e(LOG_TAG,
-		 * line.toString()); }
-		 * 
-		 * throw new Exception("Login failure for " + getSiteName() +
-		 * " with user " + username); }
-		 */
+		
+		Log.d(LOG_TAG, "Successfully logged in to hdbits.org.");
 	}
 
 	// =========================================================
 	// SEARCH LOGIC
 	// =========================================================
 
-	
-	
-	
-	
-	
-
-	// =========================================================
-	// OLD JUNK
-	// =========================================================
-
-	protected List<SearchResult> parseHtml(String html, int maxResults)
-			throws Exception {
-
-		try {
-
-			// Texts to find subsequently
-			final String RESULTS = "<table class=torrents align=center border=1>";
-			final String NOTORRENTS = "No Torrents Found";
-			final String TORRENT = "<tr><td class=t_label>";
-
-			// Parse the search results from HTML by looking for the identifying
-			// texts
-			List<SearchResult> results = new ArrayList<SearchResult>();
-			int resultsStart = html.indexOf(RESULTS) + RESULTS.length();
-			if (html.indexOf(NOTORRENTS) >= 0)
-				return results; // Success, but no results for this query
-
-			int torStart = html.indexOf(TORRENT, resultsStart);
-			while (torStart >= 0 && results.size() < maxResults) {
-				int nextTorrentIndex = html.indexOf(TORRENT,
-						torStart + TORRENT.length());
-				if (nextTorrentIndex >= 0) {
-					results.add(parseHtmlItem(html.substring(
-							torStart + TORRENT.length(), nextTorrentIndex)));
-				} else {
-					results.add(parseHtmlItem(html.substring(torStart
-							+ TORRENT.length())));
-				}
-				torStart = nextTorrentIndex;
+	protected List<SearchResult> parseHtml(String html, int maxResults) throws Exception {
+		Log.d(LOG_TAG, "Parsing search results.");		
+		
+		List<SearchResult> results = new ArrayList<SearchResult>();
+		int matchCount = 0;
+		int errorCount = 0;
+		
+		Pattern regex = Pattern.compile(SEARCH_REGEX, Pattern.DOTALL);
+		Matcher match = regex.matcher(html);
+		while (match.find()) {
+			matchCount++;
+			if (match.groupCount() != 11) {
+				errorCount++;
+				continue;
 			}
-			return results;
-
-		} catch (OutOfMemoryError e) {
-			throw new Exception(e);
-		} catch (Exception e) {
-			throw new Exception(e);
-		}
-	}
-
-	private SearchResult parseHtmlItem(String htmlItem) {
-
-		// Texts to find subsequently
-		final String DETAILS = "<a class=\"t_title\" href=\"";
-		final String DETAILS_END = "\">";
-		final String NAME_END = "</a>";
-		final String LINK = "Bookmark it!\"></a></td><td class=ac><a href=\"";
-		final String LINK_END = "\">";
-		final String COMMENTS = "#startcomments";
-		final String SIZE = "</a></td><td class=ac>";
-		final String SIZE_END = "</td>";
-		final String SEEDERS = "t_seeders\">";
-		final String SEEDERS_END = "</td>";
-		final String LEECHERS = "t_leechers\">";
-		final String LEECHERS_END = "</td>";
-		String prefix = "http://www.iptorrents.com";
-
-		int detailsStart = htmlItem.indexOf(DETAILS) + DETAILS.length();
-		String details = htmlItem.substring(detailsStart,
-				htmlItem.indexOf(DETAILS_END, detailsStart));
-		details = prefix + details;
-
-		// Name starts right after the link of an item
-		int nameStart = htmlItem.indexOf(DETAILS_END, detailsStart)
-				+ DETAILS_END.length();
-		String name = htmlItem.substring(nameStart,
-				htmlItem.indexOf(NAME_END, nameStart));
-
-		int linkStart = htmlItem.indexOf(LINK, nameStart) + LINK.length();
-		String link = htmlItem.substring(linkStart,
-				htmlItem.indexOf(LINK_END, linkStart));
-		link = prefix + link;
-
-		int commentsStart = htmlItem.indexOf(COMMENTS, linkStart)
-				+ COMMENTS.length();
-
-		int sizeStart = htmlItem.indexOf(SIZE, commentsStart) + SIZE.length();
-		String size = htmlItem.substring(sizeStart,
-				htmlItem.indexOf(SIZE_END, sizeStart));
-
-		int seedersStart = htmlItem.indexOf(SEEDERS, sizeStart)
-				+ SEEDERS.length();
-		int seeders = 0;
-		if (seedersStart >= 0) {
-			try {
-				String seedersText = htmlItem.substring(seedersStart,
-						htmlItem.indexOf(SEEDERS_END, seedersStart));
-				seeders = Integer.parseInt(seedersText);
-			} catch (Exception e) {
-				// Number of seeders not found; ignore
+			
+			String detailsUrl = URL_PREFIX + match.group(1);
+			String title      = match.group(2);
+			String torrentUrl = URL_PREFIX + match.group(3);
+			String size       = match.group(8) + match.group(9); // size + unit
+			int seeders       = Integer.parseInt(match.group(10));
+			int leechers      = Integer.parseInt(match.group(11));
+			
+			int time1         = Integer.parseInt(match.group(4));
+			String timeUnit1  = match.group(5);
+			int time2         = Integer.parseInt(match.group(6));
+			String timeUnit2  = match.group(7);
+			
+			Log.d(LOG_TAG, "" + time1 + timeUnit1 + " " + time2 + timeUnit2);
+			
+			// hdbits.org lists "added date" in a relative format (i.e. 8 months 7 days ago)
+			// we roughly calculate the number of MS elapsed then subtract that from "now"
+			// could be a day or two off depending on month lengths, it's just imprecise data
+			long elapsedTime = 0;
+			if (timeUnit1.startsWith("month")) {
+				elapsedTime += time1 * 1000L * 60L * 60L * 24L * 30L;
+				Log.d(LOG_TAG, "time1=month, elapsedTime=" + elapsedTime);
 			}
-		}
-
-		int leechersStart = htmlItem.indexOf(LEECHERS, seedersStart)
-				+ LEECHERS.length();
-		int leechers = 0;
-		if (leechersStart >= 0) {
-			try {
-				String leechersText = htmlItem.substring(leechersStart,
-						htmlItem.indexOf(LEECHERS_END, leechersStart));
-				leechers = Integer.parseInt(leechersText);
-			} catch (Exception e) {
-				// Number of seeders not found; ignore
+			if (timeUnit1.startsWith("day")) {
+				elapsedTime += time1 * 1000L * 60L * 60L * 24L;
+				Log.d(LOG_TAG, "time1=day, elapsedTime=" + elapsedTime);
 			}
+			if (timeUnit2.startsWith("day")) {
+				elapsedTime += time2 * 1000L * 60L * 60L * 24L;
+				Log.d(LOG_TAG, "time2=day, elapsedTime=" + elapsedTime);
+			}
+			if (timeUnit2.startsWith("hour")) {
+				elapsedTime += time2 * 1000L * 60L * 60L;
+				Log.d(LOG_TAG, "time2=hour, elapsedTime=" + elapsedTime);
+			}
+
+			Date addedDate = new Date();
+			addedDate.setTime(addedDate.getTime() - elapsedTime);
+
+			// build our search result
+			SearchResult torrent = new SearchResult(title, torrentUrl, detailsUrl, size, addedDate, seeders, leechers);
+			results.add(torrent);				
 		}
-
-		return new SearchResult(name, link, details, size, null, seeders,
-				leechers);
-
+		
+		Log.d(LOG_TAG, "Found " + matchCount + " matches and successfully parsed " + (matchCount - errorCount) + " of those matches.");
+		return results;
 	}
 }
