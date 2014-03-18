@@ -36,6 +36,7 @@ import org.transdroid.search.RssFeedSearch.TorrentDownloadsAdapter;
 import org.transdroid.search.RssFeedSearch.VertorAdapter;
 import org.transdroid.search.ThePirateBay.ThePirateBayAdapter;
 import org.transdroid.search.ThePirateBay.ThePirateBayMirrorAdapter;
+import org.transdroid.search.hdbitsorg.HdBitsOrgAdapter;
 
 import android.content.Context;
 
@@ -66,6 +67,12 @@ public enum TorrentSite {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new FenopyAdapter();
+		}
+	},
+	HdBitsOrg {
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new HdBitsOrgAdapter();
 		}
 	},
 	Isohunt {
