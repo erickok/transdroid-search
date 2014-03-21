@@ -30,6 +30,8 @@ import java.util.Date;
 import java.util.List;
 import java.util.Locale;
 
+import javax.security.auth.login.LoginException;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -65,8 +67,8 @@ public class BitHdtvAdapter implements ISearchAdapter {
 
 	private DefaultHttpClient prepareRequest(Context context) throws Exception {
 
-		String username = SettingsHelper.getSiteUser(context, TorrentSite.IpTorrents);
-		String password = SettingsHelper.getSitePass(context, TorrentSite.IpTorrents);
+		String username = SettingsHelper.getSiteUser(context, TorrentSite.BitHdtv);
+		String password = SettingsHelper.getSitePass(context, TorrentSite.BitHdtv);
 		if (username == null || password == null) {
 			throw new InvalidParameterException(
 					"No username or password was provided, while this is required for this private site.");
@@ -85,7 +87,7 @@ public class BitHdtvAdapter implements ISearchAdapter {
 		HttpResponse loginResult = httpclient.execute(loginPost);
 		if (loginResult.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
 			// Failed to sign in
-			throw new Exception("Login failure for IPTorrents with user " + username);
+			throw new LoginException("Login failure for BitHdTv with user " + username);
 		}
 		
 		return httpclient;

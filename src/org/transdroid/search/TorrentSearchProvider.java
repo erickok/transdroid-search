@@ -25,15 +25,21 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+import javax.security.auth.login.LoginException;
+
 import android.content.ContentProvider;
 import android.content.ContentResolver;
 import android.content.ContentValues;
+import android.content.Context;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
 import android.os.ParcelFileDescriptor;
 import android.util.Log;
+import android.widget.Toast;
 
 /**
  * Main entry point for Android applications that want to query for torrent search results.
@@ -180,6 +186,11 @@ public class TorrentSearchProvider extends ContentProvider {
 					values[7] = result.getLeechers();
 					cursor.addRow(values);
 				}
+			} catch (LoginException e) {
+	            // this toast really shouldn't be implemented here, but main app doesn't currently notify user
+	            // of a login failure, it simply says no search results.
+				backgroundToast(R.string.login_failure);
+				
 			} catch (Exception e) {
 				// Log the error and stack trace, but also throw an explicit run-time exception for clarity
 				Log.d(TorrentSearchProvider.class.getName(), e.toString());
@@ -187,7 +198,7 @@ public class TorrentSearchProvider extends ContentProvider {
 					Log.d(TorrentSearchProvider.class.getName(), stack.toString());
 				}
 				throw new RuntimeException(e.toString());
-			}
+			}			
 
 		}
 
@@ -259,5 +270,27 @@ public class TorrentSearchProvider extends ContentProvider {
 		}
 		throw new RuntimeException("Files can only be opened using the /get/*/* uri type.");
 	}
+	
+    // =========================================================
+    // UTILITY METHODS
+    // =========================================================
+    
+    private void backgroundToast(final int resourceId) {
+        new Thread() {
+            @Override public void run() {                                    
+            	final Context context = TorrentSearchProvider.this.getContext();
+            	
+            	Looper.prepare();
+                Handler handler = new Handler();
+                handler.post(new Runnable() {
+                    @Override public void run() {
+                        Toast.makeText(context, context.getString(resourceId), Toast.LENGTH_LONG).show();
+                    }
+                });                
+                Looper.loop();
+                Looper.myLooper().quit();
+            }
+        }.start();
+    }
 
 }

@@ -25,6 +25,8 @@ import java.security.InvalidParameterException;
 import java.text.*;
 import java.util.*;
 
+import javax.security.auth.login.LoginException;
+
 import org.apache.http.*;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
@@ -75,7 +77,7 @@ public class AsiaTorrentsAdapter implements ISearchAdapter {
 		HttpResponse loginResult = httpclient.execute(loginPost);
 		if (loginResult.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
 			// Failed to sign in
-			throw new Exception("Login failure for AsiaTorrents with user " + username);
+			throw new LoginException("Login failure for AsiaTorrents with user " + username);
 		}
 
 		return httpclient;
