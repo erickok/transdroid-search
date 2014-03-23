@@ -28,6 +28,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.security.auth.login.LoginException;
+
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -220,10 +222,8 @@ public class HdBitsOrgAdapter implements ISearchAdapter {
         // if we don't have the correct cookies, login failed. notify user with a toast and toss an exception.
         success = uid && pass && hash;
         if (!success) {
-            // this toast really shouldn't be implemented here, but main app doesn't currently notify user
-            // of a login failure, it simply says no search results.
-            backgroundToast(R.string.login_failure);
-            throw new Exception("Failed to log into hdbits.org as '" + username + "'. Did not receive expected login cookies!");            
+        	Log.e(LOG_TAG, "Failed to log into hdbits.org as '" + username + "'. Did not receive expected login cookies!");
+            throw new LoginException("Failed to log into hdbits.org as '" + username + "'. Did not receive expected login cookies!");            
         }
         
         Log.d(LOG_TAG, "Successfully logged in to hdbits.org.");
@@ -280,25 +280,5 @@ public class HdBitsOrgAdapter implements ISearchAdapter {
         
         Log.d(LOG_TAG, "Found " + matchCount + " matches and successfully parsed " + (matchCount - errorCount) + " of those matches.");
         return results;
-    }
-    
-    // =========================================================
-    // UTILITY METHODS
-    // =========================================================
-    
-    private void backgroundToast(final int resourceId) {
-        new Thread() {
-            @Override public void run() {                    
-                Looper.prepare();
-                Handler handler = new Handler();
-                handler.post(new Runnable() {
-                    @Override public void run() {
-                        Toast.makeText(context, context.getString(resourceId), Toast.LENGTH_LONG).show();
-                    }
-                });                
-                Looper.loop();
-                Looper.myLooper().quit();
-            }
-        }.start();
     }
 }
