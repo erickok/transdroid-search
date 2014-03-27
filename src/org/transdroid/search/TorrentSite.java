@@ -36,6 +36,7 @@ import org.transdroid.search.RssFeedSearch.TorrentDownloadsAdapter;
 import org.transdroid.search.RssFeedSearch.VertorAdapter;
 import org.transdroid.search.ThePirateBay.ThePirateBayAdapter;
 import org.transdroid.search.ThePirateBay.ThePirateBayMirrorAdapter;
+import org.transdroid.search.TvTorrents.TvTorrentsAdapter;
 import org.transdroid.search.hdbitsorg.HdBitsOrgAdapter;
 
 import android.content.Context;
@@ -45,6 +46,12 @@ import android.content.Context;
  * @author Eric Kok
  */
 public enum TorrentSite {
+	AsiaTorrents {
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new AsiaTorrentsAdapter();
+		}
+	},
 	BitSnoop {
 		@Override
 		public ISearchAdapter getAdapter() {
@@ -87,12 +94,6 @@ public enum TorrentSite {
 			return new IpTorrentsAdapter();
 		}
 	},
-	AsiaTorrents {
-		@Override
-		public ISearchAdapter getAdapter() {
-			return new AsiaTorrentsAdapter();
-		}
-	},
 	KickassTorents {
 		@Override
 		public ISearchAdapter getAdapter() {
@@ -133,6 +134,12 @@ public enum TorrentSite {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new TorrentDownloadsAdapter();
+		}
+	},
+	TvTorrents {
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new TvTorrentsAdapter();
 		}
 	},
 	Vertor {

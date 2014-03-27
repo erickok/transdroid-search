@@ -18,6 +18,8 @@
  */
 package org.transdroid.search.gui;
 
+import java.util.Locale;
+
 import org.transdroid.search.TorrentSite;
 
 import android.content.Context;
@@ -26,7 +28,6 @@ import android.preference.Preference;
 
 /**
  * Represents a public site in as preference activity list item and allow enabling/disabling the site.
- * 
  * @author Eric Kok
  */
 public class PublicSitePreference extends CheckBoxPreference {
@@ -42,7 +43,8 @@ public class PublicSitePreference extends CheckBoxPreference {
 	@Override
 	public int compareTo(Preference another) {
 		// Override default Preference comparison to compare forcefully on the torrent site name
-		return getTitle().toString().compareTo(another.getTitle().toString());
+		return getTitle().toString().toLowerCase(Locale.getDefault())
+				.compareTo(another.getTitle().toString().toLowerCase(Locale.getDefault()));
 	}
 
 }

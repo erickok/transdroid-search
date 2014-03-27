@@ -18,6 +18,8 @@
  */
 package org.transdroid.search.gui;
 
+import java.util.Locale;
+
 import org.transdroid.search.R;
 import org.transdroid.search.TorrentSite;
 
@@ -43,7 +45,7 @@ public class PrivateSitePreference extends DialogPreference {
 	public PrivateSitePreference(Context context, int sortOrder, TorrentSite torrentSite) {
 		super(context, null);
 		this.torrentSite = torrentSite;
-		
+
 		// Set up the credentials dialog and the preference appearance
 		setOrder(sortOrder);
 		setTitle(torrentSite.getAdapter().getSiteName());
@@ -53,13 +55,14 @@ public class PrivateSitePreference extends DialogPreference {
 				SettingsHelper.PREF_SITE_USER + torrentSite.name(), null);
 		if (currentUser != null)
 			setSummary(currentUser);
-		
+
 	}
 
 	@Override
 	public int compareTo(Preference another) {
 		// Override default Preference comparison to compare forcefully on the torrent site name
-		return getTitle().toString().compareTo(another.getTitle().toString());
+		return getTitle().toString().toLowerCase(Locale.getDefault())
+				.compareTo(another.getTitle().toString().toLowerCase(Locale.getDefault()));
 	}
 
 	@Override
