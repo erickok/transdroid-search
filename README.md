@@ -57,6 +57,10 @@ Developed By
 * Steve Garon
 * Gabor Tanka
 * Eric Taix
+* John Conrad
+* Toon Schoenmakers
+* Gabor Foldvari
+* and others...
 
 License
 =======
