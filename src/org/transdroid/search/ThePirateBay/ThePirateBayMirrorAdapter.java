@@ -26,7 +26,7 @@ package org.transdroid.search.ThePirateBay;
  */
 public class ThePirateBayMirrorAdapter extends ThePirateBayAdapter {
 
-	private static final String QUERYURL = "http://pirateproxy.net/search/%s/%s/%s/100,200,300,400,600/";
+	private static final String QUERYURL = "http://tpbtpb.com/search/%s/%s/%s/100,200,300,400,600/";
 
 	@Override
 	public String getSiteName() {
