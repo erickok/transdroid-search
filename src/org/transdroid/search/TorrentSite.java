@@ -36,6 +36,7 @@ import org.transdroid.search.RssFeedSearch.TorrentDownloadsAdapter;
 import org.transdroid.search.RssFeedSearch.VertorAdapter;
 import org.transdroid.search.ThePirateBay.ThePirateBayAdapter;
 import org.transdroid.search.ThePirateBay.ThePirateBayMirrorAdapter;
+import org.transdroid.search.TorrentDay.TorrentDayAdapter;
 import org.transdroid.search.TvTorrents.TvTorrentsAdapter;
 import org.transdroid.search.hdbitsorg.HdBitsOrgAdapter;
 
@@ -128,6 +129,12 @@ public enum TorrentSite {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new ThePirateBayMirrorAdapter();
+		}
+	},
+	TorrentDay {
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new TorrentDayAdapter();
 		}
 	},
 	TorrentDownloads {
