@@ -236,7 +236,7 @@ public class ScambioEtico implements ISearchAdapter {
 
 	@Override
 	public String getSiteName() {
-		return "Scambio Etico (Italian community)";
+		return "Scambio Etico";
 	}
 
 	@Override
