@@ -34,6 +34,7 @@ import org.transdroid.search.RssFeedSearch.MininovaAdapter;
 import org.transdroid.search.RssFeedSearch.MonovaAdapter;
 import org.transdroid.search.RssFeedSearch.TorrentDownloadsAdapter;
 import org.transdroid.search.RssFeedSearch.VertorAdapter;
+import org.transdroid.search.ScambioEtico.ScambioEtico;
 import org.transdroid.search.ThePirateBay.ThePirateBayAdapter;
 import org.transdroid.search.ThePirateBay.ThePirateBayMirrorAdapter;
 import org.transdroid.search.TorrentDay.TorrentDayAdapter;
@@ -153,6 +154,12 @@ public enum TorrentSite {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new VertorAdapter();
+		}
+	},
+	ScambioEtico {
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new ScambioEtico();
 		}
 	};
 
