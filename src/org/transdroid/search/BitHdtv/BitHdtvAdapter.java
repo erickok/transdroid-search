@@ -58,8 +58,8 @@ public class BitHdtvAdapter implements ISearchAdapter {
 
 	private static final String LOGIN_USER = "username";
 	private static final String LOGIN_PASS = "password";
-	private static final String LOGINURL = "http://www.bit-hdtv.com/takelogin.php";
-	private static final String QUERYURL = "http://www.bit-hdtv.com/torrents.php?search=%1$s&cat=0%2$s";
+	private static final String LOGINURL = "https://www.bit-hdtv.com/takelogin.php";
+	private static final String QUERYURL = "https://www.bit-hdtv.com/torrents.php?search=%1$s&cat=0%2$s";
 	private static final String SORT_COMPOSITE = "";
 	private static final String SORT_SEEDS = "&sort=7&type=desc";
 	private static final int CONNECTION_TIMEOUT = 8000;

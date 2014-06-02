@@ -120,6 +120,12 @@ public enum TorrentSite {
 			return new MonovaAdapter();
 		}
 	},
+	ScambioEtico {
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new ScambioEtico();
+		}
+	},
 	ThePirateBay {
 		@Override
 		public ISearchAdapter getAdapter() {
@@ -154,12 +160,6 @@ public enum TorrentSite {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new VertorAdapter();
-		}
-	},
-	ScambioEtico {
-		@Override
-		public ISearchAdapter getAdapter() {
-			return new ScambioEtico();
 		}
 	};
 
