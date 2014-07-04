@@ -42,7 +42,6 @@ import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
 import org.transdroid.search.ISearchAdapter;
-import org.transdroid.search.R;
 import org.transdroid.search.SearchResult;
 import org.transdroid.search.SortOrder;
 import org.transdroid.search.TorrentSite;
@@ -50,14 +49,10 @@ import org.transdroid.search.gui.SettingsHelper;
 import org.transdroid.util.HttpHelper;
 
 import android.content.Context;
-import android.os.Handler;
-import android.os.Looper;
 import android.util.Log;
-import android.widget.Toast;
 
 /**
- * An adapter that provides access to hdbits.org searches by parsing the raw
- * HTML output.
+ * An adapter that provides access to hdbits.org searches by parsing the raw HTML output.
  * 
  * @author John Conrad
  */
@@ -87,8 +82,6 @@ public class HdBitsOrgAdapter implements ISearchAdapter {
     private static final String URL_PREFIX = "https://hdbits.org/";
     private static final int CONNECTION_TIMEOUT = 8000;
 
-    private Context context = null;
-    
     // =========================================================
     // ISearchAdapter
     // =========================================================
@@ -105,7 +98,6 @@ public class HdBitsOrgAdapter implements ISearchAdapter {
 
     @Override
     public List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception {
-        this.context = context;
         
         DefaultHttpClient client = prepareRequest(context);
 

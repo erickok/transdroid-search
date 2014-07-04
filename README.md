@@ -60,6 +60,7 @@ Developed By
 * John Conrad
 * Toon Schoenmakers
 * Gabor Foldvari
+* Marco Furlando
 * and others...
 
 License

@@ -1,33 +1,35 @@
 /*
- *	This file is part of Transdroid Torrent Search
+ *	This file is part of Transdroid Torrent Search 
  *	<http://code.google.com/p/transdroid-search/>
- *
- *	Transdroid Torrent Search is free software: you can redistribute
- *	it and/or modify it under the terms of the GNU Lesser General
- *	Public License as published by the Free Software Foundation,
- *	either version 3 of the License, or (at your option) any later
+ *	
+ *	Transdroid Torrent Search is free software: you can redistribute 
+ *	it and/or modify it under the terms of the GNU Lesser General 
+ *	Public License as published by the Free Software Foundation, 
+ *	either version 3 of the License, or (at your option) any later 
  *	version.
- *
- *	Transdroid Torrent Search is distributed in the hope that it will
- *	be useful, but WITHOUT ANY WARRANTY; without even the implied
- *	warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
+ *	
+ *	Transdroid Torrent Search is distributed in the hope that it will 
+ *	be useful, but WITHOUT ANY WARRANTY; without even the implied 
+ *	warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
  *	See the GNU Lesser General Public License for more details.
- *
- *	You should have received a copy of the GNU Lesser General Public
+ *	
+ *	You should have received a copy of the GNU Lesser General Public 
  *	License along with Transdroid.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.transdroid.search.AsiaTorrents;
+package org.transdroid.search.TorrentLeech;
 
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.InvalidParameterException;
-import java.text.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 import javax.security.auth.login.LoginException;
 
-import org.apache.http.*;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -46,26 +48,26 @@ import org.transdroid.util.HttpHelper;
 import android.content.Context;
 
 /**
- * An adapter that provides access to AsiaTorrents searches by parsing the raw HTML output.
+ * An adapter that provides access to TorrentLeech.org searches by parsing the raw HTML output.
  */
-public class AsiaTorrentsAdapter implements ISearchAdapter {
+public class TorrentLeechAdapter implements ISearchAdapter {
 
-	private static final String LOGIN_USER = "uid";
-	private static final String LOGIN_PASS = "pwd";
-	private static final String LOGINURL = "http://www.asiatorrents.me/index.php?page=login";
-	private static final String QUERYURL = "http://www.asiatorrents.me/index.php?page=torrents&search=%1$s";
+	private static final String LOGINURL = "http://www.torrentleech.org/user/account/login/";
+	private static final String QUERYURL = "http://www.torrentleech.org/torrents/browse/index/query/%1$s%2$s";
+	private static final String SORT_COMPOSITE = "";
+	private static final String SORT_SEEDS = "/orderby/seeders/order/desc";
 	private static final int CONNECTION_TIMEOUT = 8000;
-	private final SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
 
 	private DefaultHttpClient prepareRequest(Context context) throws Exception {
 
-		String username = SettingsHelper.getSiteUser(context, TorrentSite.AsiaTorrents);
-		String password = SettingsHelper.getSitePass(context, TorrentSite.AsiaTorrents);
+		String username = SettingsHelper.getSiteUser(context, TorrentSite.TorrentLeech);
+		String password = SettingsHelper.getSitePass(context, TorrentSite.TorrentLeech);
 		if (username == null || password == null) {
-			throw new InvalidParameterException("No username or password was provided, while this is required for this private site.");
+			throw new InvalidParameterException(
+					"No username or password was provided, while this is required for this private site.");
 		}
 
-		// Setup request using GET
+		// Setup http client
 		HttpParams httpparams = new BasicHttpParams();
 		HttpConnectionParams.setConnectionTimeout(httpparams, CONNECTION_TIMEOUT);
 		HttpConnectionParams.setSoTimeout(httpparams, CONNECTION_TIMEOUT);
@@ -73,11 +75,15 @@ public class AsiaTorrentsAdapter implements ISearchAdapter {
 
 		// First log in
 		HttpPost loginPost = new HttpPost(LOGINURL);
-		loginPost.setEntity(new UrlEncodedFormEntity(Arrays.asList(new BasicNameValuePair[]{new BasicNameValuePair(LOGIN_USER, username), new BasicNameValuePair(LOGIN_PASS, password)})));
+		loginPost.setEntity(new UrlEncodedFormEntity(Arrays.asList(new BasicNameValuePair[] {
+				new BasicNameValuePair("username", username), new BasicNameValuePair("password", password),
+				new BasicNameValuePair("remember_me", "off") })));
 		HttpResponse loginResult = httpclient.execute(loginPost);
-		if (loginResult.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+		String loginHtml = HttpHelper.ConvertStreamToString(loginResult.getEntity().getContent());
+		final String LOGIN_ERROR = "Invalid Username/password combination";
+		if (loginResult.getStatusLine().getStatusCode() != HttpStatus.SC_OK || loginHtml.indexOf(LOGIN_ERROR) >= 0) {
 			// Failed to sign in
-			throw new LoginException("Login failure for AsiaTorrents with user " + username);
+			throw new LoginException("Login failure for TorrentLeecht with user " + username);
 		}
 
 		return httpclient;
@@ -97,11 +103,10 @@ public class AsiaTorrentsAdapter implements ISearchAdapter {
 			throw e;
 		}
 
-		final String url = String.format(QUERYURL, encodedQuery/*, (order == SortOrder.BySeeders ? SORT_SEEDS : SORT_COMPOSITE)*/);
+		final String url = String.format(QUERYURL, encodedQuery, (order == SortOrder.BySeeders ? SORT_SEEDS
+				: SORT_COMPOSITE));
 
 		// Start synchronous search
-
-		// Make request
 		HttpGet httpget = new HttpGet(url);
 		HttpResponse response = httpclient.execute(httpget);
 
@@ -128,18 +133,17 @@ public class AsiaTorrentsAdapter implements ISearchAdapter {
 		try {
 
 			// Texts to find subsequently
-			final String RESULTS = "<td align=\"center\" width=\"20\" class=\"header\">Dl</td>";
-			final String TORRENT = "<td class=\"lista\" valign=\"middle\" onMouseOver=";
+			final String RESULTS = "<table id=\"torrenttable\"";
+			final String NOTORRENTS = "There are no results found";
+			final String TORRENT = "<td class=\"category\">";
 
 			// Parse the search results from HTML by looking for the identifying texts
 			List<SearchResult> results = new ArrayList<SearchResult>();
-			//if (html.indexOf(NOMATCH) >= 0)
-				//return results; // Success, but no result for this query
 			int resultsStart = html.indexOf(RESULTS) + RESULTS.length();
-			android.util.Log.d("resultsStart", "" + resultsStart);
+			if (html.indexOf(NOTORRENTS) >= 0)
+				return results; // Success, but no results for this query
 
 			int torStart = html.indexOf(TORRENT, resultsStart);
-			android.util.Log.d("torStart", "" + torStart);
 			while (torStart >= 0 && results.size() < maxResults) {
 				int nextTorrentIndex = html.indexOf(TORRENT, torStart + TORRENT.length());
 				if (nextTorrentIndex >= 0) {
@@ -161,49 +165,35 @@ public class AsiaTorrentsAdapter implements ISearchAdapter {
 	private SearchResult parseHtmlItem(String htmlItem) {
 
 		// Texts to find subsequently
-		final String DETAILS_START = "<a href=\"";
-		final String DETAILS_END = "\"";
-		final String NAME_START = "\">";
-		final String NAME_END = "</a>";
-		final String LINK = "<a href=\"download.php";
+		final String DETAILS = "title\"><a href=\"";
+		final String DETAILS_END = "\">";
+		final String NAME_END = "<";
+		final String LINK = "<td class=\"quickdownload\">\n                									<a href=\"";
 		final String LINK_END = "\">";
-		final String DATE_TAG_START = "<td align=\"center\" width=\"85\" class=\"lista\"";
-		final String DATE_START = "\">";
-		final String DATE_END = "</td>";
-		final String SIZE = "\">";
+		final String COMMENTS = "#comments\">";
+		final String SIZE = "<td>";
 		final String SIZE_END = "</td>";
-		final String SEEDERS = "title=\"Click here to view peers details\">";
-		final String SEEDERS_END = "</a></td>";
-		final String LEECHERS = "title=\"Click here to view peers details\">";
-		final String LEECHERS_END = "</a></td>";
-		final String prefix = "http://asiatorrents.me/";
+		final String SEEDERS = "<td class=\"seeders\">";
+		final String SEEDERS_END = "</td>";
+		final String LEECHERS = "<td class=\"leechers\">";
+		final String LEECHERS_END = "</td>";
+		String prefix = "http://www.torrentleech.org";
 
-		int detailsStart = htmlItem.indexOf(DETAILS_START) + DETAILS_START.length();
+		int detailsStart = htmlItem.indexOf(DETAILS) + DETAILS.length();
 		String details = htmlItem.substring(detailsStart, htmlItem.indexOf(DETAILS_END, detailsStart));
-		details = prefix + details.replace("&amp;", "&");
+		details = prefix + details;
 
-		int nameStart = htmlItem.indexOf(NAME_START) + NAME_START.length();
-		nameStart = htmlItem.indexOf(NAME_START, nameStart) + NAME_START.length();
+		// Name starts right after the link of an item
+		int nameStart = htmlItem.indexOf(DETAILS_END, detailsStart) + DETAILS_END.length();
 		String name = htmlItem.substring(nameStart, htmlItem.indexOf(NAME_END, nameStart));
-		int logoStart = name.indexOf(" &nbsp;");
-		if (logoStart > 0)
-			name = name.substring(0, logoStart);
 
-		int linkStart = htmlItem.indexOf(LINK, nameStart) + DETAILS_START.length();
+		int linkStart = htmlItem.indexOf(LINK, nameStart) + LINK.length();
 		String link = htmlItem.substring(linkStart, htmlItem.indexOf(LINK_END, linkStart));
-		link = prefix + link.replace("&amp;", "&");
+		link = prefix + link;
 
-		int dateStart = htmlItem.indexOf(DATE_TAG_START, linkStart) + DATE_TAG_START.length();
-		dateStart = htmlItem.indexOf(DATE_START, dateStart) + DATE_START.length();
-		String dateText = htmlItem.substring(dateStart, htmlItem.indexOf(DATE_END, dateStart));
-		Date date = null;
-		try {
-			date = df.parse(dateText);
-		} catch (java.text.ParseException e) {
-			// Not parsable; just leave it at null
-		}
+		int commentsStart = htmlItem.indexOf(COMMENTS, linkStart) + COMMENTS.length();
 
-		int sizeStart = htmlItem.indexOf(SIZE, dateStart) + SIZE.length();
+		int sizeStart = htmlItem.indexOf(SIZE, commentsStart) + SIZE.length();
 		String size = htmlItem.substring(sizeStart, htmlItem.indexOf(SIZE_END, sizeStart));
 
 		int seedersStart = htmlItem.indexOf(SEEDERS, sizeStart) + SEEDERS.length();
@@ -228,19 +218,19 @@ public class AsiaTorrentsAdapter implements ISearchAdapter {
 			}
 		}
 
-		return new SearchResult(name, link, details, size, date, seeders, leechers);
+		return new SearchResult(name, link, details, size, null, seeders, leechers);
 
 	}
 
 	@Override
 	public String buildRssFeedUrlFromSearch(String query, SortOrder order) {
-		// AsiaTorrents doesn't support RSS feed-based searches
+		// TorrentLeech doesn't support RSS feed-based searches
 		return null;
 	}
 
 	@Override
 	public String getSiteName() {
-		return "AsiaTorrents";
+		return "TorrentLeech";
 	}
 
 	@Override
