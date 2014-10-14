@@ -61,6 +61,7 @@ Developed By
 * Toon Schoenmakers
 * Gabor Foldvari
 * Marco Furlando
+* Mário Franco
 * and others...
 
 License
