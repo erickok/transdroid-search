@@ -22,7 +22,6 @@ import android.content.Context;
 
 import org.transdroid.search.AsiaTorrents.AsiaTorrentsAdapter;
 import org.transdroid.search.BitHdtv.BitHdtvAdapter;
-import org.transdroid.search.Isohunt.IsohuntAdapter;
 import org.transdroid.search.OldPirateBay.OldPirateBayAdapter;
 import org.transdroid.search.RssFeedSearch.BitSnoopAdapter;
 import org.transdroid.search.RssFeedSearch.ExtraTorrentAdapter;
@@ -32,7 +31,6 @@ import org.transdroid.search.RssFeedSearch.MininovaAdapter;
 import org.transdroid.search.RssFeedSearch.MonovaAdapter;
 import org.transdroid.search.RssFeedSearch.NyaaTorrentsAdapter;
 import org.transdroid.search.RssFeedSearch.TorrentDownloadsAdapter;
-import org.transdroid.search.RssFeedSearch.VertorAdapter;
 import org.transdroid.search.ScambioEtico.ScambioEtico;
 import org.transdroid.search.TorrentDay.TorrentDayAdapter;
 import org.transdroid.search.TorrentLeech.TorrentLeechAdapter;
@@ -141,12 +139,6 @@ public enum TorrentSite {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new TvTorrentsAdapter();
-		}
-	},
-	Vertor {
-		@Override
-		public ISearchAdapter getAdapter() {
-			return new VertorAdapter();
 		}
 	};
 

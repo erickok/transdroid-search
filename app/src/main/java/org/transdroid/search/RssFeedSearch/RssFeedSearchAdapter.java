@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.params.BasicHttpParams;
@@ -33,6 +34,7 @@ import org.ifies.android.sax.RssParser;
 import org.transdroid.search.ISearchAdapter;
 import org.transdroid.search.SearchResult;
 import org.transdroid.search.SortOrder;
+import org.transdroid.util.HttpHelper;
 
 import android.content.Context;
 
@@ -44,8 +46,6 @@ import android.content.Context;
  */
 public abstract class RssFeedSearchAdapter implements ISearchAdapter {
 
-	private static final int CONNECTION_TIMEOUT = 7000;
-	
 	/**
 	 * Returns a SearchResult object from a single RSS item. Typically, you return a 
 	 * new SearchResult object filled with the title and URL's from the raw RSS item.
@@ -87,7 +87,7 @@ public abstract class RssFeedSearchAdapter implements ISearchAdapter {
 		List<Item> items = parser.getChannel().getItems();
 		
 		// Create a list of SearchResults and send it back
-		List<SearchResult> results = new ArrayList<SearchResult>();
+		List<SearchResult> results = new ArrayList<>();
 		int i = 0;
 		if (items != null) {
 			for (Item item : items) {
@@ -106,10 +106,7 @@ public abstract class RssFeedSearchAdapter implements ISearchAdapter {
 	public InputStream getTorrentFile(Context context, String url) throws Exception {
 
 		// Provide a simple file handle to the requested url
-		HttpParams httpparams = new BasicHttpParams();
-		HttpConnectionParams.setConnectionTimeout(httpparams, CONNECTION_TIMEOUT);
-		HttpConnectionParams.setSoTimeout(httpparams, CONNECTION_TIMEOUT);
-		DefaultHttpClient httpclient = new DefaultHttpClient(httpparams);
+		HttpClient httpclient = HttpHelper.buildDefaultSearchHttpClient(false);
 		HttpResponse response = httpclient.execute(new HttpGet(url));
 		return response.getEntity().getContent();
 		
