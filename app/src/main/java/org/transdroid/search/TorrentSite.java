@@ -34,7 +34,6 @@ import org.transdroid.search.RssFeedSearch.TorrentDownloadsAdapter;
 import org.transdroid.search.ScambioEtico.ScambioEtico;
 import org.transdroid.search.TorrentDay.TorrentDayAdapter;
 import org.transdroid.search.TorrentLeech.TorrentLeechAdapter;
-import org.transdroid.search.TvTorrents.TvTorrentsAdapter;
 import org.transdroid.search.hdbitsorg.HdBitsOrgAdapter;
 import org.transdroid.search.revolutiontt.RevolutionTTAdapter;
 
@@ -140,12 +139,6 @@ public enum TorrentSite {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new TorrentLeechAdapter();
-		}
-	},
-	TvTorrents {
-		@Override
-		public ISearchAdapter getAdapter() {
-			return new TvTorrentsAdapter();
 		}
 	};
 
