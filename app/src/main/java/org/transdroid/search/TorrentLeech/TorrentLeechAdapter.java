@@ -18,6 +18,23 @@
  */
 package org.transdroid.search.TorrentLeech;
 
+import android.content.Context;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
+import org.transdroid.search.ISearchAdapter;
+import org.transdroid.search.SearchResult;
+import org.transdroid.search.SortOrder;
+import org.transdroid.search.TorrentSite;
+import org.transdroid.search.gui.SettingsHelper;
+import org.transdroid.util.HttpHelper;
+
 import java.io.InputStream;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -28,25 +45,6 @@ import java.util.List;
 
 import javax.security.auth.login.LoginException;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
-import org.transdroid.search.ISearchAdapter;
-import org.transdroid.search.SearchResult;
-import org.transdroid.search.SortOrder;
-import org.transdroid.search.TorrentSite;
-import org.transdroid.search.gui.SettingsHelper;
-import org.transdroid.util.HttpHelper;
-
-import android.content.Context;
-
 /**
  * An adapter that provides access to TorrentLeech.org searches by parsing the raw HTML output.
  */
@@ -56,28 +54,23 @@ public class TorrentLeechAdapter implements ISearchAdapter {
 	private static final String QUERYURL = "http://www.torrentleech.org/torrents/browse/index/query/%1$s%2$s";
 	private static final String SORT_COMPOSITE = "";
 	private static final String SORT_SEEDS = "/orderby/seeders/order/desc";
-	private static final int CONNECTION_TIMEOUT = 8000;
 
-	private DefaultHttpClient prepareRequest(Context context) throws Exception {
+	private HttpClient prepareRequest(Context context) throws Exception {
 
 		String username = SettingsHelper.getSiteUser(context, TorrentSite.TorrentLeech);
 		String password = SettingsHelper.getSitePass(context, TorrentSite.TorrentLeech);
 		if (username == null || password == null) {
-			throw new InvalidParameterException(
-					"No username or password was provided, while this is required for this private site.");
+			throw new InvalidParameterException("No username or password was provided, while this is required for this private site.");
 		}
 
 		// Setup http client
-		HttpParams httpparams = new BasicHttpParams();
-		HttpConnectionParams.setConnectionTimeout(httpparams, CONNECTION_TIMEOUT);
-		HttpConnectionParams.setSoTimeout(httpparams, CONNECTION_TIMEOUT);
-		DefaultHttpClient httpclient = new DefaultHttpClient(httpparams);
+		HttpClient httpclient = HttpHelper.buildDefaultSearchHttpClient(false);
 
 		// First log in
 		HttpPost loginPost = new HttpPost(LOGINURL);
-		loginPost.setEntity(new UrlEncodedFormEntity(Arrays.asList(new BasicNameValuePair[] {
-				new BasicNameValuePair("username", username), new BasicNameValuePair("password", password),
-				new BasicNameValuePair("remember_me", "off") })));
+		loginPost.setEntity(new UrlEncodedFormEntity(Arrays.asList(
+				new BasicNameValuePair[]{new BasicNameValuePair("username", username), new BasicNameValuePair("password", password),
+						new BasicNameValuePair("remember_me", "off")})));
 		HttpResponse loginResult = httpclient.execute(loginPost);
 		String loginHtml = HttpHelper.convertStreamToString(loginResult.getEntity().getContent());
 		final String LOGIN_ERROR = "Invalid Username/password combination";
@@ -93,18 +86,10 @@ public class TorrentLeechAdapter implements ISearchAdapter {
 	@Override
 	public List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception {
 
-		DefaultHttpClient httpclient = prepareRequest(context);
+		HttpClient httpclient = prepareRequest(context);
 
 		// Build a search request parameters
-		String encodedQuery = "";
-		try {
-			encodedQuery = URLEncoder.encode(query, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			throw e;
-		}
-
-		final String url = String.format(QUERYURL, encodedQuery, (order == SortOrder.BySeeders ? SORT_SEEDS
-				: SORT_COMPOSITE));
+		final String url = String.format(QUERYURL, URLEncoder.encode(query, "UTF-8"), (order == SortOrder.BySeeders ? SORT_SEEDS : SORT_COMPOSITE));
 
 		// Start synchronous search
 		HttpGet httpget = new HttpGet(url);
@@ -122,7 +107,7 @@ public class TorrentLeechAdapter implements ISearchAdapter {
 	public InputStream getTorrentFile(Context context, String url) throws Exception {
 
 		// Provide an authenticated file handle to the requested url
-		DefaultHttpClient httpclient = prepareRequest(context);
+		HttpClient httpclient = prepareRequest(context);
 		HttpResponse response = httpclient.execute(new HttpGet(url));
 		return response.getEntity().getContent();
 
@@ -130,36 +115,30 @@ public class TorrentLeechAdapter implements ISearchAdapter {
 
 	protected List<SearchResult> parseHtml(String html, int maxResults) throws Exception {
 
-		try {
+		// Texts to find subsequently
+		final String RESULTS = "<table id=\"torrenttable\"";
+		final String NOTORRENTS = "There are no results found";
+		final String TORRENT = "<td class=\"category\">";
 
-			// Texts to find subsequently
-			final String RESULTS = "<table id=\"torrenttable\"";
-			final String NOTORRENTS = "There are no results found";
-			final String TORRENT = "<td class=\"category\">";
-
-			// Parse the search results from HTML by looking for the identifying texts
-			List<SearchResult> results = new ArrayList<SearchResult>();
-			int resultsStart = html.indexOf(RESULTS) + RESULTS.length();
-			if (html.indexOf(NOTORRENTS) >= 0)
-				return results; // Success, but no results for this query
-
-			int torStart = html.indexOf(TORRENT, resultsStart);
-			while (torStart >= 0 && results.size() < maxResults) {
-				int nextTorrentIndex = html.indexOf(TORRENT, torStart + TORRENT.length());
-				if (nextTorrentIndex >= 0) {
-					results.add(parseHtmlItem(html.substring(torStart + TORRENT.length(), nextTorrentIndex)));
-				} else {
-					results.add(parseHtmlItem(html.substring(torStart + TORRENT.length())));
-				}
-				torStart = nextTorrentIndex;
-			}
-			return results;
-
-		} catch (OutOfMemoryError e) {
-			throw new Exception(e);
-		} catch (Exception e) {
-			throw new Exception(e);
+		// Parse the search results from HTML by looking for the identifying texts
+		List<SearchResult> results = new ArrayList<SearchResult>();
+		int resultsStart = html.indexOf(RESULTS) + RESULTS.length();
+		if (html.contains(NOTORRENTS)) {
+			return results; // Success, but no results for this query
 		}
+
+		int torStart = html.indexOf(TORRENT, resultsStart);
+		while (torStart >= 0 && results.size() < maxResults) {
+			int nextTorrentIndex = html.indexOf(TORRENT, torStart + TORRENT.length());
+			if (nextTorrentIndex >= 0) {
+				results.add(parseHtmlItem(html.substring(torStart + TORRENT.length(), nextTorrentIndex)));
+			} else {
+				results.add(parseHtmlItem(html.substring(torStart + TORRENT.length())));
+			}
+			torStart = nextTorrentIndex;
+		}
+		return results;
+
 	}
 
 	private SearchResult parseHtmlItem(String htmlItem) {
