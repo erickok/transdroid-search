@@ -92,12 +92,6 @@ public enum TorrentSite {
 			return new IsohuntAdapter();
 		}
 	},
-	IpTorrents {
-		@Override
-		public ISearchAdapter getAdapter() {
-			return new IpTorrentsAdapter();
-		}
-	},
 	KickassTorents {
 		@Override
 		public ISearchAdapter getAdapter() {

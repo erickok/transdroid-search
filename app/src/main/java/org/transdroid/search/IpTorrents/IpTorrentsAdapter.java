@@ -80,12 +80,19 @@ public class IpTorrentsAdapter implements ISearchAdapter {
 		loginPost.setEntity(new UrlEncodedFormEntity(Arrays.asList(new BasicNameValuePair[] {
 				new BasicNameValuePair(LOGIN_USER, username), new BasicNameValuePair(LOGIN_PASS, password) })));
 		HttpResponse loginResult = httpclient.execute(loginPost);
-		if (loginResult.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-			// Failed to sign in
-			throw new LoginException("Login failure for IPTorrents with user " + username);
+
+		// Check login result
+		if (loginResult.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
+			InputStream instream = loginResult.getEntity().getContent();
+			String html = HttpHelper.ConvertStreamToString(instream);
+			instream.close();
+			if (!html.contains("Forgot Password?")) {
+				return httpclient;
+			}
 		}
 
-		return httpclient;
+		// Failed to log in
+		throw new LoginException("Login failure for IPTorrents with user " + username);
 
 	}
 
@@ -95,12 +102,7 @@ public class IpTorrentsAdapter implements ISearchAdapter {
 		DefaultHttpClient httpclient = prepareRequest(context);
 
 		// Build a search request parameters
-		String encodedQuery = "";
-		try {
-			encodedQuery = URLEncoder.encode(query, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			throw e;
-		}
+		String encodedQuery = URLEncoder.encode(query, "UTF-8");
 
 		final String url = String.format(QUERYURL, encodedQuery, (order == SortOrder.BySeeders ? SORT_SEEDS
 				: SORT_COMPOSITE));
@@ -139,7 +141,7 @@ public class IpTorrentsAdapter implements ISearchAdapter {
 			final String TORRENT = "<tr><td class=t_label>";
 
 			// Parse the search results from HTML by looking for the identifying texts
-			List<SearchResult> results = new ArrayList<SearchResult>();
+			List<SearchResult> results = new ArrayList<>();
 			int resultsStart = html.indexOf(RESULTS) + RESULTS.length();
 			if (html.indexOf(NOTORRENTS) >= 0)
 				return results; // Success, but no results for this query
