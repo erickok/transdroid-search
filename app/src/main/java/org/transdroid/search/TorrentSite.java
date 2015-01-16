@@ -77,12 +77,6 @@ public enum TorrentSite {
 			return new HdBitsOrgAdapter();
 		}
 	},
-	Isohunt {
-		@Override
-		public ISearchAdapter getAdapter() {
-			return new IsohuntAdapter();
-		}
-	},
 	KickassTorents {
 		@Override
 		public ISearchAdapter getAdapter() {
