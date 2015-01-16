@@ -17,8 +17,3 @@ android {
         }
     }
 }
-
-dependencies {
-    compile 'com.android.support:appcompat-v7:21.0.3'
-    compile 'com.android.support:support-annotations:20.0.0'
-}

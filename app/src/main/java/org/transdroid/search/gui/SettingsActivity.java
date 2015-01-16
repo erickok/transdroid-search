@@ -18,10 +18,10 @@
  */
 package org.transdroid.search.gui;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
-import android.support.v7.app.ActionBarActivity;
 
 import org.transdroid.search.R;
 import org.transdroid.search.TorrentSite;
@@ -31,13 +31,12 @@ import org.transdroid.search.TorrentSite;
  * enable/disable a site.
  * @author Eric Kok
  */
-public class SettingsActivity extends ActionBarActivity {
+public class SettingsActivity extends Activity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		if (savedInstanceState == null) {
-			getSupportActionBar(); // Call to force content creation; see https://code.google.com/p/android/issues/detail?id=78701
 			getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingsFragment()).commit();
 		}
 	}

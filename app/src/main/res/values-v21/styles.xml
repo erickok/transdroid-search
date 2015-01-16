@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+	<style name="Theme.Transdroid.Search" parent="android:Theme.Material">
+		<item name="android:colorPrimary">#388E3C</item>
+		<item name="android:colorPrimaryDark">#1B5E20</item>
+		<item name="android:colorAccent">#A5D6A7</item>
+		<item name="android:colorControlHighlight">#A5D6A7</item>
+		<item name="android:alertDialogTheme">@style/Theme.AlertDialog</item>
+	</style>
+
+	<style name="Theme.AlertDialog" parent="android:Theme.Material.Light.Dialog.Alert">
+		<item name="android:colorPrimary">#388E3C</item>
+		<item name="android:colorPrimaryDark">#1B5E20</item>
+		<item name="android:colorAccent">#388E3C</item>
+	</style>
+
+</resources>
