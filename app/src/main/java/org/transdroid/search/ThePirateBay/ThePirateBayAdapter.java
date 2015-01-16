@@ -90,7 +90,7 @@ public class ThePirateBayAdapter implements ISearchAdapter {
 
         // Read HTML response
         InputStream instream = response.getEntity().getContent();
-        String html = HttpHelper.ConvertStreamToString(instream);
+        String html = HttpHelper.convertStreamToString(instream);
         instream.close();
         return parseHtml(html);
         

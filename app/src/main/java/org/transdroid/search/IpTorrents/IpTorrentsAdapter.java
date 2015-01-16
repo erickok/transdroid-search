@@ -19,7 +19,6 @@
 package org.transdroid.search.IpTorrents;
 
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
@@ -84,7 +83,7 @@ public class IpTorrentsAdapter implements ISearchAdapter {
 		// Check login result
 		if (loginResult.getStatusLine().getStatusCode() == HttpStatus.SC_OK) {
 			InputStream instream = loginResult.getEntity().getContent();
-			String html = HttpHelper.ConvertStreamToString(instream);
+			String html = HttpHelper.convertStreamToString(instream);
 			instream.close();
 			if (!html.contains("Forgot Password?")) {
 				return httpclient;
@@ -115,7 +114,7 @@ public class IpTorrentsAdapter implements ISearchAdapter {
 
 		// Read HTML response
 		InputStream instream = response.getEntity().getContent();
-		String html = HttpHelper.ConvertStreamToString(instream);
+		String html = HttpHelper.convertStreamToString(instream);
 		instream.close();
 		return parseHtml(html, maxResults);
 

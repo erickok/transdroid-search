@@ -18,13 +18,10 @@
  */
 package org.transdroid.search;
 
-import java.io.InputStream;
-import java.util.List;
+import android.content.Context;
 
 import org.transdroid.search.AsiaTorrents.AsiaTorrentsAdapter;
 import org.transdroid.search.BitHdtv.BitHdtvAdapter;
-import org.transdroid.search.Fenopy.FenopyAdapter;
-import org.transdroid.search.IpTorrents.IpTorrentsAdapter;
 import org.transdroid.search.Isohunt.IsohuntAdapter;
 import org.transdroid.search.RssFeedSearch.BitSnoopAdapter;
 import org.transdroid.search.RssFeedSearch.ExtraTorrentAdapter;
@@ -43,7 +40,8 @@ import org.transdroid.search.TorrentLeech.TorrentLeechAdapter;
 import org.transdroid.search.TvTorrents.TvTorrentsAdapter;
 import org.transdroid.search.hdbitsorg.HdBitsOrgAdapter;
 
-import android.content.Context;
+import java.io.InputStream;
+import java.util.List;
 
 /**
  * Provides factory-like access to all the torrent site search adapters.
@@ -179,13 +177,13 @@ public enum TorrentSite {
 	}
 
 	/**
-	 * Synchronously set up a connection to download a specific torrent file and return an input stream to this.
-	 * Authentication and authorization is off-loaded to the implementing torrent site.
+	 * Synchronously set up a connection to download a specific torrent file and return an input stream to this. Authentication and authorization is
+	 * off-loaded to the implementing torrent site.
 	 * @param context The Android activity/provider context from which the shared preferences can be accessed
 	 * @param url The full url of the torrent file to download
-	 * @return An InputStream handle to the requested file so it can be further downloaded, or null if no connection is
-	 *         possible (like when the device is offline or when the user is not authorized)
-	 * @throws Exception When an exception occurred during the retrieval of the request url 
+	 * @return An InputStream handle to the requested file so it can be further downloaded, or null if no connection is possible (like when the device
+	 * is offline or when the user is not authorized)
+	 * @throws Exception When an exception occurred during the retrieval of the request url
 	 */
 	public InputStream getTorrentFile(Context context, String url) throws Exception {
 		return getAdapter().getTorrentFile(context, url);
@@ -194,8 +192,8 @@ public enum TorrentSite {
 	public abstract ISearchAdapter getAdapter();
 
 	/**
-	 * Returns the TorrentSite corresponding to the Enum type name it has, e.g.
-	 * <code>TorrentSite.fromCode("Mininova")</code> returns the <code>TorrentSite.Mininova</code> enumeration value
+	 * Returns the TorrentSite corresponding to the Enum type name it has, e.g. <code>TorrentSite.fromCode("Mininova")</code> returns the
+	 * <code>TorrentSite.Mininova</code> enumeration value
 	 * @param siteCode The name of the enum type value
 	 * @return The corresponding enum type value of a torrent site
 	 */

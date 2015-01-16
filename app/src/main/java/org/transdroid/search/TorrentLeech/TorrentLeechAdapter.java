@@ -79,7 +79,7 @@ public class TorrentLeechAdapter implements ISearchAdapter {
 				new BasicNameValuePair("username", username), new BasicNameValuePair("password", password),
 				new BasicNameValuePair("remember_me", "off") })));
 		HttpResponse loginResult = httpclient.execute(loginPost);
-		String loginHtml = HttpHelper.ConvertStreamToString(loginResult.getEntity().getContent());
+		String loginHtml = HttpHelper.convertStreamToString(loginResult.getEntity().getContent());
 		final String LOGIN_ERROR = "Invalid Username/password combination";
 		if (loginResult.getStatusLine().getStatusCode() != HttpStatus.SC_OK || loginHtml.indexOf(LOGIN_ERROR) >= 0) {
 			// Failed to sign in
@@ -112,7 +112,7 @@ public class TorrentLeechAdapter implements ISearchAdapter {
 
 		// Read HTML response
 		InputStream instream = response.getEntity().getContent();
-		String html = HttpHelper.ConvertStreamToString(instream);
+		String html = HttpHelper.convertStreamToString(instream);
 		instream.close();
 		return parseHtml(html, maxResults);
 

@@ -111,7 +111,7 @@ public class HdBitsOrgAdapter implements ISearchAdapter {
         HttpResponse response = client.execute(new HttpGet(url));
 
         // parse HTML response into a list of torrents
-        String html = HttpHelper.ConvertStreamToString(response.getEntity().getContent());
+        String html = HttpHelper.convertStreamToString(response.getEntity().getContent());
         return parseHtml(html, maxResults);
 
     }
@@ -175,7 +175,7 @@ public class HdBitsOrgAdapter implements ISearchAdapter {
             throw new Exception("Failed to retrieve hdbits.org login form.");
 
         // try to find the hidden parameter on the login form
-        String html = HttpHelper.ConvertStreamToString(response.getEntity().getContent());
+        String html = HttpHelper.convertStreamToString(response.getEntity().getContent());
         Pattern tokenRegexParser = Pattern.compile(LOGIN_TOKEN_REGEX);
         Matcher match = tokenRegexParser.matcher(html);
         boolean success = match.find();

@@ -116,7 +116,7 @@ public class ScambioEtico implements ISearchAdapter {
 						new BasicNameValuePair(LOGIN_PASS, password)
 				})));
 		HttpResponse loginResult = httpclient.execute(loginPost);
-		String loginHtml = HttpHelper.ConvertStreamToString(loginResult.getEntity().getContent());
+		String loginHtml = HttpHelper.convertStreamToString(loginResult.getEntity().getContent());
 		if (loginHtml.indexOf(WRONG_LOGIN) >= 0) {
 			throw new LoginException("Login failure for Scambio Etico wrong username " + username);
 		} else if (loginHtml.indexOf(WRONG_PASSWORD) >= 0) {
@@ -152,7 +152,7 @@ public class ScambioEtico implements ISearchAdapter {
 
 		// Read HTML response
 		InputStream instream = response.getEntity().getContent();
-		String html = HttpHelper.ConvertStreamToString(instream);
+		String html = HttpHelper.convertStreamToString(instream);
 		instream.close();
 		return parseHtml(html, maxResults);
 

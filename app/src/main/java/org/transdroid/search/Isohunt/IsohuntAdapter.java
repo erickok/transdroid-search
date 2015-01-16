@@ -100,7 +100,7 @@ public class IsohuntAdapter implements ISearchAdapter {
 
         // Read JSON response
         InputStream instream = response.getEntity().getContent();
-        JSONObject json = new JSONObject(HttpHelper.ConvertStreamToString(instream));
+        JSONObject json = new JSONObject(HttpHelper.convertStreamToString(instream));
         instream.close();
         
 		// Empty result set?

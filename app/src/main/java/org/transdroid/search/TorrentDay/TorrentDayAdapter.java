@@ -123,7 +123,7 @@ public class TorrentDayAdapter implements ISearchAdapter {
 
 		// Read JSON response
 		InputStream instream = queryResult.getEntity().getContent();
-		String json = HttpHelper.ConvertStreamToString(instream);
+		String json = HttpHelper.convertStreamToString(instream);
 		instream.close();
 		JSONObject structure = new JSONObject(json);
 		
