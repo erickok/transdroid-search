@@ -74,12 +74,6 @@ public enum TorrentSite {
 			return new ExtraTorrentAdapter();
 		}
 	},
-	Fenopy {
-		@Override
-		public ISearchAdapter getAdapter() {
-			return new FenopyAdapter();
-		}
-	},
 	HdBitsOrg {
 		@Override
 		public ISearchAdapter getAdapter() {
