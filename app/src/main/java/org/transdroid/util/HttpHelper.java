@@ -26,7 +26,17 @@ import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpResponseInterceptor;
+import org.apache.http.client.HttpClient;
+import org.apache.http.conn.scheme.PlainSocketFactory;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.scheme.SchemeRegistry;
+import org.apache.http.conn.ssl.SSLSocketFactory;
 import org.apache.http.entity.HttpEntityWrapper;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.apache.http.protocol.HttpContext;
 
 import java.io.BufferedReader;
@@ -41,6 +51,24 @@ import java.util.zip.GZIPInputStream;
  * @author erickok
  */
 public class HttpHelper {
+
+	public static HttpClient buildDefaultSearchHttpClient(boolean ignoreSslIssues) {
+
+		SchemeRegistry registry = new SchemeRegistry();
+		registry.register(new Scheme("http", new PlainSocketFactory(), 80));
+		registry.register(new Scheme("https", ignoreSslIssues ? new IgnoreTlsSniSocketFactory() : SSLSocketFactory.getSocketFactory(), 443));
+
+		HttpParams httpparams = new BasicHttpParams();
+		HttpConnectionParams.setConnectionTimeout(httpparams, 5000);
+		HttpConnectionParams.setSoTimeout(httpparams, 5000);
+		DefaultHttpClient httpclient = new DefaultHttpClient(new ThreadSafeClientConnManager(httpparams, registry), httpparams);
+
+		httpclient.addRequestInterceptor(HttpHelper.gzipRequestInterceptor);
+		httpclient.addResponseInterceptor(HttpHelper.gzipResponseInterceptor);
+
+		return httpclient;
+
+	}
 
 	/**
 	 * HTTP request interceptor to allow for GZip-encoded data transfer

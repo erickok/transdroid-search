@@ -61,8 +61,8 @@ public class IpTorrentsAdapter implements ISearchAdapter {
 
 	private DefaultHttpClient prepareRequest(Context context) throws Exception {
 
-		String username = SettingsHelper.getSiteUser(context, TorrentSite.IpTorrents);
-		String password = SettingsHelper.getSitePass(context, TorrentSite.IpTorrents);
+		String username = null; //SettingsHelper.getSiteUser(context, TorrentSite.IpTorrents);
+		String password = null; //SettingsHelper.getSitePass(context, TorrentSite.IpTorrents);
 		if (username == null || password == null) {
 			throw new InvalidParameterException(
 					"No username or password was provided, while this is required for this private site.");

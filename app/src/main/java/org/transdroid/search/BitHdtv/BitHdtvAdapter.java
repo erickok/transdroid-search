@@ -18,8 +18,23 @@
  */
 package org.transdroid.search.BitHdtv;
 
+import android.content.Context;
+
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.message.BasicNameValuePair;
+import org.transdroid.search.ISearchAdapter;
+import org.transdroid.search.SearchResult;
+import org.transdroid.search.SortOrder;
+import org.transdroid.search.TorrentSite;
+import org.transdroid.search.gui.SettingsHelper;
+import org.transdroid.util.HttpHelper;
+
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.InvalidParameterException;
 import java.text.ParseException;
@@ -32,25 +47,6 @@ import java.util.Locale;
 
 import javax.security.auth.login.LoginException;
 
-import org.apache.http.HttpResponse;
-import org.apache.http.HttpStatus;
-import org.apache.http.client.entity.UrlEncodedFormEntity;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
-import org.transdroid.search.ISearchAdapter;
-import org.transdroid.search.SearchResult;
-import org.transdroid.search.SortOrder;
-import org.transdroid.search.TorrentSite;
-import org.transdroid.search.gui.SettingsHelper;
-import org.transdroid.util.HttpHelper;
-
-import android.content.Context;
-
 /**
  * An adapter that provides access to BitHDTV searches by parsing the raw HTML output.
  */
@@ -62,53 +58,37 @@ public class BitHdtvAdapter implements ISearchAdapter {
 	private static final String QUERYURL = "https://www.bit-hdtv.com/torrents.php?search=%1$s&cat=0%2$s";
 	private static final String SORT_COMPOSITE = "";
 	private static final String SORT_SEEDS = "&sort=7&type=desc";
-	private static final int CONNECTION_TIMEOUT = 8000;
 	private final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 
-	private DefaultHttpClient prepareRequest(Context context) throws Exception {
+	private HttpClient prepareRequest(Context context) throws Exception {
 
 		String username = SettingsHelper.getSiteUser(context, TorrentSite.BitHdtv);
 		String password = SettingsHelper.getSitePass(context, TorrentSite.BitHdtv);
 		if (username == null || password == null) {
-			throw new InvalidParameterException(
-					"No username or password was provided, while this is required for this private site.");
+			throw new InvalidParameterException("No username or password was provided, while this is required for this private site.");
 		}
 
-		// Setup request using GET
-		HttpParams httpparams = new BasicHttpParams();
-		HttpConnectionParams.setConnectionTimeout(httpparams, CONNECTION_TIMEOUT);
-		HttpConnectionParams.setSoTimeout(httpparams, CONNECTION_TIMEOUT);
-		DefaultHttpClient httpclient = new DefaultHttpClient(httpparams);
-
 		// First log in
+		HttpClient httpclient = HttpHelper.buildDefaultSearchHttpClient(false);
 		HttpPost loginPost = new HttpPost(LOGINURL);
-		loginPost.setEntity(new UrlEncodedFormEntity(Arrays.asList(new BasicNameValuePair[] {
-				new BasicNameValuePair(LOGIN_USER, username), new BasicNameValuePair(LOGIN_PASS, password) })));
+		loginPost.setEntity(new UrlEncodedFormEntity(
+				Arrays.asList(new BasicNameValuePair[]{new BasicNameValuePair(LOGIN_USER, username), new BasicNameValuePair(LOGIN_PASS, password)})));
 		HttpResponse loginResult = httpclient.execute(loginPost);
 		if (loginResult.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
 			// Failed to sign in
 			throw new LoginException("Login failure for BitHdTv with user " + username);
 		}
-		
+
 		return httpclient;
 
 	}
-	
+
 	@Override
 	public List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception {
-		
-		DefaultHttpClient httpclient = prepareRequest(context);
-		
-		// Build a search request parameters
-		String encodedQuery = "";
-		try {
-			encodedQuery = URLEncoder.encode(query, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			throw e;
-		}
 
-		final String url = String.format(QUERYURL, encodedQuery, (order == SortOrder.BySeeders ? SORT_SEEDS
-				: SORT_COMPOSITE));
+		HttpClient httpclient = prepareRequest(context);
+
+		final String url = String.format(QUERYURL, URLEncoder.encode(query, "UTF-8"), (order == SortOrder.BySeeders ? SORT_SEEDS : SORT_COMPOSITE));
 
 		// Start synchronous search
 
@@ -128,44 +108,38 @@ public class BitHdtvAdapter implements ISearchAdapter {
 	public InputStream getTorrentFile(Context context, String url) throws Exception {
 
 		// Provide an authenticated file handle to the requested url
-		DefaultHttpClient httpclient = prepareRequest(context);
+		HttpClient httpclient = prepareRequest(context);
 		HttpResponse response = httpclient.execute(new HttpGet(url));
 		return response.getEntity().getContent();
-		
+
 	}
 
 	protected List<SearchResult> parseHtml(String html, int maxResults) throws Exception {
 
-		try {
+		// Texts to find subsequently
+		final String NOMATCH = "No match!";
+		final String RESULTS = "<!-- uj rendezes kezdodik -->";
+		final String TORRENT = "<td class=detail align=center><p><a href='";
 
-			// Texts to find subsequently
-			final String NOMATCH = "No match!";
-			final String RESULTS = "<!-- uj rendezes kezdodik -->";
-			final String TORRENT = "<td class=detail align=center><p><a href='";
-
-			// Parse the search results from HTML by looking for the identifying texts
-			List<SearchResult> results = new ArrayList<SearchResult>();
-			if (html.indexOf(NOMATCH) >= 0)
-				return results; // Success, but no result for this query
-			int resultsStart = html.indexOf(RESULTS) + RESULTS.length();
-
-			int torStart = html.indexOf(TORRENT, resultsStart);
-			while (torStart >= 0 && results.size() < maxResults) {
-				int nextTorrentIndex = html.indexOf(TORRENT, torStart + TORRENT.length());
-				if (nextTorrentIndex >= 0) {
-					results.add(parseHtmlItem(html.substring(torStart + TORRENT.length(), nextTorrentIndex)));
-				} else {
-					results.add(parseHtmlItem(html.substring(torStart + TORRENT.length())));
-				}
-				torStart = nextTorrentIndex;
-			}
-			return results;
-
-		} catch (OutOfMemoryError e) {
-			throw new Exception(e);
-		} catch (Exception e) {
-			throw new Exception(e);
+		// Parse the search results from HTML by looking for the identifying texts
+		List<SearchResult> results = new ArrayList<>();
+		if (html.contains(NOMATCH)) {
+			return results; // Success, but no result for this query
 		}
+		int resultsStart = html.indexOf(RESULTS) + RESULTS.length();
+
+		int torStart = html.indexOf(TORRENT, resultsStart);
+		while (torStart >= 0 && results.size() < maxResults) {
+			int nextTorrentIndex = html.indexOf(TORRENT, torStart + TORRENT.length());
+			if (nextTorrentIndex >= 0) {
+				results.add(parseHtmlItem(html.substring(torStart + TORRENT.length(), nextTorrentIndex)));
+			} else {
+				results.add(parseHtmlItem(html.substring(torStart + TORRENT.length())));
+			}
+			torStart = nextTorrentIndex;
+		}
+		return results;
+
 	}
 
 	private SearchResult parseHtmlItem(String htmlItem) {
@@ -212,7 +186,7 @@ public class BitHdtvAdapter implements ISearchAdapter {
 		int seedersStart = htmlItem.indexOf(SEEDERS, dateStart);
 		int seeders = 0;
 		if (seedersStart >= 0) {
-			seedersStart +=  SEEDERS.length();
+			seedersStart += SEEDERS.length();
 			String seedersText = htmlItem.substring(seedersStart, htmlItem.indexOf(SEEDERS_END, seedersStart));
 			seeders = Integer.parseInt(seedersText);
 		}
@@ -220,7 +194,7 @@ public class BitHdtvAdapter implements ISearchAdapter {
 		int leechersStart = htmlItem.indexOf(LEECHERS, dateStart);
 		int leechers = 0;
 		if (leechersStart >= 0) {
-			leechersStart +=  LEECHERS.length();
+			leechersStart += LEECHERS.length();
 			String leechersText = htmlItem.substring(leechersStart, htmlItem.indexOf(LEECHERS_END, leechersStart));
 			leechers = Integer.parseInt(leechersText);
 		}

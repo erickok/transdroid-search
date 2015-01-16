@@ -7,15 +7,8 @@
 package org.ifies.android.sax;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.conn.scheme.PlainSocketFactory;
-import org.apache.http.conn.scheme.Scheme;
-import org.apache.http.conn.scheme.SchemeRegistry;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
 import org.transdroid.util.HttpHelper;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
@@ -44,7 +37,7 @@ public class RssParser extends DefaultHandler {
 
 	public void parse() throws ParserConfigurationException, SAXException, IOException {
 
-		DefaultHttpClient httpclient = initialise();
+		HttpClient httpclient = initialise();
 		HttpResponse result = httpclient.execute(new HttpGet(urlString));
 		//FileInputStream urlInputStream = new FileInputStream("/sdcard/rsstest2.txt");
 		SAXParserFactory spf = SAXParserFactory.newInstance();
@@ -58,21 +51,8 @@ public class RssParser extends DefaultHandler {
 	/**
 	 * Instantiates an HTTP client that can be used for all requests.
 	 */
-	protected DefaultHttpClient initialise() {
-
-		SchemeRegistry registry = new SchemeRegistry();
-		registry.register(new Scheme("http", new PlainSocketFactory(), 80));
-
-		HttpParams httpparams = new BasicHttpParams();
-		HttpConnectionParams.setConnectionTimeout(httpparams, 5000);
-		HttpConnectionParams.setSoTimeout(httpparams, 5000);
-		DefaultHttpClient httpclient = new DefaultHttpClient(new ThreadSafeClientConnManager(httpparams, registry), httpparams);
-
-		httpclient.addRequestInterceptor(HttpHelper.gzipRequestInterceptor);
-		httpclient.addResponseInterceptor(HttpHelper.gzipResponseInterceptor);
-
-		return httpclient;
-
+	protected HttpClient initialise() {
+		return HttpHelper.buildDefaultSearchHttpClient(false);
 	}
 
 	/**

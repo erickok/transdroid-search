@@ -21,6 +21,7 @@ package org.transdroid.search.RssFeedSearch;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 
+import org.apache.http.client.HttpClient;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.ifies.android.sax.Item;
 import org.ifies.android.sax.RssParser;
@@ -109,8 +110,8 @@ public class BitSnoopAdapter extends RssFeedSearchAdapter {
 		}
 		
 		@Override
-		protected DefaultHttpClient initialise() {
-			DefaultHttpClient client = super.initialise();	
+		protected HttpClient initialise() {
+			HttpClient client = super.initialise();
 			// Spoof Firefox user agent to force a result from BitSnoop
 	        client.getParams().setParameter("http.useragent", "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
 	        return client;

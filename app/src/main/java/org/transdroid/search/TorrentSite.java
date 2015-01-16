@@ -23,6 +23,7 @@ import android.content.Context;
 import org.transdroid.search.AsiaTorrents.AsiaTorrentsAdapter;
 import org.transdroid.search.BitHdtv.BitHdtvAdapter;
 import org.transdroid.search.Isohunt.IsohuntAdapter;
+import org.transdroid.search.OldPirateBay.OldPirateBayAdapter;
 import org.transdroid.search.RssFeedSearch.BitSnoopAdapter;
 import org.transdroid.search.RssFeedSearch.ExtraTorrentAdapter;
 import org.transdroid.search.RssFeedSearch.KickassTorrentsAdapter;
@@ -33,8 +34,6 @@ import org.transdroid.search.RssFeedSearch.NyaaTorrentsAdapter;
 import org.transdroid.search.RssFeedSearch.TorrentDownloadsAdapter;
 import org.transdroid.search.RssFeedSearch.VertorAdapter;
 import org.transdroid.search.ScambioEtico.ScambioEtico;
-import org.transdroid.search.ThePirateBay.ThePirateBayAdapter;
-import org.transdroid.search.ThePirateBay.ThePirateBayMirrorAdapter;
 import org.transdroid.search.TorrentDay.TorrentDayAdapter;
 import org.transdroid.search.TorrentLeech.TorrentLeechAdapter;
 import org.transdroid.search.TvTorrents.TvTorrentsAdapter;
@@ -114,22 +113,16 @@ public enum TorrentSite {
 			return new NyaaTorrentsAdapter();
 		}
 	},
+	OldPirateBay {
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new OldPirateBayAdapter();
+		}
+	},
 	ScambioEtico {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new ScambioEtico();
-		}
-	},
-	ThePirateBay {
-		@Override
-		public ISearchAdapter getAdapter() {
-			return new ThePirateBayAdapter();
-		}
-	},
-	ThePirateBayMirror {
-		@Override
-		public ISearchAdapter getAdapter() {
-			return new ThePirateBayMirrorAdapter();
 		}
 	},
 	TorrentDay {
