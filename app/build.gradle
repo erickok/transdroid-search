@@ -6,14 +6,19 @@ android {
 
     defaultConfig {
         applicationId "org.transdroid.search"
-        minSdkVersion 3
+        minSdkVersion 11
         targetSdkVersion 21
         versionCode 21
         versionName "3.0"
     }
     buildTypes {
         release {
-            minifyEnabled false
+            minifyEnabled true
         }
     }
+}
+
+dependencies {
+    compile 'com.android.support:appcompat-v7:21.0.3'
+    compile 'com.android.support:support-annotations:20.0.0'
 }

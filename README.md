@@ -1,7 +1,7 @@
 transdroid-search
 =================
 
-Transdroid Torrent Search is an Android application that provides torrent search results to other Android apps by exposing `ContentProvider`s. Originally part of [Transdroid](http://www.transdroid.org), it now supplies torrent links for 10+ torrent sites to various torrent-related Android applications.
+Transdroid Torrent Search is an Android application that provides torrent search results to other Android apps by exposing `ContentProvider`s. Originally part of [Transdroid](http://www.transdroid.org), it now supplies torrent links for 20+ public and private torrent sites to various torrent-related Android applications.
 
 The latest .apk is available via [transdroid.org/latest-search](http://transdroid.org/latest-search) and code is available under the Lesser GPL v3 license.
 

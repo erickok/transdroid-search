@@ -18,48 +18,57 @@
  */
 package org.transdroid.search.gui;
 
+import android.os.Bundle;
+import android.preference.PreferenceCategory;
+import android.preference.PreferenceFragment;
+import android.support.v7.app.ActionBarActivity;
+
 import org.transdroid.search.R;
 import org.transdroid.search.TorrentSite;
 
-import android.os.Bundle;
-import android.preference.PreferenceActivity;
-import android.preference.PreferenceCategory;
-
 /**
- * An activity that shows all public and private torrent sites supported and allows to enter settings for each site (if
- * approprate) as well as to enable/disable a site.
+ * An activity that shows all public and private torrent sites supported and allows to enter settings for each site (if approprate) as well as to
+ * enable/disable a site.
  * @author Eric Kok
  */
-public class SettingsActivity extends PreferenceActivity {
+public class SettingsActivity extends ActionBarActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		if (savedInstanceState == null) {
+			getSupportActionBar(); // Call to force content creation; see https://code.google.com/p/android/issues/detail?id=78701
+			getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingsFragment()).commit();
+		}
 	}
 
-	@SuppressWarnings("deprecation")
-	@Override
-	protected void onResume() {
-		super.onResume();
+	public static class SettingsFragment extends PreferenceFragment {
 
-		// Load the preferences screen
-		if (getPreferenceScreen() != null)
-			getPreferenceScreen().removeAll();
-		addPreferencesFromResource(R.xml.pref_settings);
+		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
 
-		// Retrieve all torrent sites and build a preference object for them
-		int publicCounter = 101;
-		int privateCounter = 201;
-		TorrentSite[] sites = TorrentSite.values();
-		PreferenceCategory publicGroup = (PreferenceCategory) findPreference("header_publicsites");
-		PreferenceCategory privateGroup = (PreferenceCategory) findPreference("header_privatesites");
-		for (TorrentSite torrentSite : sites) {
-			if (torrentSite.getAdapter().isPrivateSite())
-				privateGroup.addPreference(new PrivateSitePreference(this, privateCounter++, torrentSite));
-			else
-				publicGroup.addPreference(new PublicSitePreference(this, publicCounter++, torrentSite));
+			// Load the preferences screen
+			if (getPreferenceScreen() != null) {
+				getPreferenceScreen().removeAll();
+			}
+			addPreferencesFromResource(R.xml.pref_settings);
+
+			// Retrieve all torrent sites and build a preference object for them
+			int publicCounter = 101;
+			int privateCounter = 201;
+			TorrentSite[] sites = TorrentSite.values();
+			PreferenceCategory publicGroup = (PreferenceCategory) findPreference("header_publicsites");
+			PreferenceCategory privateGroup = (PreferenceCategory) findPreference("header_privatesites");
+			for (TorrentSite torrentSite : sites) {
+				if (torrentSite.getAdapter().isPrivateSite()) {
+					privateGroup.addPreference(new PrivateSitePreference(getActivity(), privateCounter++, torrentSite));
+				} else {
+					publicGroup.addPreference(new PublicSitePreference(getActivity(), publicCounter++, torrentSite));
+				}
+			}
+
 		}
-
 	}
 
 }

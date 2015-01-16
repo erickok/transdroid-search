@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+	<style name="Theme.Transdroid.Search" parent="Theme.AppCompat">
+		<item name="colorPrimary">#388E3C</item>
+		<item name="colorPrimaryDark">#1B5E20</item>
+		<item name="colorAccent">#A5D6A7</item>
+		<item name="colorControlHighlight">#A5D6A7</item>
+	</style>
+
+</resources>

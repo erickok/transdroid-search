@@ -14,7 +14,7 @@
  *	be useful, but WITHOUT ANY WARRANTY; without even the implied 
  *	warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
  *	See the GNU Lesser General Public License for more details.
- *	
+ *
  *	You should have received a copy of the GNU Lesser General Public 
  *	License along with Transdroid.  If not, see <http://www.gnu.org/licenses/>.
  */
@@ -29,7 +29,8 @@
 	<application
 		android:icon="@drawable/ic_launcher" 
 		android:label="Torrent Search (by Transdroid)"
-		android:description="@string/app_description">
+		android:description="@string/app_description"
+		android:theme="@style/Theme.Transdroid.Search">
 	
 		<provider
 			android:name="org.transdroid.search.TorrentSitesProvider"
