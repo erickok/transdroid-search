@@ -1,0 +1,19 @@
+apply plugin: 'com.android.application'
+
+android {
+    compileSdkVersion 21
+    buildToolsVersion "21.1.1"
+
+    defaultConfig {
+        applicationId "org.transdroid.search"
+        minSdkVersion 3
+        targetSdkVersion 21
+        versionCode 21
+        versionName "3.0"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+        }
+    }
+}

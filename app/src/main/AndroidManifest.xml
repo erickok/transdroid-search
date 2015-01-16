@@ -21,13 +21,9 @@
  -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools"
-	package="org.transdroid.search"
-	android:versionName="2.3"
-	android:versionCode="20">
+	package="org.transdroid.search">
 	
-	<uses-sdk android:minSdkVersion="3" android:targetSdkVersion="19" />
-	<supports-screens android:smallScreens="true" android:normalScreens="true" android:largeScreens="true" 
-		android:anyDensity="true" />
+	<uses-sdk />
 	<uses-permission android:name="android.permission.INTERNET" />
 	
 	<application
