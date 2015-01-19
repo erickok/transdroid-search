@@ -19,6 +19,8 @@
 package org.transdroid.search.gui;
 
 import android.app.Activity;
+import android.content.Intent;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
@@ -27,8 +29,8 @@ import org.transdroid.search.R;
 import org.transdroid.search.TorrentSite;
 
 /**
- * An activity that shows all public and private torrent sites supported and allows to enter settings for each site (if approprate) as well as to
- * enable/disable a site.
+ * Dummy activity to decide which interaface to use, compat or modern, based on the Android version. This allows using an PreferenceActivity for
+ * Android devices/versions that do not yet support PreferenceFragment without having to include support libraries, etc.
  * @author Eric Kok
  */
 public class SettingsActivity extends Activity {
@@ -36,38 +38,12 @@ public class SettingsActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		if (savedInstanceState == null) {
-			getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingsFragment()).commit();
+		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
+			startActivity(new Intent(this, SettingsActivityModern.class));
+		} else {
+			startActivity(new Intent(this, SettingsActivityCompat.class));
 		}
-	}
-
-	public static class SettingsFragment extends PreferenceFragment {
-
-		@Override
-		public void onCreate(Bundle savedInstanceState) {
-			super.onCreate(savedInstanceState);
-
-			// Load the preferences screen
-			if (getPreferenceScreen() != null) {
-				getPreferenceScreen().removeAll();
-			}
-			addPreferencesFromResource(R.xml.pref_settings);
-
-			// Retrieve all torrent sites and build a preference object for them
-			int publicCounter = 101;
-			int privateCounter = 201;
-			TorrentSite[] sites = TorrentSite.values();
-			PreferenceCategory publicGroup = (PreferenceCategory) findPreference("header_publicsites");
-			PreferenceCategory privateGroup = (PreferenceCategory) findPreference("header_privatesites");
-			for (TorrentSite torrentSite : sites) {
-				if (torrentSite.getAdapter().isPrivateSite()) {
-					privateGroup.addPreference(new PrivateSitePreference(getActivity(), privateCounter++, torrentSite));
-				} else {
-					publicGroup.addPreference(new PublicSitePreference(getActivity(), publicCounter++, torrentSite));
-				}
-			}
-
-		}
+		finish();
 	}
 
 }

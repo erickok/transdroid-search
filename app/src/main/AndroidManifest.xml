@@ -22,37 +22,46 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
 	xmlns:tools="http://schemas.android.com/tools"
 	package="org.transdroid.search">
-	
+
 	<uses-sdk />
 	<uses-permission android:name="android.permission.INTERNET" />
-	
+
 	<application
-		android:icon="@drawable/ic_launcher" 
+		android:icon="@drawable/ic_launcher"
 		android:label="Torrent Search (by Transdroid)"
 		android:description="@string/app_description"
 		android:theme="@style/Theme.Transdroid.Search">
-	
+
 		<provider
 			android:name="org.transdroid.search.TorrentSitesProvider"
 			android:authorities="org.transdroid.search.torrentsitesprovider"
 			android:exported="true"
 			tools:ignore="ExportedContentProvider" />
-	
+
 		<provider
 			android:name="org.transdroid.search.TorrentSearchProvider"
 			android:authorities="org.transdroid.search.torrentsearchprovider"
 			android:exported="true"
 			tools:ignore="ExportedContentProvider" />
-		
+
 		<activity
-			android:name="org.transdroid.search.gui.SettingsActivity"
-			android:label="@string/pref_settingslabel">
+			android:name=".gui.SettingsActivity"
+			android:label="@string/pref_settingslabel"
+			android:noHistory="true">
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
 				<category android:name="android.intent.category.LAUNCHER" />
 			</intent-filter>
 		</activity>
-		
-</application>
+
+		<activity
+			android:name=".gui.SettingsActivityCompat"
+			android:label="@string/pref_settingslabel" />
+
+		<activity
+			android:name=".gui.SettingsActivityModern"
+			android:label="@string/pref_settingslabel" />
+
+	</application>
 
 </manifest> 

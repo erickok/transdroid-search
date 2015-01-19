@@ -6,7 +6,7 @@ android {
 
     defaultConfig {
         applicationId "org.transdroid.search"
-        minSdkVersion 11
+        minSdkVersion 8
         targetSdkVersion 21
         versionCode 22
         versionName "3.0.1"
