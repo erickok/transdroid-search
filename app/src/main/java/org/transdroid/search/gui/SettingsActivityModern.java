@@ -18,7 +18,9 @@
  */
 package org.transdroid.search.gui;
 
+import android.annotation.TargetApi;
 import android.app.Activity;
+import android.os.Build;
 import android.os.Bundle;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
@@ -27,10 +29,11 @@ import org.transdroid.search.R;
 import org.transdroid.search.TorrentSite;
 
 /**
- * The modern-devcie version (Android 3.0 and later) of the activity that shows all public and private torrent sites supported and which allows to
+ * The modern-device version (Android 3.0 and later) of the activity that shows all public and private torrent sites supported and which allows to
  * enter settings for each site (if appropriate) as well as to enable/disable a site.
  * @author Eric Kok
  */
+@TargetApi(Build.VERSION_CODES.HONEYCOMB)
 public class SettingsActivityModern extends Activity {
 
 	@Override
