@@ -52,12 +52,12 @@ import org.transdroid.util.HttpHelper;
 import android.content.Context;
 
 /**
- * An adapter that provides access to IPTorrents searches by parsing the raw HTML output.
+ * An adapter that provides access to TorrentDay searches by parsing the raw HTML output.
  */
 public class TorrentDayAdapter implements ISearchAdapter {
 
-	private static final String LOGINURL = "http://www.td.af/torrents/";
-	private static final String QUERYURL = "http://www.td.af/V3/API/API.php";
+	private static final String LOGINURL = "https://torrentday.eu/torrents/";
+	private static final String QUERYURL = "https://torrentday.eu/V3/API/API.php";
 	private static final int CONNECTION_TIMEOUT = 8000;
 
 	private DefaultHttpClient prepareRequest(Context context) throws Exception {
@@ -77,8 +77,8 @@ public class TorrentDayAdapter implements ISearchAdapter {
 
 		// First log in
 		HttpPost loginPost = new HttpPost(LOGINURL);
-		loginPost.setEntity(new UrlEncodedFormEntity(Arrays.asList(new BasicNameValuePair[] {
-				new BasicNameValuePair("username", username), new BasicNameValuePair("password", password) })));
+		loginPost.setEntity(new UrlEncodedFormEntity(Arrays.asList(new BasicNameValuePair("username", username),
+				new BasicNameValuePair("password", password))));
 		HttpResponse loginResult = httpclient.execute(loginPost);
 		if (loginResult.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
 			// Failed to sign in
@@ -94,20 +94,10 @@ public class TorrentDayAdapter implements ISearchAdapter {
 
 		DefaultHttpClient httpclient = prepareRequest(context);
 
-		// Build a search request parameters
-		String encodedQuery = "";
-		try {
-			encodedQuery = URLEncoder.encode(query, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			throw e;
-		}
-
 		// Start synchronous search via the JSON API
-
-		// Make request
 		HttpPost queryPost = new HttpPost(QUERYURL);
-		List<BasicNameValuePair> params = new ArrayList<BasicNameValuePair>();
-		params.add(new BasicNameValuePair("search", encodedQuery));
+		List<BasicNameValuePair> params = new ArrayList<>();
+		params.add(new BasicNameValuePair("search", URLEncoder.encode(query, "UTF-8")));
 		params.add(new BasicNameValuePair("jxt", "8")); // ???
 		params.add(new BasicNameValuePair("jxw", "b")); // ???
 		params.add(new BasicNameValuePair("cata", "yes")); // ???
@@ -128,7 +118,7 @@ public class TorrentDayAdapter implements ISearchAdapter {
 		JSONObject structure = new JSONObject(json);
 		
 		// Construct the list of search results
-		List<SearchResult> results = new ArrayList<SearchResult>();
+		List<SearchResult> results = new ArrayList<>();
 		JSONArray torrents = structure.getJSONArray("Fs").getJSONObject(0).getJSONObject("Cn").getJSONArray("torrents");
 		String detailsLink = "http://www.td.af/details.php?id=%1$s";
 		String torrentLink = "http://www.td.af/download.php/%1$s/%2$s";
