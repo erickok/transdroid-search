@@ -1,4 +1,4 @@
-package org.transdroid.search.GetStrike;
+package org.transdroid.search.StrikeSearch;
 
 import android.content.Context;
 
@@ -27,9 +27,9 @@ import java.util.List;
 import java.util.Locale;
 
 /*
-* Adapter for getstrike.net. See https://getstrike.net/api
+* Adapter for Strike Search. See https://getstrike.net/api
 * */
-public class GetStrikeAdapter implements ISearchAdapter{
+public class StrikeSearchAdapter implements ISearchAdapter{
     private static final String QUERYURL = "https://getstrike.net/api/v2/torrents/search/?phrase=";
     private static final int CONNECTION_TIMEOUT = 8000;
     private static final int MEGABYTES_IN_BYTES = 1024*1024;
@@ -120,7 +120,7 @@ public class GetStrikeAdapter implements ISearchAdapter{
 
     @Override
     public String getSiteName() {
-        return "GetStrike";
+        return "Strike Search";
     }
 
     @Override
