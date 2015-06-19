@@ -22,6 +22,7 @@ import android.content.Context;
 
 import org.transdroid.search.AsiaTorrents.AsiaTorrentsAdapter;
 import org.transdroid.search.BitHdtv.BitHdtvAdapter;
+import org.transdroid.search.HoundDawgs.HoundDawgsAdapter;
 import org.transdroid.search.OldPirateBay.OldPirateBayAdapter;
 import org.transdroid.search.RssFeedSearch.BitSnoopAdapter;
 import org.transdroid.search.RssFeedSearch.ExtraTorrentAdapter;
@@ -73,6 +74,12 @@ public enum TorrentSite {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new HdBitsOrgAdapter();
+		}
+	},
+	HoundDawgs {
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new HoundDawgsAdapter();
 		}
 	},
 	KickassTorents {
