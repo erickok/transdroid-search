@@ -35,6 +35,7 @@ import org.transdroid.search.ScambioEtico.ScambioEtico;
 import org.transdroid.search.TorrentDay.TorrentDayAdapter;
 import org.transdroid.search.TorrentLeech.TorrentLeechAdapter;
 import org.transdroid.search.hdbitsorg.HdBitsOrgAdapter;
+import org.transdroid.search.hdtorrents.HdTorrentsAdapter;
 import org.transdroid.search.revolutiontt.RevolutionTTAdapter;
 
 import java.io.InputStream;
@@ -140,7 +141,13 @@ public enum TorrentSite {
 		public ISearchAdapter getAdapter() {
 			return new TorrentLeechAdapter();
 		}
-	};
+	},
+    HdTorrents {
+        @Override
+        public ISearchAdapter getAdapter() {
+            return new HdTorrentsAdapter();
+        }
+    };
 
 	/**
 	 * Directly and synchronously perform the search for torrents matching the given query string.
