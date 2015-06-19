@@ -39,6 +39,7 @@ import org.transdroid.search.TorrentDay.TorrentDayAdapter;
 import org.transdroid.search.TorrentLeech.TorrentLeechAdapter;
 import org.transdroid.search.hdbitsorg.HdBitsOrgAdapter;
 import org.transdroid.search.hdtorrents.HdTorrentsAdapter;
+import org.transdroid.search.rarbg.RarbgAdapter;
 import org.transdroid.search.revolutiontt.RevolutionTTAdapter;
 
 import java.io.InputStream;
@@ -149,6 +150,12 @@ public enum TorrentSite {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new RevolutionTTAdapter();
+		}
+	},
+	Rarbg {
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new RarbgAdapter();
 		}
 	},
 	TorrentDay {

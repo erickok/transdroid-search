@@ -56,7 +56,7 @@ public class HttpHelper {
 
 		SchemeRegistry registry = new SchemeRegistry();
 		registry.register(new Scheme("http", new PlainSocketFactory(), 80));
-		registry.register(new Scheme("https", ignoreSslIssues ? new IgnoreTlsSniSocketFactory() : SSLSocketFactory.getSocketFactory(), 443));
+		registry.register(new Scheme("https", ignoreSslIssues ? new IgnoreTlsSniSocketFactory() : new TlsSniSocketFactory(), 443));
 
 		HttpParams httpparams = new BasicHttpParams();
 		HttpConnectionParams.setConnectionTimeout(httpparams, 8000);
