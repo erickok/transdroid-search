@@ -23,6 +23,7 @@ import android.content.Context;
 import org.transdroid.search.AsiaTorrents.AsiaTorrentsAdapter;
 import org.transdroid.search.BitHdtv.BitHdtvAdapter;
 import org.transdroid.search.HoundDawgs.HoundDawgsAdapter;
+import org.transdroid.search.StrikeSearch.StrikeSearchAdapter;
 import org.transdroid.search.OldPirateBay.OldPirateBayAdapter;
 import org.transdroid.search.RssFeedSearch.BitSnoopAdapter;
 import org.transdroid.search.RssFeedSearch.ExtraTorrentAdapter;
@@ -36,6 +37,7 @@ import org.transdroid.search.ScambioEtico.ScambioEtico;
 import org.transdroid.search.TorrentDay.TorrentDayAdapter;
 import org.transdroid.search.TorrentLeech.TorrentLeechAdapter;
 import org.transdroid.search.hdbitsorg.HdBitsOrgAdapter;
+import org.transdroid.search.hdtorrents.HdTorrentsAdapter;
 import org.transdroid.search.revolutiontt.RevolutionTTAdapter;
 
 import java.io.InputStream;
@@ -74,6 +76,12 @@ public enum TorrentSite {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new HdBitsOrgAdapter();
+		}
+	},
+	HdTorrents {
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new HdTorrentsAdapter();
 		}
 	},
 	HoundDawgs {
@@ -122,6 +130,12 @@ public enum TorrentSite {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new ScambioEtico();
+		}
+	},
+	StrikeSearch {
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new StrikeSearchAdapter();
 		}
 	},
 	RevolutionTT {
