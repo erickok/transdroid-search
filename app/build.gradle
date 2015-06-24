@@ -2,14 +2,14 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 21
-    buildToolsVersion "21.1.1"
+    buildToolsVersion "21.1.2"
 
     defaultConfig {
         applicationId "org.transdroid.search"
         minSdkVersion 8
-        targetSdkVersion 21
-        versionCode 23
-        versionName "3.1.0"
+        targetSdkVersion 22
+        versionCode 24
+        versionName "3.2.0"
     }
     buildTypes {
         release {
