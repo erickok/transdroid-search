@@ -30,7 +30,6 @@ import org.transdroid.search.RssFeedSearch.ExtraTorrentAdapter;
 import org.transdroid.search.RssFeedSearch.KickassTorrentsAdapter;
 import org.transdroid.search.RssFeedSearch.LimeTorrentsAdapter;
 import org.transdroid.search.RssFeedSearch.MininovaAdapter;
-import org.transdroid.search.RssFeedSearch.MonovaAdapter;
 import org.transdroid.search.RssFeedSearch.NyaaTorrentsAdapter;
 import org.transdroid.search.RssFeedSearch.TorrentDownloadsAdapter;
 import org.transdroid.search.ScambioEtico.ScambioEtico;
@@ -114,12 +113,6 @@ public enum TorrentSite {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new MininovaAdapter();
-		}
-	},
-	Monova {
-		@Override
-		public ISearchAdapter getAdapter() {
-			return new MonovaAdapter();
 		}
 	},
 	NyaaTorrents {
