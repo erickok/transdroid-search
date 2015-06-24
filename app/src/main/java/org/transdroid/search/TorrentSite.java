@@ -25,7 +25,6 @@ import org.transdroid.search.BitHdtv.BitHdtvAdapter;
 import org.transdroid.search.Danishbits.DanishbitsAdapter;
 import org.transdroid.search.HoundDawgs.HoundDawgsAdapter;
 import org.transdroid.search.StrikeSearch.StrikeSearchAdapter;
-import org.transdroid.search.OldPirateBay.OldPirateBayAdapter;
 import org.transdroid.search.RssFeedSearch.BitSnoopAdapter;
 import org.transdroid.search.RssFeedSearch.ExtraTorrentAdapter;
 import org.transdroid.search.RssFeedSearch.KickassTorrentsAdapter;
@@ -35,6 +34,7 @@ import org.transdroid.search.RssFeedSearch.MonovaAdapter;
 import org.transdroid.search.RssFeedSearch.NyaaTorrentsAdapter;
 import org.transdroid.search.RssFeedSearch.TorrentDownloadsAdapter;
 import org.transdroid.search.ScambioEtico.ScambioEtico;
+import org.transdroid.search.ThePirateBay.ThePirateBayAdapter;
 import org.transdroid.search.TorrentDay.TorrentDayAdapter;
 import org.transdroid.search.TorrentLeech.TorrentLeechAdapter;
 import org.transdroid.search.hdbitsorg.HdBitsOrgAdapter;
@@ -128,10 +128,10 @@ public enum TorrentSite {
 			return new NyaaTorrentsAdapter();
 		}
 	},
-	OldPirateBay {
+	ThePirateBay {
 		@Override
 		public ISearchAdapter getAdapter() {
-			return new OldPirateBayAdapter();
+			return new ThePirateBayAdapter();
 		}
 	},
 	ScambioEtico {

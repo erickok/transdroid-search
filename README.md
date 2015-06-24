@@ -62,6 +62,8 @@ Developed By
 * Gabor Foldvari
 * Marco Furlando
 * Mário Franco
+* Martin Piffault
+* Colby Brown
 * and others...
 
 License
