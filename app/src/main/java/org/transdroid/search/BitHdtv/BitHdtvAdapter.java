@@ -72,9 +72,15 @@ public class BitHdtvAdapter implements ISearchAdapter {
 		HttpClient httpclient = HttpHelper.buildDefaultSearchHttpClient(false);
 		HttpPost loginPost = new HttpPost(LOGINURL);
 		loginPost.setEntity(new UrlEncodedFormEntity(
-				Arrays.asList(new BasicNameValuePair[]{new BasicNameValuePair(LOGIN_USER, username), new BasicNameValuePair(LOGIN_PASS, password)})));
+				Arrays.asList(new BasicNameValuePair(LOGIN_USER, username), new BasicNameValuePair(LOGIN_PASS, password))));
 		HttpResponse loginResult = httpclient.execute(loginPost);
 		if (loginResult.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+			// Failed to sign in
+			throw new LoginException("Login failure for BitHdTv with user " + username);
+		}
+		String loginHtml = HttpHelper.convertStreamToString(loginResult.getEntity().getContent());
+		final String LOGIN_ERROR = "Login failed!";
+		if (loginHtml == null || loginHtml.contains(LOGIN_ERROR)) {
 			// Failed to sign in
 			throw new LoginException("Login failure for BitHdTv with user " + username);
 		}
