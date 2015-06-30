@@ -52,7 +52,7 @@ import org.transdroid.util.HttpHelper;
 import android.content.Context;
 
 /**
- * An adapter that provides access to TorrentDay searches by parsing the raw HTML output.
+ * An adapter that provides access to TorrentDay searches by parsing their AJAX JSON API.
  */
 public class TorrentDayAdapter implements ISearchAdapter {
 
@@ -108,7 +108,7 @@ public class TorrentDayAdapter implements ISearchAdapter {
 		queryPost.setEntity(new UrlEncodedFormEntity(params));
 		HttpResponse queryResult = httpclient.execute(queryPost);
 		if (queryResult.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-			throw new Exception("Unsuccessful query to the TorretnDay JSON API (after a successful login)");
+			throw new Exception("Unsuccessful query to the TorrentDay JSON API (after a successful login)");
 		}
 
 		// Read JSON response
@@ -120,8 +120,8 @@ public class TorrentDayAdapter implements ISearchAdapter {
 		// Construct the list of search results
 		List<SearchResult> results = new ArrayList<>();
 		JSONArray torrents = structure.getJSONArray("Fs").getJSONObject(0).getJSONObject("Cn").getJSONArray("torrents");
-		String detailsLink = "http://www.td.af/details.php?id=%1$s";
-		String torrentLink = "http://www.td.af/download.php/%1$s/%2$s";
+		String detailsLink = "https://torrentday.eu/details.php?id=%1$s";
+		String torrentLink = "https://torrentday.eu/download.php/%1$s/%2$s";
 		SimpleDateFormat addedFormat = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
 		for (int i = 0; i < torrents.length(); i++) {
 			JSONObject torrent = torrents.getJSONObject(i);
