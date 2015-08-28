@@ -86,8 +86,8 @@ public class BTNAdapter implements ISearchAdapter {
 			JSONObject apiSearchResultsTorrents = apiSearchResults.getJSONObject("torrents");
 			Iterator<String> searchResultSetKeys = apiSearchResultsTorrents.keys();
 			while (searchResultSetKeys.hasNext())
-            {
-                String resultKey = searchResultSetKeys.next();
+			{
+				String resultKey = searchResultSetKeys.next();
 				try {
 					JSONObject resultEntry = apiSearchResultsTorrents.getJSONObject(resultKey);
 
@@ -106,43 +106,43 @@ public class BTNAdapter implements ISearchAdapter {
 
 					// Ensure we have a title, in case the torrent has no release name
 					if (name.equals(""))
-                    {
-                        StringBuilder sb = new StringBuilder();
-                        sb.append(series);
-                        if (!sb.toString().equals(""))
-                            sb.append(".");
-                        sb.append(groupName);
-                        if (!sb.toString().equals(""))
-                            sb.append(".");
-                        sb.append(resolution);
-                        if (!sb.toString().equals(""))
-                            sb.append(".");
-                        sb.append(source);
-                        if (!sb.toString().equals(""))
-                            sb.append(".");
-                        sb.append(codec);
-                        if (!sb.toString().equals(""))
-                            name = sb.toString();
+					{
+						StringBuilder sb = new StringBuilder();
+						sb.append(series);
+						if (!sb.toString().equals(""))
+							sb.append(".");
+						sb.append(groupName);
+						if (!sb.toString().equals(""))
+							sb.append(".");
+						sb.append(resolution);
+						if (!sb.toString().equals(""))
+							sb.append(".");
+						sb.append(source);
+						if (!sb.toString().equals(""))
+							sb.append(".");
+						sb.append(codec);
+						if (!sb.toString().equals(""))
+							name = sb.toString();
 
-                        name = name.replace(" ", ".");
-                    }
+						name = name.replace(" ", ".");
+					}
 
 					String details = "";
 					if (tvdbID != null)
-                        details = THETVDB_BASE_URL + tvdbID;
+						details = THETVDB_BASE_URL + tvdbID;
 
 					results.add(
-                        new SearchResult(name, link, details, size, date, seeders, leechers)
-                    );
+						new SearchResult(name, link, details, size, date, seeders, leechers)
+					);
 				} catch (JSONException e) {
 					e.printStackTrace();
 				}
 			}
 
 			if (order == SortOrder.BySeeders)
-            {
-                Collections.sort(results, new TorrentSeedsComparator());
-            }
+			{
+				 Collections.sort(results, new TorrentSeedsComparator());
+			}
 		} catch (JSONException e) {
 			e.printStackTrace();
 		} finally {
