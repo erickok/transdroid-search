@@ -95,5 +95,17 @@ public class SettingsHelper {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		return prefs.getString(PREF_SITE_PASS + site.name(), null);
 	}
+	
+	/**
+	 * Returns the API token that the user specified in the settings as site-specific credentials.
+	 * @param context The android activity or provider context to access shared preferences from
+	 * @param site The site for which to retrieve the API key/access token
+	 * @return The API token that the user entered in the settings as site-specific user pass, or null if none
+	 *         entered
+	 */
+	public static String getSiteToken(Context context, TorrentSite site) {
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+		return prefs.getString(PREF_SITE_TOKEN + site.name(), null);
+	}
 
 }
