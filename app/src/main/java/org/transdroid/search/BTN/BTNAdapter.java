@@ -59,14 +59,10 @@ public class BTNAdapter implements ISearchAdapter {
 	@Override
 	public List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception {
 
-		// transdroid fudge - the user can enter the API key in either field
-		String username = SettingsHelper.getSiteUser(context, TorrentSite.BTN);
-		String password = SettingsHelper.getSitePass(context, TorrentSite.BTN);
-		String apikey = (username == null ? password : username);
+		String apikey = SettingsHelper.getSiteToken(context, TorrentSite.BTN);
 
-		if (username == null && password == null) {
+		if (apikey == null)
 			throw new LoginException("The BTN user API key was not provided, please configure BTN site settings");
-		}
 
 		// Try and get the search results - if we can't, assume invalid API key
 		JSONObject apiSearchResults;
