@@ -1,5 +1,4 @@
 apply plugin: 'com.android.application'
-
 android {
     compileSdkVersion 23
     buildToolsVersion "23.0.0"
@@ -17,4 +16,7 @@ android {
             minifyEnabled true
         }
     }
+}
+dependencies {
+    compile files('libs/android-json-rpc-0.3.4.jar')
 }
