@@ -123,5 +123,10 @@ public class BitSnoopAdapter extends RssFeedSearchAdapter {
 	public boolean isPrivateSite() {
 		return false;
 	}
-	
+
+	@Override
+	public boolean usesToken() {
+		return false;
+	}
+
 }

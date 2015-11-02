@@ -49,6 +49,11 @@ public class RarbgAdapter implements ISearchAdapter {
 	}
 
 	@Override
+	public boolean usesToken() {
+		return false;
+	}
+
+	@Override
 	public List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception {
 
 		if (httpclient == null) {

@@ -40,7 +40,7 @@ public interface ISearchAdapter {
 	 * @return The list of found torrents on the site matching the search query
 	 * @throws Exception When an exception occurred during the loading or parsing of the search results
 	 */
-	public List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception;
+	List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception;
 
 	/**
 	 * Implementing search providers should provide the URL of an RSS feed matching the search a specific query.
@@ -48,20 +48,26 @@ public interface ISearchAdapter {
 	 * @param order The preferred order in which the RSS items are sorted
 	 * @return The RSS feed URL, or null if this is not supported by the site
 	 */
-	public String buildRssFeedUrlFromSearch(String query, SortOrder order);
+	String buildRssFeedUrlFromSearch(String query, SortOrder order);
 
 	/**
 	 * Implementing search providers should return the real name of the site they work on.
 	 * @return The name of the torrent site
 	 */
-	public String getSiteName();
+	String getSiteName();
 
 	/**
 	 * Implementing search providers should return whether this is a private site, that is, whether this site requires
 	 * user credentials before it can be searched.
 	 * @return True if this is an adapter to a private site, false otherwise.
 	 */
-	public boolean isPrivateSite();
+	boolean isPrivateSite();
+
+	/**
+	 * Implementing search providers should return whether the site uses a token authentication system.
+	 * @return True is a session token is used in lieu of a username/password login combination
+	 */
+	boolean usesToken();
 
 	/**
 	 * Implement search providers should set up an HTTP request for the specified torrent file uri and, possibly after
@@ -72,6 +78,6 @@ public interface ISearchAdapter {
 	 *         possible (like when the device is offline or when the user is not authorized)
 	 * @throws Exception When an exception occurred during the retrieval of the request url
 	 */
-	public InputStream getTorrentFile(Context context, String url) throws Exception;
+	InputStream getTorrentFile(Context context, String url) throws Exception;
 
 }

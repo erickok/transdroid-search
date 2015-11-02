@@ -97,6 +97,11 @@ public class HdBitsOrgAdapter implements ISearchAdapter {
     }
 
     @Override
+    public boolean usesToken() {
+        return false;
+    }
+
+    @Override
     public List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception {
         
         DefaultHttpClient client = prepareRequest(context);

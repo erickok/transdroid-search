@@ -129,6 +129,11 @@ public class StrikeSearchAdapter implements ISearchAdapter{
     }
 
     @Override
+    public boolean usesToken() {
+        return false;
+    }
+
+    @Override
     public InputStream getTorrentFile(Context context, String url) throws Exception {
         return null;
     }
