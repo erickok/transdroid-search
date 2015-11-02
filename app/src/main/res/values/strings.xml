@@ -7,8 +7,10 @@
     <string name="pref_publicsites">Public sites</string>
     <string name="pref_privatesites">Private sites</string>
     <string name="pref_credentials">Site credentials</string>
+    <string name="pref_token">Site token</string>
     <string name="pref_hint_username">Username</string>
     <string name="pref_hint_password">Password</string>
+    <string name="pref_hint_token">API/session token</string>
     
     <string name="login_failure">Invalid user name or password for private tracker.</string>
 

@@ -64,5 +64,10 @@ public class MininovaAdapter extends RssFeedSearchAdapter {
 	public boolean isPrivateSite() {
 		return false;
 	}
-	
+
+	@Override
+	public boolean usesToken() {
+		return false;
+	}
+
 }

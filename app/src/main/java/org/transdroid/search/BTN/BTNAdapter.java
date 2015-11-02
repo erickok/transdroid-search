@@ -173,6 +173,11 @@ public class BTNAdapter implements ISearchAdapter {
 		return true;
 	}
 
+	@Override
+	public boolean usesToken() {
+		return true;
+	}
+
 	class TorrentSeedsComparator implements Comparator<SearchResult> {
 		public int compare(SearchResult tor1, SearchResult tor2) {
 			return tor2.getSeeds() - tor1.getSeeds();

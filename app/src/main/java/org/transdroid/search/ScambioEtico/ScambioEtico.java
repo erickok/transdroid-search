@@ -245,4 +245,9 @@ public class ScambioEtico implements ISearchAdapter {
 		return true;
 	}
 
+	@Override
+	public boolean usesToken() {
+		return false;
+	}
+
 }

@@ -122,5 +122,10 @@ public class LimeTorrentsAdapter extends RssFeedSearchAdapter {
 	public boolean isPrivateSite() {
 		return false;
 	}
-	
+
+	@Override
+	public boolean usesToken() {
+		return false;
+	}
+
 }

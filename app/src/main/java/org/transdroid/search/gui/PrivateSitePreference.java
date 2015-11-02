@@ -34,28 +34,35 @@ import android.view.View;
 import android.widget.EditText;
 
 /**
- * Represents a private site as preference activity list item and allows entering the username and password for the site
- * via a pop-up dialog.
+ * Represents a private site as preference activity list item and allows entering the token or username and password for
+ * the site via a pop-up dialog.
  * @author Eric Kok
  */
 public class PrivateSitePreference extends DialogPreference {
 
 	private final TorrentSite torrentSite;
-	private EditText userEdit, passEdit;
+	private final boolean usesToken;
+	private EditText userEdit, passEdit, tokenEdit;
 
 	public PrivateSitePreference(Context context, int sortOrder, TorrentSite torrentSite) {
 		super(context, null);
 		this.torrentSite = torrentSite;
+		this.usesToken = torrentSite.getAdapter().usesToken();
 
 		// Set up the credentials dialog and the preference appearance
 		setOrder(sortOrder);
 		setTitle(torrentSite.getAdapter().getSiteName());
-		setDialogLayoutResource(R.layout.dialog_credentials);
-		setDialogTitle(R.string.pref_credentials);
-		String currentUser = PreferenceManager.getDefaultSharedPreferences(getContext()).getString(
-				SettingsHelper.PREF_SITE_USER + torrentSite.name(), null);
-		if (currentUser != null)
-			setSummary(currentUser);
+		if (usesToken) {
+			setDialogLayoutResource(R.layout.dialog_token);
+			setDialogTitle(R.string.pref_token);
+		} else {
+			setDialogLayoutResource(R.layout.dialog_credentials);
+			setDialogTitle(R.string.pref_credentials);
+			String currentUser = PreferenceManager.getDefaultSharedPreferences(getContext())
+					.getString(SettingsHelper.PREF_SITE_USER + torrentSite.name(), null);
+			if (currentUser != null)
+				setSummary(currentUser);
+		}
 
 	}
 
@@ -69,11 +76,17 @@ public class PrivateSitePreference extends DialogPreference {
 	@Override
 	protected View onCreateDialogView() {
 		View dialog = super.onCreateDialogView();
-		userEdit = (EditText) dialog.findViewById(R.id.username);
-		passEdit = (EditText) dialog.findViewById(R.id.password);
-		SharedPreferences sp = PreferenceManager.getDefaultSharedPreferences(getContext());
-		userEdit.setText(sp.getString(SettingsHelper.PREF_SITE_USER + torrentSite.name(), ""));
-		passEdit.setText(sp.getString(SettingsHelper.PREF_SITE_PASS + torrentSite.name(), ""));
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+		if (usesToken) {
+			tokenEdit = (EditText) dialog.findViewById(R.id.token);
+			// Show token for easy modification
+			tokenEdit.setText(prefs.getString(SettingsHelper.PREF_SITE_TOKEN + torrentSite.name(), ""));
+		} else {
+			userEdit = (EditText) dialog.findViewById(R.id.username);
+			passEdit = (EditText) dialog.findViewById(R.id.password);
+			// Show username for easy modification
+			userEdit.setText(prefs.getString(SettingsHelper.PREF_SITE_USER + torrentSite.name(), ""));
+		}
 		return dialog;
 	}
 
@@ -81,9 +94,20 @@ public class PrivateSitePreference extends DialogPreference {
 	protected void onDialogClosed(boolean positiveResult) {
 		super.onDialogClosed(positiveResult);
 		if (positiveResult) {
-			// Get the edit texts that the user entered the username and password in
-			persistUserAndPass(userEdit.getText().toString(), passEdit.getText().toString());
+			if (usesToken) {
+				persistToken(tokenEdit.getText().toString());
+			} else {
+				persistUserAndPass(userEdit.getText().toString(), passEdit.getText().toString());
+			}
 		}
+	}
+
+	private void persistToken(String token) {
+		if (TextUtils.isEmpty(token))
+			token = null;
+		Editor edit = PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
+		edit.putString(SettingsHelper.PREF_SITE_TOKEN + torrentSite.name(), token);
+		edit.commit();
 	}
 
 	private void persistUserAndPass(String username, String password) {

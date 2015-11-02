@@ -195,5 +195,10 @@ public class ThePirateBayAdapter implements ISearchAdapter {
 	public boolean isPrivateSite() {
 		return false;
 	}
-	
+
+	@Override
+	public boolean usesToken() {
+		return false;
+	}
+
 }

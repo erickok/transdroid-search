@@ -217,4 +217,9 @@ public class TorrentLeechAdapter implements ISearchAdapter {
 		return true;
 	}
 
+	@Override
+	public boolean usesToken() {
+		return false;
+	}
+
 }

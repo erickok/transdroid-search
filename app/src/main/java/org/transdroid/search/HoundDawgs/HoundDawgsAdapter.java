@@ -228,4 +228,9 @@ public class HoundDawgsAdapter implements ISearchAdapter {
 		return true;
 	}
 
+	@Override
+	public boolean usesToken() {
+		return false;
+	}
+
 }

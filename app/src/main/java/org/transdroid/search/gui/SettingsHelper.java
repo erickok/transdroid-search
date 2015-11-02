@@ -37,6 +37,7 @@ public class SettingsHelper {
 	// Used to store a private site's user credentials (with the site name appended to this key)
 	static final String PREF_SITE_USER = "pref_key_user_";
 	static final String PREF_SITE_PASS = "pref_key_pass_";
+	static final String PREF_SITE_TOKEN = "pref_key_token_";
 
 	/**
 	 * Determines if a torrent site is currently enabled by the user, based on the user settings. Public sites are
@@ -55,13 +56,18 @@ public class SettingsHelper {
 		if (!site.getAdapter().isPrivateSite())
 			return prefs.getBoolean(PREF_SITE_ENABLED + site.name(), true);
 
-		// For private sites see if a username and password are specified as well
+		// For private sites see if a token or username and password are specified as well
 		if (!prefs.getBoolean(PREF_SITE_ENABLED + site.name(), true))
 			return false;
-		if (prefs.getString(PREF_SITE_USER + site.name(), null) == null)
-			return false;
-		if (prefs.getString(PREF_SITE_PASS + site.name(), null) == null)
-			return false;
+		if (site.getAdapter().usesToken()) {
+			if (prefs.getString(PREF_SITE_TOKEN + site.name(), null) == null)
+				return false;
+		} else {
+			if (prefs.getString(PREF_SITE_USER + site.name(), null) == null)
+				return false;
+			if (prefs.getString(PREF_SITE_PASS + site.name(), null) == null)
+				return false;
+		}
 		return true;
 
 	}
