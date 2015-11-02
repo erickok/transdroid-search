@@ -49,7 +49,7 @@ public class KickassTorrentsAdapter extends RssFeedSearchAdapter {
 	@Override
 	protected String getUrl(String query, SortOrder order) {
 		try {
-			return "http://kasssto.come.in/search/" + URLEncoder.encode(query, "UTF-8").replace("+", "%20") + "/?rss=1" + (order == SortOrder.BySeeders? "&field=seeders&sorder=desc": "");
+			return "http://kat.cr/search/" + URLEncoder.encode(query, "UTF-8").replace("+", "%20") + "/?rss=1" + (order == SortOrder.BySeeders? "&field=seeders&sorder=desc": "");
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 			return null;

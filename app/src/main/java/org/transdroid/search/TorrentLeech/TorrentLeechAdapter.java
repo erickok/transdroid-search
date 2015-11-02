@@ -50,8 +50,8 @@ import javax.security.auth.login.LoginException;
  */
 public class TorrentLeechAdapter implements ISearchAdapter {
 
-	private static final String LOGINURL = "http://www.torrentleech.org/user/account/login/";
-	private static final String QUERYURL = "http://www.torrentleech.org/torrents/browse/index/query/%1$s%2$s";
+	private static final String LOGINURL = "https://www.torrentleech.org/user/account/login/";
+	private static final String QUERYURL = "https://www.torrentleech.org/torrents/browse/index/query/%1$s%2$s";
 	private static final String SORT_COMPOSITE = "";
 	private static final String SORT_SEEDS = "/orderby/seeders/order/desc";
 
