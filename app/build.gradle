@@ -8,8 +8,8 @@ android {
         applicationId "org.transdroid.search"
         minSdkVersion 8
         targetSdkVersion 23
-        versionCode 27
-        versionName "3.4"
+        versionCode 28
+        versionName "3.5"
     }
     buildTypes {
         release {
