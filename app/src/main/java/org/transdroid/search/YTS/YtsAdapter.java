@@ -96,14 +96,14 @@ public class YtsAdapter implements ISearchAdapter {
             // Get the torrents for this movie
             JSONArray torrents = movie.getJSONArray("torrents");
             for (int t = 0; t < torrents.length(); t++) {
-                // Dequeue the next movie
+                // Dequeue the next torrent
                 JSONObject torrent = torrents.getJSONObject(t);
 
                 // Get the file size
                 long sizeBytes = torrent.getLong("size_bytes");
                 String size = getFormattedSize(sizeBytes);
 
-                // Get the file size
+                // Get the uploaded date
                 Date date = null;
                 try {
                     date = new SimpleDateFormat("yyyy-MM-dd HH:mm", Locale.US).parse(torrent.getString("date_uploaded"));
