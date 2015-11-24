@@ -71,7 +71,7 @@ public class YtsAdapter implements ISearchAdapter {
         HttpConnectionParams.setSoTimeout(httpparams, CONNECTION_TIMEOUT);
         DefaultHttpClient httpclient = new DefaultHttpClient(httpparams);
         httpclient.getParams().setParameter("http.useragent", "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
-        HttpResponse response = httpclient.execute(new HttpGet(BASE_URL + q));
+        HttpResponse response = httpclient.execute(new HttpGet(BASE_URL + (query.length() > 0 ? q : "")));
 
         // Read JSON response
         InputStream instream = response.getEntity().getContent();
