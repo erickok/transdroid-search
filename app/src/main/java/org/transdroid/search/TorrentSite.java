@@ -22,6 +22,7 @@ import android.content.Context;
 
 import org.transdroid.search.AsiaTorrents.AsiaTorrentsAdapter;
 import org.transdroid.search.BTN.BTNAdapter;
+import org.transdroid.search.ncore.NcoreAdapter;
 import org.transdroid.search.BitHdtv.BitHdtvAdapter;
 import org.transdroid.search.Danishbits.DanishbitsAdapter;
 import org.transdroid.search.HoundDawgs.HoundDawgsAdapter;
@@ -39,6 +40,7 @@ import org.transdroid.search.TorrentDay.TorrentDayAdapter;
 import org.transdroid.search.TorrentLeech.TorrentLeechAdapter;
 import org.transdroid.search.hdbitsorg.HdBitsOrgAdapter;
 import org.transdroid.search.hdtorrents.HdTorrentsAdapter;
+import org.transdroid.search.ncore.NcoreAdapter;
 import org.transdroid.search.rarbg.RarbgAdapter;
 import org.transdroid.search.revolutiontt.RevolutionTTAdapter;
 
@@ -126,6 +128,12 @@ public enum TorrentSite {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new NyaaTorrentsAdapter();
+		}
+	},
+	Ncore {
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new NcoreAdapter();
 		}
 	},
 	ThePirateBay {
