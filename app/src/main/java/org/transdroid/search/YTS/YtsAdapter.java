@@ -79,8 +79,7 @@ public class YtsAdapter implements ISearchAdapter {
         // Some ugly mangling because the YTS response does not play nicely with the json library
         String json = HttpHelper.convertStreamToString(instream);
         json = json.replace("\"data\":{", "\"data\":[{");
-        json = json.substring(0, json.length() - 2);
-        json = json + "]}";
+        json = json.replace(",\"@meta\"", "],\"@meta\"");
         instream.close();
 
         // Parse results
