@@ -32,7 +32,9 @@ import org.transdroid.util.HttpHelper;
 import android.content.Context;
 import android.util.Log;   
 
-
+/*
+ api doc @ https://github.com/WhatCD/Gazelle/wiki/JSON-API-Documentation#torrent-search
+*/
 public class WhatCdAdapter implements ISearchAdapter {
     private static final String LOG_TAG = WhatCdAdapter.class.getName();
 
