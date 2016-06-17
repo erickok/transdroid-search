@@ -1,13 +1,23 @@
+/*
+    thismachinechills / Alex
+    License: GPLv3 and greater
+
+    Thanks to other Transdroid plugin developers for
+    providing a good portion of this
+
+
+ */
 package org.transdroid.search.WhatCd;
 
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.security.InvalidParameterException;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.List;
 import java.util.Locale;
@@ -20,12 +30,7 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.cookie.Cookie;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -39,9 +44,12 @@ import org.transdroid.util.HttpHelper;
 import android.content.Context;
 import android.util.Log;   
 
+
+
 /*
- api doc @ https://github.com/WhatCD/Gazelle/wiki/JSON-API-Documentation#torrent-search
+ api doc @ https://github.com/WhatCD/Gazelle/wiki/JSON-API-Documentation
 */
+
 public class WhatCdAdapter implements ISearchAdapter {
     private static final String LOG_TAG = WhatCdAdapter.class.getName();
     private static final String SITE_NAME = "What.cd";
@@ -60,6 +68,11 @@ public class WhatCdAdapter implements ISearchAdapter {
     private String authkey = null;
     private String passkey = null;
 
+    private class SearchResultComparator implements Comparator<SearchResult> {
+        public int compare(SearchResult result1, SearchResult result2) {
+            return result1.getSeeds() - result2.getSeeds();
+        }
+    }
 
 	private HttpClient prepareRequest(Context context) throws Exception {
 		String username = SettingsHelper.getSiteUser(context, TorrentSite.WhatCd);
@@ -71,21 +84,11 @@ public class WhatCdAdapter implements ISearchAdapter {
 
 		HttpClient client = HttpHelper.buildDefaultSearchHttpClient(false);
         login(client, username, password);
+        getKeys(client);
 
 		return client;
 	}
 
-    /**
-     * Implementing search providers should synchronously perform the search for torrents matching the given query
-     * string.
-     *
-     * @param context    The Android activity/provider context from which the shared preferences can be accessed
-     * @param query      The raw (non-urlencoded) query to search for
-     * @param order      The preferred order in which results are sorted
-     * @param maxResults Maximum number of results to return
-     * @return The list of found torrents on the site matching the search query
-     * @throws Exception When an exception occurred during the loading or parsing of the search results
-     */
     public List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception {
         HttpClient httpclient = prepareRequest(context);
         String searchString =  URLEncoder.encode(query, "UTF-8");
@@ -108,34 +111,120 @@ public class WhatCdAdapter implements ISearchAdapter {
                                       .getJSONArray("results");
         Log.d(LOG_TAG, jsonResults.toString());
 
+        jsonResults = getTorrentsFromResults(jsonResults);
+
         for (int i = 0; i < jsonResults.length(); i++) {
             JSONObject torrent = jsonResults.getJSONObject(i);
 
-            results.add(new SearchResult(
-                                torrent.getString("torrent_title"),
-                                torrent.getString("magnet_uri"),
-                                torrent.getString("page"),
-                                bytesToMBytes(torrent.getString("size")),
-                                getDate(torrent),
-                                torrent.getInt("seeds"),
-                                torrent.getInt("leeches")));
+            SearchResult result = new SearchResult(
+                                        torrent.getString("groupName"),
+                                        getTorrentUrl(torrent.getString("torrentId")),
+                                        getDetailsUrl(torrent),
+                                        bytesToMBytes(torrent.getString("size")),
+                                        getDate(torrent),
+                                        torrent.getInt("seeders"),
+                                        torrent.getInt("leechers"));
+            Log.d(LOG_TAG, result.getTorrentUrl());
+            results.add(result);
+
         }
+
+        Collections.sort(results, new SearchResultComparator());
+        Collections.reverse(results);
+
         return results;
     }
 
+    private String getDetailsUrl(JSONObject torrent) throws Exception {
+        return "https://what.cd/torrents.php?id=" + torrent.getInt("groupId") +
+                "&torrentid=" + torrent.getInt("torrentId");
+    }
+
+    private String getTorrentUrl(String torrentId) {
+        return "https://what.cd/torrents.php?action=download&id=" + torrentId +
+                "&authkey=" + authkey +
+                "&torrent_pass=" + passkey;
+    }
+
+    private JSONArray getTorrentsFromResults(JSONArray results) throws Exception {
+        JSONArray jsonTorrents = new JSONArray();
+
+        for (int index = 0; index < results.length(); index++) {
+            JSONObject item = results.getJSONObject(index);
+            boolean isMusic = item.has("artist");
+
+            Log.d(LOG_TAG, item.toString());
+
+            if (isJsonTorrent(item)) {
+                jsonTorrents.put(item);
+
+            } else {
+                long groupId = item.getLong("groupId");
+                String name = item.getString("groupName");
+
+                if (isMusic) {
+                    name = item.getString("artist") + " - " + name;
+                }
+
+                JSONArray torrentArray = item.getJSONArray("torrents");
+                JSONArray deepTorrents = getTorrentsFromResults(torrentArray);
+
+                for (int jIndex = 0; jIndex < deepTorrents.length(); jIndex++) {
+                    JSONObject torrent = deepTorrents.getJSONObject(jIndex);
+                    String torrentTitle = name;
+
+                    if (isJsonTorrent(torrent)) {
+                        if (isMusic) {
+                            torrentTitle += " - " + torrent.getString("format") +
+                                    " - " + torrent.getString("encoding");
+                        }
+
+                        torrent.put("groupName", torrentTitle);
+                        torrent.put("groupId", groupId);
+                        jsonTorrents.put(torrent);
+                    }
+
+                }
+            }
+        }
+
+        Log.d(LOG_TAG, jsonTorrents.toString());
+
+        return jsonTorrents;
+    }
+
+
+
+    private boolean isJsonTorrent(JSONObject json) {
+        return json.has("torrentId");
+    }
+
     private String bytesToMBytes (String bytesString) {
+        /*
+            Thanks to StrikeSearchAdapter developer
+         */
+
         long nbBytes = 0;
+
         try {
             nbBytes = Long.parseLong(bytesString);
-        } catch (NumberFormatException e) {
+        }
+
+        catch (NumberFormatException e) {
             return bytesString;
         }
+
         long nbMegaBytes = nbBytes / MEGABYTES_IN_BYTES;
         long lastingBytesTruncated = (nbBytes % MEGABYTES_IN_BYTES) / 10000;
+
         return nbMegaBytes + "." + lastingBytesTruncated + "MB";
     }
 
     private Date getDate(JSONObject torrent) {
+        /*
+            Thanks to StrikeSearchAdapter developer
+         */
+
         Date date;
         try {
             date = DATE_FMT.parse(torrent.getString("time"));
@@ -181,8 +270,10 @@ public class WhatCdAdapter implements ISearchAdapter {
         HttpResponse response = client.execute(new HttpGet(INDEX_URL));
         JSONObject json = getJSON(response).getJSONObject("response");
 
+        authkey = json.getString("authkey");
+        passkey = json.getString("passkey");
 
-
+        Log.d(LOG_TAG, "keys: " + authkey + " " + passkey);
     }
 
     private JSONObject getJSON(HttpResponse result) throws Exception {
@@ -195,6 +286,7 @@ public class WhatCdAdapter implements ISearchAdapter {
    
   	private void login(HttpClient client, String username, String password) throws Exception {
         Log.d(LOG_TAG, "Attempting to login.");
+
         HttpPost loginPost = new HttpPost(LOGIN_URL);
         loginPost.setEntity(new UrlEncodedFormEntity(
                 Arrays.asList(
@@ -204,18 +296,12 @@ public class WhatCdAdapter implements ISearchAdapter {
                 )));
         HttpResponse loginResult = client.execute(loginPost);
 
-        if (loginResult.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-            // Failed to sign in
-            throw new LoginException("Login failure for What.cd with user " + username);
-        }
-
         String loginHtml = HttpHelper.convertStreamToString(loginResult.getEntity().getContent());
+
         if (loginHtml == null || loginHtml.contains(LOGIN_ERROR)) {
-            // Failed to sign in
             throw new LoginException("Login failure for What.cd with user " + username);
         }
 
         Log.d(LOG_TAG, "Successfully logged in to What.cd");
-        Log.d(LOG_TAG, loginHtml);
     }
 }
