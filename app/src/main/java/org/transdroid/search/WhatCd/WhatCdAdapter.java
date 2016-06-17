@@ -63,7 +63,7 @@ public class WhatCdAdapter implements ISearchAdapter {
     private static final String LOGIN = "Log In";
     private static final String LOGIN_ERROR = "Your username or password was incorrect.";
     private static SimpleDateFormat DATE_FMT = new SimpleDateFormat("yyyy-dd-MM kk:mm:ss", Locale.ENGLISH);
-    private static final int MEGABYTES_IN_BYTES = 1024*1024;
+    private static final int MEGABYTES_IN_BYTES = 1024 * 1024;
 
     private String authkey = null;
     private String passkey = null;
@@ -74,24 +74,24 @@ public class WhatCdAdapter implements ISearchAdapter {
         }
     }
 
-	private HttpClient prepareRequest(Context context) throws Exception {
-		String username = SettingsHelper.getSiteUser(context, TorrentSite.WhatCd);
-		String password = SettingsHelper.getSitePass(context, TorrentSite.WhatCd);
+    private HttpClient prepareRequest(Context context) throws Exception {
+        String username = SettingsHelper.getSiteUser(context, TorrentSite.WhatCd);
+        String password = SettingsHelper.getSitePass(context, TorrentSite.WhatCd);
 
-		if (username == null || password == null) {
-			throw new InvalidParameterException("No username or password was provided, while this is required for this private site.");
-		}
+        if (username == null || password == null) {
+            throw new InvalidParameterException("No username or password was provided, while this is required for this private site.");
+        }
 
-		HttpClient client = HttpHelper.buildDefaultSearchHttpClient(false);
+        HttpClient client = HttpHelper.buildDefaultSearchHttpClient(false);
         login(client, username, password);
         getKeys(client);
 
-		return client;
-	}
+        return client;
+    }
 
     public List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception {
         HttpClient httpclient = prepareRequest(context);
-        String searchString =  URLEncoder.encode(query, "UTF-8");
+        String searchString = URLEncoder.encode(query, "UTF-8");
         HttpGet queryGet = new HttpGet(SEARCH_URL + searchString);
 
         HttpResponse queryResult = httpclient.execute(queryGet);
@@ -108,7 +108,7 @@ public class WhatCdAdapter implements ISearchAdapter {
 
         List<SearchResult> results = new ArrayList<>();
         JSONArray jsonResults = structure.getJSONObject("response")
-                                      .getJSONArray("results");
+                .getJSONArray("results");
         Log.d(LOG_TAG, jsonResults.toString());
 
         jsonResults = getTorrentsFromResults(jsonResults);
@@ -117,13 +117,13 @@ public class WhatCdAdapter implements ISearchAdapter {
             JSONObject torrent = jsonResults.getJSONObject(i);
 
             SearchResult result = new SearchResult(
-                                        torrent.getString("groupName"),
-                                        getTorrentUrl(torrent.getString("torrentId")),
-                                        getDetailsUrl(torrent),
-                                        bytesToMBytes(torrent.getString("size")),
-                                        getDate(torrent),
-                                        torrent.getInt("seeders"),
-                                        torrent.getInt("leechers"));
+                    torrent.getString("groupName"),
+                    getTorrentUrl(torrent.getString("torrentId")),
+                    getDetailsUrl(torrent),
+                    bytesToMBytes(torrent.getString("size")),
+                    getDate(torrent),
+                    torrent.getInt("seeders"),
+                    torrent.getInt("leechers"));
             Log.d(LOG_TAG, result.getTorrentUrl());
             results.add(result);
 
@@ -194,12 +194,11 @@ public class WhatCdAdapter implements ISearchAdapter {
     }
 
 
-
     private boolean isJsonTorrent(JSONObject json) {
         return json.has("torrentId");
     }
 
-    private String bytesToMBytes (String bytesString) {
+    private String bytesToMBytes(String bytesString) {
         /*
             Thanks to StrikeSearchAdapter developer
          */
@@ -208,9 +207,7 @@ public class WhatCdAdapter implements ISearchAdapter {
 
         try {
             nbBytes = Long.parseLong(bytesString);
-        }
-
-        catch (NumberFormatException e) {
+        } catch (NumberFormatException e) {
             return bytesString;
         }
 
@@ -249,8 +246,8 @@ public class WhatCdAdapter implements ISearchAdapter {
 
 
     public boolean isPrivateSite() {
-	  return true;
-	}
+        return true;
+    }
 
 
     public boolean usesToken() {
@@ -283,8 +280,8 @@ public class WhatCdAdapter implements ISearchAdapter {
 
         return new JSONObject(json);
     }
-   
-  	private void login(HttpClient client, String username, String password) throws Exception {
+
+    private void login(HttpClient client, String username, String password) throws Exception {
         Log.d(LOG_TAG, "Attempting to login.");
 
         HttpPost loginPost = new HttpPost(LOGIN_URL);
