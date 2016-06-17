@@ -1,18 +1,22 @@
-package org.transdroid.search.WhatCdAdapter;
+package org.transdroid.search.WhatCd;
 
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.security.InvalidParameterException;
 import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.security.auth.login.LoginException;
 
 import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
+import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -22,6 +26,9 @@ import org.apache.http.message.BasicNameValuePair;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.transdroid.search.ISearchAdapter;
 import org.transdroid.search.SearchResult;
 import org.transdroid.search.SortOrder;
@@ -37,90 +44,178 @@ import android.util.Log;
 */
 public class WhatCdAdapter implements ISearchAdapter {
     private static final String LOG_TAG = WhatCdAdapter.class.getName();
-
+    private static final String SITE_NAME = "What.cd";
     private static final String LOGIN_URL = "https://what.cd/login.php";
+    private static final String SEARCH_URL = "https://what.cd/ajax.php?action=browse&searchstr=";
+    private static final String INDEX_URL = "https://what.cd/ajax.php?action=index";
+
 
     private static final String USERNAME = "username";
     private static final String PASSWORD = "password";
     private static final String LOGIN = "Log In";
+    private static final String LOGIN_ERROR = "Your username or password was incorrect.";
+    private static SimpleDateFormat DATE_FMT = new SimpleDateFormat("yyyy-dd-MM kk:mm:ss", Locale.ENGLISH);
+    private static final int MEGABYTES_IN_BYTES = 1024*1024;
 
-	/**
-	 * Implementing search providers should synchronously perform the search for torrents matching the given query
-	 * string.
-	 * @param context The Android activity/provider context from which the shared preferences can be accessed
-	 * @param query The raw (non-urlencoded) query to search for
-	 * @param order The preferred order in which results are sorted
-	 * @param maxResults Maximum number of results to return
-	 * @return The list of found torrents on the site matching the search query
-	 * @throws Exception When an exception occurred during the loading or parsing of the search results
-	 */
-	List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception;
+    private String authkey = null;
+    private String passkey = null;
 
-	/**
-	 * Implementing search providers should provide the URL of an RSS feed matching the search a specific query.
-	 * @param query The raw (non-urlencoded) query for which the RSS feed should provide torrents
-	 * @param order The preferred order in which the RSS items are sorted
-	 * @return The RSS feed URL, or null if this is not supported by the site
-	 */
-	String buildRssFeedUrlFromSearch(String query, SortOrder order);
 
-	/**
-	 * Implementing search providers should return the real name of the site they work on.
-	 * @return The name of the torrent site
-	 */
-	String getSiteName();
+	private HttpClient prepareRequest(Context context) throws Exception {
+		String username = SettingsHelper.getSiteUser(context, TorrentSite.WhatCd);
+		String password = SettingsHelper.getSitePass(context, TorrentSite.WhatCd);
 
-	/**
-	 * Implementing search providers should return whether this is a private site, that is, whether this site requires
-	 * user credentials before it can be searched.
-	 * @return True if this is an adapter to a private site, false otherwise.
-	 */
-	boolean isPrivateSite() {
+		if (username == null || password == null) {
+			throw new InvalidParameterException("No username or password was provided, while this is required for this private site.");
+		}
+
+		HttpClient client = HttpHelper.buildDefaultSearchHttpClient(false);
+        login(client, username, password);
+
+		return client;
+	}
+
+    /**
+     * Implementing search providers should synchronously perform the search for torrents matching the given query
+     * string.
+     *
+     * @param context    The Android activity/provider context from which the shared preferences can be accessed
+     * @param query      The raw (non-urlencoded) query to search for
+     * @param order      The preferred order in which results are sorted
+     * @param maxResults Maximum number of results to return
+     * @return The list of found torrents on the site matching the search query
+     * @throws Exception When an exception occurred during the loading or parsing of the search results
+     */
+    public List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception {
+        HttpClient httpclient = prepareRequest(context);
+        String searchString =  URLEncoder.encode(query, "UTF-8");
+        HttpGet queryGet = new HttpGet(SEARCH_URL + searchString);
+
+        HttpResponse queryResult = httpclient.execute(queryGet);
+
+        if (queryResult.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+            throw new Exception("Unsuccessful query to the What.cd JSON API");
+        }
+
+        JSONObject structure = getJSON(queryResult);
+
+        if (structure == null) {
+            return new ArrayList<SearchResult>();
+        }
+
+        List<SearchResult> results = new ArrayList<>();
+        JSONArray jsonResults = structure.getJSONObject("response")
+                                      .getJSONArray("results");
+        Log.d(LOG_TAG, jsonResults.toString());
+
+        for (int i = 0; i < jsonResults.length(); i++) {
+            JSONObject torrent = jsonResults.getJSONObject(i);
+
+            results.add(new SearchResult(
+                                torrent.getString("torrent_title"),
+                                torrent.getString("magnet_uri"),
+                                torrent.getString("page"),
+                                bytesToMBytes(torrent.getString("size")),
+                                getDate(torrent),
+                                torrent.getInt("seeds"),
+                                torrent.getInt("leeches")));
+        }
+        return results;
+    }
+
+    private String bytesToMBytes (String bytesString) {
+        long nbBytes = 0;
+        try {
+            nbBytes = Long.parseLong(bytesString);
+        } catch (NumberFormatException e) {
+            return bytesString;
+        }
+        long nbMegaBytes = nbBytes / MEGABYTES_IN_BYTES;
+        long lastingBytesTruncated = (nbBytes % MEGABYTES_IN_BYTES) / 10000;
+        return nbMegaBytes + "." + lastingBytesTruncated + "MB";
+    }
+
+    private Date getDate(JSONObject torrent) {
+        Date date;
+        try {
+            date = DATE_FMT.parse(torrent.getString("time"));
+        } catch (ParseException e) {
+            date = new Date();
+        } catch (JSONException e) {
+            date = new Date();
+        }
+        return date;
+    }
+
+    @Override
+    public String buildRssFeedUrlFromSearch(String query, SortOrder order) {
+        return null;
+    }
+
+
+    @Override
+    public String getSiteName() {
+        return SITE_NAME;
+    }
+
+
+    public boolean isPrivateSite() {
 	  return true;
 	}
 
-	/**
-	 * Implementing search providers should return whether the site uses a token authentication system.
-	 * @return True is a session token is used in lieu of a username/password login combination
-	 */
-	boolean usesToken();
 
-	/**
-	 * Implement search providers should set up an HTTP request for the specified torrent file uri and, possibly after
-	 * setting authentication credentials, return a handle to the file content stream.
-	 * @param context The Android activity/provider context from which the shared preferences can be accessed
-	 * @param url The full url of the torrent file to download
-	 * @return An InputStream handle to the requested file so it can be further downloaded, or null if no connection is
-	 *         possible (like when the device is offline or when the user is not authorized)
-	 * @throws Exception When an exception occurred during the retrieval of the request url
-	 */
-	InputStream getTorrentFile(Context context, String url) throws Exception;
+    public boolean usesToken() {
+        return false;
+    }
+
+
+    @Override
+    public InputStream getTorrentFile(Context context, String url) throws Exception {
+        HttpClient client = prepareRequest(context);
+        HttpResponse response = client.execute(new HttpGet(url));
+        return response.getEntity().getContent();
+
+    }
+
+    private void getKeys(HttpClient client) throws Exception {
+        HttpResponse response = client.execute(new HttpGet(INDEX_URL));
+        JSONObject json = getJSON(response).getJSONObject("response");
+
+
+
+    }
+
+    private JSONObject getJSON(HttpResponse result) throws Exception {
+        InputStream instream = result.getEntity().getContent();
+        String json = HttpHelper.convertStreamToString(instream);
+        instream.close();
+
+        return new JSONObject(json);
+    }
    
-  private void login(DefaultHttpClient client, String username, String password) throws Exception {
+  	private void login(HttpClient client, String username, String password) throws Exception {
         Log.d(LOG_TAG, "Attempting to login.");
-
-        HttpPost request = new HttpPost(LOGIN_URL);
-        request.setEntity(new UrlEncodedFormEntity(Arrays
-                .asList(new BasicNameValuePair[] {
+        HttpPost loginPost = new HttpPost(LOGIN_URL);
+        loginPost.setEntity(new UrlEncodedFormEntity(
+                Arrays.asList(
                         new BasicNameValuePair(USERNAME, username),
                         new BasicNameValuePair(PASSWORD, password),
-                        new BasicNameValuePair(LOGIN, LOGIN)})));
+                        new BasicNameValuePair(LOGIN, LOGIN)
+                )));
+        HttpResponse loginResult = client.execute(loginPost);
 
-        client.execute(request);
+        if (loginResult.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+            // Failed to sign in
+            throw new LoginException("Login failure for What.cd with user " + username);
+        }
 
-        // verify we have the cookies needed to log in
-        boolean success = false;
-        for (Cookie cookie : client.getCookieStore().getCookies()) {
-            if ("session".equals(cookie.getName()))
-              success = true;
+        String loginHtml = HttpHelper.convertStreamToString(loginResult.getEntity().getContent());
+        if (loginHtml == null || loginHtml.contains(LOGIN_ERROR)) {
+            // Failed to sign in
+            throw new LoginException("Login failure for What.cd with user " + username);
         }
-        
-        // if we don't have the correct cookies, login failed. notify user with a toast and toss an exception.
-        if (!success) {
-        	Log.e(LOG_TAG, "Failed to log into What.cd as '" + username + "'. Did not receive expected login cookies!");
-            throw new LoginException("Failed to log into What.cd as '" + username + "'. Did not receive expected login cookies!");
-        }
-        
+
         Log.d(LOG_TAG, "Successfully logged in to What.cd");
+        Log.d(LOG_TAG, loginHtml);
     }
 }
