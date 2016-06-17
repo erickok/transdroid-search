@@ -4,9 +4,8 @@
 
     Thanks to other Transdroid plugin developers for
     providing a good portion of this
-
-
  */
+
 package org.transdroid.search.WhatCd;
 
 import java.io.InputStream;
@@ -43,7 +42,6 @@ import org.transdroid.util.HttpHelper;
 
 import android.content.Context;
 import android.util.Log;   
-
 
 
 /*
@@ -109,7 +107,8 @@ public class WhatCdAdapter implements ISearchAdapter {
         List<SearchResult> results = new ArrayList<>();
         JSONArray jsonResults = structure.getJSONObject("response")
                 .getJSONArray("results");
-        Log.d(LOG_TAG, jsonResults.toString());
+
+        //Log.d(LOG_TAG, jsonResults.toString());
 
         jsonResults = getTorrentsFromResults(jsonResults);
 
@@ -124,7 +123,8 @@ public class WhatCdAdapter implements ISearchAdapter {
                     getDate(torrent),
                     torrent.getInt("seeders"),
                     torrent.getInt("leechers"));
-            Log.d(LOG_TAG, result.getTorrentUrl());
+            //Log.d(LOG_TAG, result.getTorrentUrl());
+
             results.add(result);
 
         }
@@ -153,7 +153,7 @@ public class WhatCdAdapter implements ISearchAdapter {
             JSONObject item = results.getJSONObject(index);
             boolean isMusic = item.has("artist");
 
-            Log.d(LOG_TAG, item.toString());
+            //Log.d(LOG_TAG, item.toString());
 
             if (isJsonTorrent(item)) {
                 jsonTorrents.put(item);
@@ -188,7 +188,7 @@ public class WhatCdAdapter implements ISearchAdapter {
             }
         }
 
-        Log.d(LOG_TAG, jsonTorrents.toString());
+        //Log.d(LOG_TAG, jsonTorrents.toString());
 
         return jsonTorrents;
     }
@@ -270,7 +270,7 @@ public class WhatCdAdapter implements ISearchAdapter {
         authkey = json.getString("authkey");
         passkey = json.getString("passkey");
 
-        Log.d(LOG_TAG, "keys: " + authkey + " " + passkey);
+        //Log.d(LOG_TAG, "keys: " + authkey + " " + passkey);
     }
 
     private JSONObject getJSON(HttpResponse result) throws Exception {
