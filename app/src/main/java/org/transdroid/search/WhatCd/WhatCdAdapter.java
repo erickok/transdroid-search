@@ -65,11 +65,13 @@ public class WhatCdAdapter implements ISearchAdapter {
 
 
     private class SearchResultComparator implements Comparator<SearchResult> {
+        @Override
         public int compare(SearchResult result1, SearchResult result2) {
             return result2.getSeeds() - result1.getSeeds();
         }
     }
 
+    @Override
     public List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception {
         String searchString = URLEncoder.encode(query, "UTF-8");
 
@@ -219,7 +221,6 @@ public class WhatCdAdapter implements ISearchAdapter {
             }
         }
     }
-
 
     private boolean isJsonTorrent(JSONObject json) {
         return json.has("torrentId");
