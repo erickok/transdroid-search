@@ -1,13 +1,11 @@
 /*
     thismachinechills / Alex
-    License: GPLv3 and greater
-
-    Thanks to other Transdroid plugin developers for
-    providing a good portion of this
+    GPLv3 and greater
  */
 
 package org.transdroid.search.WhatCd;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.security.InvalidParameterException;
@@ -51,15 +49,14 @@ import android.util.Log;
 public class WhatCdAdapter implements ISearchAdapter {
     private static final String LOG_TAG = WhatCdAdapter.class.getName();
     private static final String SITE_NAME = "What.cd";
+
     private static final String LOGIN_URL = "https://what.cd/login.php";
     private static final String SEARCH_URL = "https://what.cd/ajax.php?action=browse&searchstr=";
     private static final String INDEX_URL = "https://what.cd/ajax.php?action=index";
 
-
-    private static final String USERNAME = "username";
-    private static final String PASSWORD = "password";
     private static final String LOGIN = "Log In";
     private static final String LOGIN_ERROR = "Your username or password was incorrect.";
+
     private static SimpleDateFormat DATE_FMT = new SimpleDateFormat("yyyy-dd-MM kk:mm:ss", Locale.ENGLISH);
     private static final int MEGABYTES_IN_BYTES = 1024 * 1024;
 
@@ -69,11 +66,60 @@ public class WhatCdAdapter implements ISearchAdapter {
 
     private class SearchResultComparator implements Comparator<SearchResult> {
         public int compare(SearchResult result1, SearchResult result2) {
-            return result1.getSeeds() - result2.getSeeds();
+            return result2.getSeeds() - result1.getSeeds();
         }
     }
 
-    private HttpClient prepareRequest(Context context) throws Exception {
+    public List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception {
+        String searchString = URLEncoder.encode(query, "UTF-8");
+
+        HttpClient httpclient = prepareRequest(context);
+        HttpGet queryGet = new HttpGet(SEARCH_URL + searchString);
+
+        HttpResponse queryResult = httpclient.execute(queryGet);
+
+        if (queryResult.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+            throw new Exception("Unsuccessful query to the What.cd JSON API");
+        }
+
+        try {
+            return getResultsFromJson(getJSON(queryResult));
+        }
+
+        catch (JSONException e) {
+            return new ArrayList<>();
+        }
+    }
+
+    @Override
+    public String buildRssFeedUrlFromSearch(String query, SortOrder order) {
+        return null;
+    }
+
+    @Override
+    public String getSiteName() {
+        return SITE_NAME;
+    }
+
+    @Override
+    public boolean isPrivateSite() {
+        return true;
+    }
+
+    @Override
+    public boolean usesToken() {
+        return false;
+    }
+
+    @Override
+    public InputStream getTorrentFile(Context context, String url) throws Exception {
+        HttpClient client = prepareRequest(context);
+        HttpResponse response = client.execute(new HttpGet(url));
+
+        return response.getEntity().getContent();
+    }
+
+    private HttpClient prepareRequest(Context context) throws JSONException, IOException, LoginException {
         String username = SettingsHelper.getSiteUser(context, TorrentSite.WhatCd);
         String password = SettingsHelper.getSitePass(context, TorrentSite.WhatCd);
 
@@ -83,35 +129,15 @@ public class WhatCdAdapter implements ISearchAdapter {
 
         HttpClient client = HttpHelper.buildDefaultSearchHttpClient(false);
         login(client, username, password);
-        getKeys(client);
+        retrieveKeys(client);
 
         return client;
     }
 
-    public List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception {
-        HttpClient httpclient = prepareRequest(context);
-        String searchString = URLEncoder.encode(query, "UTF-8");
-        HttpGet queryGet = new HttpGet(SEARCH_URL + searchString);
-
-        HttpResponse queryResult = httpclient.execute(queryGet);
-
-        if (queryResult.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-            throw new Exception("Unsuccessful query to the What.cd JSON API");
-        }
-
-        JSONObject json = getJSON(queryResult);
-
-        if (json == null) {
-            return new ArrayList<SearchResult>();
-        }
-
-        List<SearchResult> results = new ArrayList<>();
-        JSONArray jsonResults = json.getJSONObject("response")
-                                    .getJSONArray("results");
-
-        //Log.d(LOG_TAG, jsonResults.toString());
-
+    private List<SearchResult> getResultsFromJson(JSONObject json) throws JSONException {
+        JSONArray jsonResults = json.getJSONObject("response").getJSONArray("results");
         jsonResults = getTorrentsFromResults(jsonResults);
+        List<SearchResult> results = new ArrayList<>();
 
         for (int i = 0; i < jsonResults.length(); i++) {
             JSONObject torrent = jsonResults.getJSONObject(i);
@@ -127,16 +153,14 @@ public class WhatCdAdapter implements ISearchAdapter {
             //Log.d(LOG_TAG, result.getTorrentUrl());
 
             results.add(result);
-
         }
 
         Collections.sort(results, new SearchResultComparator());
-        Collections.reverse(results);
 
         return results;
     }
 
-    private String getDetailsUrl(JSONObject torrent) throws Exception {
+    private String getDetailsUrl(JSONObject torrent) throws JSONException {
         return "https://what.cd/torrents.php?id=" + torrent.getLong("groupId") +
                 "&torrentid=" + torrent.getLong("torrentId");
     }
@@ -147,51 +171,53 @@ public class WhatCdAdapter implements ISearchAdapter {
                 "&torrent_pass=" + passkey;
     }
 
-    private JSONArray getTorrentsFromResults(JSONArray results) throws Exception {
+    private JSONArray getTorrentsFromResults(JSONArray results) throws JSONException {
         JSONArray jsonTorrents = new JSONArray();
 
         for (int index = 0; index < results.length(); index++) {
             JSONObject item = results.getJSONObject(index);
-            boolean isMusic = item.has("artist");
-
             //Log.d(LOG_TAG, item.toString());
 
             if (isJsonTorrent(item)) {
                 jsonTorrents.put(item);
-
-            } else {
-                long groupId = item.getLong("groupId");
-                String name = item.getString("groupName");
-
-                if (isMusic) {
-                    name = item.getString("artist") + " - " + name;
-                }
-
-                JSONArray jorrentJson = item.getJSONArray("torrents");
-                JSONArray torrents = getTorrentsFromResults(jorrentJson);
-
-                for (int torrentIndex = 0; torrentIndex < torrents.length(); torrentIndex++) {
-                    JSONObject torrent = torrents.getJSONObject(torrentIndex);
-                    String torrentTitle = name;
-
-                    if (isJsonTorrent(torrent)) {
-                        if (isMusic) {
-                            torrentTitle += " - " + torrent.getString("format") +
-                                    " - " + torrent.getString("encoding");
-                        }
-
-                        torrent.put("groupName", torrentTitle);
-                        torrent.put("groupId", groupId);
-                        jsonTorrents.put(torrent);
-                    }
-
-                }
             }
-        }
 
+            else {
+                processTorrentGroup(jsonTorrents, item);
+            }
+
+        }
         //Log.d(LOG_TAG, jsonTorrents.toString());
 
         return jsonTorrents;
+    }
+
+    private void processTorrentGroup(JSONArray jsonTorrents, JSONObject item) throws JSONException {
+        boolean isMusic = item.has("artist");
+        String name = item.getString("groupName");
+
+        if (isMusic) {
+            name = item.getString("artist") + " - " + name;
+        }
+
+        JSONArray torrents = getTorrentsFromResults(item.getJSONArray("torrents"));
+        long groupId = item.getLong("groupId");
+
+        for (int index = 0; index < torrents.length(); index++) {
+            JSONObject torrent = torrents.getJSONObject(index);
+            String torrentTitle = name;
+
+            if (isJsonTorrent(torrent)) {
+                if (isMusic) {
+                    torrentTitle += " - " + torrent.getString("format") +
+                                    " - " + torrent.getString("encoding");
+                }
+
+                torrent.put("groupName", torrentTitle);
+                torrent.put("groupId", groupId);
+                jsonTorrents.put(torrent);
+            }
+        }
     }
 
 
@@ -234,37 +260,7 @@ public class WhatCdAdapter implements ISearchAdapter {
         return date;
     }
 
-    @Override
-    public String buildRssFeedUrlFromSearch(String query, SortOrder order) {
-        return null;
-    }
-
-
-    @Override
-    public String getSiteName() {
-        return SITE_NAME;
-    }
-
-
-    public boolean isPrivateSite() {
-        return true;
-    }
-
-
-    public boolean usesToken() {
-        return false;
-    }
-
-
-    @Override
-    public InputStream getTorrentFile(Context context, String url) throws Exception {
-        HttpClient client = prepareRequest(context);
-        HttpResponse response = client.execute(new HttpGet(url));
-        return response.getEntity().getContent();
-
-    }
-
-    private void getKeys(HttpClient client) throws Exception {
+    private void retrieveKeys(HttpClient client) throws IOException, JSONException {
         HttpResponse response = client.execute(new HttpGet(INDEX_URL));
         JSONObject json = getJSON(response).getJSONObject("response");
 
@@ -274,7 +270,7 @@ public class WhatCdAdapter implements ISearchAdapter {
         //Log.d(LOG_TAG, "keys: " + authkey + " " + passkey);
     }
 
-    private JSONObject getJSON(HttpResponse result) throws Exception {
+    private JSONObject getJSON(HttpResponse result) throws JSONException, IOException {
         InputStream instream = result.getEntity().getContent();
         String json = HttpHelper.convertStreamToString(instream);
         instream.close();
@@ -282,15 +278,16 @@ public class WhatCdAdapter implements ISearchAdapter {
         return new JSONObject(json);
     }
 
-    private void login(HttpClient client, String username, String password) throws Exception {
+    private void login(HttpClient client, String username, String password)
+            throws IOException, LoginException {
         Log.d(LOG_TAG, "Attempting to login.");
 
         HttpPost loginPost = new HttpPost(LOGIN_URL);
         loginPost.setEntity(new UrlEncodedFormEntity(
                 Arrays.asList(
-                        new BasicNameValuePair(USERNAME, username),
-                        new BasicNameValuePair(PASSWORD, password),
-                        new BasicNameValuePair(LOGIN, LOGIN)
+                        new BasicNameValuePair("username", username),
+                        new BasicNameValuePair("password", password),
+                        new BasicNameValuePair("login", LOGIN)
                 )));
         HttpResponse loginResult = client.execute(loginPost);
         String loginHtml = HttpHelper.convertStreamToString(loginResult.getEntity().getContent());
