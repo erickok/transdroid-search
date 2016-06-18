@@ -63,8 +63,9 @@ public class WhatCdAdapter implements ISearchAdapter {
     private static SimpleDateFormat DATE_FMT = new SimpleDateFormat("yyyy-dd-MM kk:mm:ss", Locale.ENGLISH);
     private static final int MEGABYTES_IN_BYTES = 1024 * 1024;
 
-    private String authkey = null;
-    private String passkey = null;
+    private String authkey;
+    private String passkey;
+
 
     private class SearchResultComparator implements Comparator<SearchResult> {
         public int compare(SearchResult result1, SearchResult result2) {
@@ -98,15 +99,15 @@ public class WhatCdAdapter implements ISearchAdapter {
             throw new Exception("Unsuccessful query to the What.cd JSON API");
         }
 
-        JSONObject structure = getJSON(queryResult);
+        JSONObject json = getJSON(queryResult);
 
-        if (structure == null) {
+        if (json == null) {
             return new ArrayList<SearchResult>();
         }
 
         List<SearchResult> results = new ArrayList<>();
-        JSONArray jsonResults = structure.getJSONObject("response")
-                .getJSONArray("results");
+        JSONArray jsonResults = json.getJSONObject("response")
+                                    .getJSONArray("results");
 
         //Log.d(LOG_TAG, jsonResults.toString());
 
@@ -136,8 +137,8 @@ public class WhatCdAdapter implements ISearchAdapter {
     }
 
     private String getDetailsUrl(JSONObject torrent) throws Exception {
-        return "https://what.cd/torrents.php?id=" + torrent.getInt("groupId") +
-                "&torrentid=" + torrent.getInt("torrentId");
+        return "https://what.cd/torrents.php?id=" + torrent.getLong("groupId") +
+                "&torrentid=" + torrent.getLong("torrentId");
     }
 
     private String getTorrentUrl(String torrentId) {
@@ -166,11 +167,11 @@ public class WhatCdAdapter implements ISearchAdapter {
                     name = item.getString("artist") + " - " + name;
                 }
 
-                JSONArray torrentArray = item.getJSONArray("torrents");
-                JSONArray deepTorrents = getTorrentsFromResults(torrentArray);
+                JSONArray jorrentJson = item.getJSONArray("torrents");
+                JSONArray torrents = getTorrentsFromResults(jorrentJson);
 
-                for (int jIndex = 0; jIndex < deepTorrents.length(); jIndex++) {
-                    JSONObject torrent = deepTorrents.getJSONObject(jIndex);
+                for (int torrentIndex = 0; torrentIndex < torrents.length(); torrentIndex++) {
+                    JSONObject torrent = torrents.getJSONObject(torrentIndex);
                     String torrentTitle = name;
 
                     if (isJsonTorrent(torrent)) {
@@ -292,7 +293,6 @@ public class WhatCdAdapter implements ISearchAdapter {
                         new BasicNameValuePair(LOGIN, LOGIN)
                 )));
         HttpResponse loginResult = client.execute(loginPost);
-
         String loginHtml = HttpHelper.convertStreamToString(loginResult.getEntity().getContent());
 
         if (loginHtml == null || loginHtml.contains(LOGIN_ERROR)) {
