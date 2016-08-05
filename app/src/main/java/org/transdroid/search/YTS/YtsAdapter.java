@@ -34,7 +34,7 @@ import java.util.Locale;
  */
 public class YtsAdapter implements ISearchAdapter {
 
-    private static final String BASE_URL = "https://yts.ag/api/v2/list_movies.json";
+    private static final String BASE_URL = "https://yts.immunicity.date/api/v2/list_movies.json";
     private static final int CONNECTION_TIMEOUT = 10000;
 
     /**
@@ -65,7 +65,8 @@ public class YtsAdapter implements ISearchAdapter {
 
     private List<SearchResult> performSearch(String query, SortOrder order) throws IOException, JSONException {
         // Ask for search results
-        String q = String.format(Locale.US, "?query_term=%1$s&sort_by=%2$s", URLEncoder.encode(query, "UTF-8"), "date_added");
+        String orderKey = order == SortOrder.BySeeders? "seeds": "date_added";
+        String q = String.format(Locale.US, "?query_term=%1$s&sort_by=%2$s", URLEncoder.encode(query, "UTF-8"), orderKey);
         HttpParams httpparams = new BasicHttpParams();
         HttpConnectionParams.setConnectionTimeout(httpparams, CONNECTION_TIMEOUT);
         HttpConnectionParams.setSoTimeout(httpparams, CONNECTION_TIMEOUT);
@@ -75,19 +76,14 @@ public class YtsAdapter implements ISearchAdapter {
 
         // Read JSON response
         InputStream instream = response.getEntity().getContent();
-
-        // Some ugly mangling because the YTS response does not play nicely with the json library
         String json = HttpHelper.convertStreamToString(instream);
-        json = json.replace("\"data\":{", "\"data\":[{");
-        json = json.replace(",\"@meta\"", "],\"@meta\"");
         instream.close();
 
         // Parse results
         JSONObject structure = new JSONObject(json);
         List<SearchResult> results = new ArrayList<>();
-        JSONArray array = structure.getJSONArray("data");
-        JSONObject payload = array.getJSONObject(0);
-        JSONArray movies = payload.getJSONArray("movies");
+        JSONObject data = structure.getJSONObject("data");
+        JSONArray movies = data.getJSONArray("movies");
         for (int i = 0; i < movies.length(); i++) {
             // Dequeue the next movie
             JSONObject movie = movies.getJSONObject(i);
@@ -97,6 +93,9 @@ public class YtsAdapter implements ISearchAdapter {
             for (int t = 0; t < torrents.length(); t++) {
                 // Dequeue the next torrent
                 JSONObject torrent = torrents.getJSONObject(t);
+
+                // Construct title as longer movie title + quality
+                String title = movie.getString("title_long") + " " + torrent.getString("quality");
 
                 // Get the file size
                 long sizeBytes = torrent.getLong("size_bytes");
@@ -111,7 +110,8 @@ public class YtsAdapter implements ISearchAdapter {
                 }
 
                 // Add to collection
-                results.add(new SearchResult(movie.getString("title"), torrent.getString("url"), movie.getString("url"), size, date, torrent.getInt("seeds"), torrent.getInt("peers")));
+                results.add(new SearchResult(title, torrent.getString("url"), movie.getString("url"), size, date, torrent.getInt("seeds"), torrent
+                        .getInt("peers")));
             }
         }
 
@@ -126,7 +126,7 @@ public class YtsAdapter implements ISearchAdapter {
 
     @Override
     public String getSiteName() {
-        return "YTS";
+        return "YTS (proxied)";
     }
 
     @Override
@@ -143,4 +143,5 @@ public class YtsAdapter implements ISearchAdapter {
     public InputStream getTorrentFile(Context context, String url) throws Exception {
         return null;
     }
+
 }

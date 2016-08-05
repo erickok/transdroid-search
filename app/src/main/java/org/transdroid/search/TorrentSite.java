@@ -179,7 +179,9 @@ public enum TorrentSite {
 	},
 	YTS {
 		@Override
-		public ISearchAdapter getAdapter() { return new YtsAdapter(); }
+		public ISearchAdapter getAdapter() {
+			return new YtsAdapter();
+		}
 	};
 
 	/**
