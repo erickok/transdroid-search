@@ -29,7 +29,6 @@ import org.transdroid.search.HoundDawgs.HoundDawgsAdapter;
 import org.transdroid.search.StrikeSearch.StrikeSearchAdapter;
 import org.transdroid.search.RssFeedSearch.BitSnoopAdapter;
 import org.transdroid.search.RssFeedSearch.ExtraTorrentAdapter;
-import org.transdroid.search.RssFeedSearch.KickassTorrentsAdapter;
 import org.transdroid.search.RssFeedSearch.LimeTorrentsAdapter;
 import org.transdroid.search.RssFeedSearch.MininovaAdapter;
 import org.transdroid.search.RssFeedSearch.NyaaTorrentsAdapter;
@@ -40,7 +39,6 @@ import org.transdroid.search.TorrentDay.TorrentDayAdapter;
 import org.transdroid.search.TorrentLeech.TorrentLeechAdapter;
 import org.transdroid.search.hdbitsorg.HdBitsOrgAdapter;
 import org.transdroid.search.hdtorrents.HdTorrentsAdapter;
-import org.transdroid.search.ncore.NcoreAdapter;
 import org.transdroid.search.rarbg.RarbgAdapter;
 import org.transdroid.search.revolutiontt.RevolutionTTAdapter;
 
@@ -104,12 +102,6 @@ public enum TorrentSite {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new HoundDawgsAdapter();
-		}
-	},
-	KickassTorents {
-		@Override
-		public ISearchAdapter getAdapter() {
-			return new KickassTorrentsAdapter();
 		}
 	},
 	LimeTorrents {
