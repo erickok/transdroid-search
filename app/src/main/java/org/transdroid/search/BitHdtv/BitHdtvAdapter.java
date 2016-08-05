@@ -164,9 +164,10 @@ public class BitHdtvAdapter implements ISearchAdapter {
 		final String SEEDERS_END = "</a>";
 		final String LEECHERS = "#leechers\">";
 		final String LEECHERS_END = "</a>";
+		final String PREFIX = "http://www.bit-hdtv.com/";
 
 		// Link starts right at the beginning of an item
-		String link = htmlItem.substring(0, htmlItem.indexOf(LINK_END));
+		String link = PREFIX + htmlItem.substring(0, htmlItem.indexOf(LINK_END));
 
 		int nameStart = htmlItem.indexOf(NAME, 0) + NAME.length();
 		String name = htmlItem.substring(nameStart, htmlItem.indexOf(NAME_END, nameStart));
