@@ -151,10 +151,10 @@ public class BitHdtvAdapter implements ISearchAdapter {
 	private SearchResult parseHtmlItem(String htmlItem) {
 
 		// Texts to find subsequently
-		final String LINK_END = "'><img src=/pic/dwnld.gif";
+		final String LINK_END = "'><img src='/pic/dwnld.gif'";
 		final String NAME = "<a title=\"";
 		final String NAME_END = "\" href=\"";
-		final String DETAILS = "\" href=\"/";
+		final String DETAILS = "\" href=\"";
 		final String DETAILS_END = "\">";
 		final String DATE = "<td class=detail align=center>";
 		final String DATE_END = "</td>";
@@ -164,17 +164,16 @@ public class BitHdtvAdapter implements ISearchAdapter {
 		final String SEEDERS_END = "</a>";
 		final String LEECHERS = "#leechers\">";
 		final String LEECHERS_END = "</a>";
-		String prefix = "http://www.bit-hdtv.com/";
+		final String PREFIX = "http://www.bit-hdtv.com/";
 
 		// Link starts right at the beginning of an item
-		String link = htmlItem.substring(0, htmlItem.indexOf(LINK_END));
+		String link = PREFIX + htmlItem.substring(0, htmlItem.indexOf(LINK_END));
 
 		int nameStart = htmlItem.indexOf(NAME, 0) + NAME.length();
 		String name = htmlItem.substring(nameStart, htmlItem.indexOf(NAME_END, nameStart));
 
 		int detailsStart = htmlItem.indexOf(DETAILS, nameStart) + DETAILS.length();
 		String details = htmlItem.substring(detailsStart, htmlItem.indexOf(DETAILS_END, detailsStart));
-		details = prefix + details;
 
 		int dateStart = htmlItem.indexOf(DATE, detailsStart) + DATE.length();
 		String dateText = htmlItem.substring(dateStart, htmlItem.indexOf(DATE_END, dateStart));
