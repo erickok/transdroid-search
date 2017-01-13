@@ -49,7 +49,7 @@ import javax.security.auth.login.LoginException;
 public class TorrentLeechAdapter implements ISearchAdapter {
 
 	private static final String LOGINURL = "https://www.torrentleech.org/user/account/login/";
-	private static final String QUERYURL = "https://www.torrentleech.org/torrents/browse/index/query/%1$s%2$s";
+	private static final String QUERYURL = "https://classic.torrentleech.org/torrents/browse/index/query/%1$s%2$s";
 	private static final String SORT_COMPOSITE = "";
 	private static final String SORT_SEEDS = "/orderby/seeders/order/desc";
 
@@ -154,7 +154,7 @@ public class TorrentLeechAdapter implements ISearchAdapter {
 		final String SEEDERS_END = "</td>";
 		final String LEECHERS = "<td class=\"leechers\">";
 		final String LEECHERS_END = "</td>";
-		String prefix = "http://www.torrentleech.org";
+		String prefix = "http://classic.torrentleech.org";
 
 		int detailsStart = htmlItem.indexOf(DETAILS) + DETAILS.length();
 		String details = htmlItem.substring(detailsStart, htmlItem.indexOf(DETAILS_END, detailsStart));
@@ -166,7 +166,6 @@ public class TorrentLeechAdapter implements ISearchAdapter {
 
 		int linkStart = htmlItem.indexOf(LINK, nameStart) + LINK.length();
 		String link = htmlItem.substring(linkStart, htmlItem.indexOf(LINK_END, linkStart));
-		link = prefix + link;
 
 		int commentsStart = htmlItem.indexOf(COMMENTS, linkStart) + COMMENTS.length();
 
