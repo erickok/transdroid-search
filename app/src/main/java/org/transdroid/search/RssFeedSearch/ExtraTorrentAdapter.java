@@ -50,7 +50,7 @@ public class ExtraTorrentAdapter extends RssFeedSearchAdapter {
 	protected String getUrl(String query, SortOrder order) {
 		// Note: doesn't support different list sortings
 		try {
-			return "http://extratorrent.cc/rss.xml?type=search&search=" + URLEncoder.encode(query, "UTF-8");
+			return "http://extra.to/rss.xml?type=search&search=" + URLEncoder.encode(query, "UTF-8");
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 			return null;

@@ -1,6 +1,6 @@
 package org.transdroid.search.ncore;
 
-import android.content.Context;
+import android.content.SharedPreferences;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -44,10 +44,10 @@ public class NcoreAdapter implements ISearchAdapter {
     private static final String SORT_SEEDS = "&miszerint=seeders&hogyan=DESC";
     private final SimpleDateFormat df = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 
-    private HttpClient prepareRequest(Context context) throws Exception {
+    private HttpClient prepareRequest(SharedPreferences prefs) throws Exception {
 
-        String username = SettingsHelper.getSiteUser(context, TorrentSite.Ncore);
-        String password = SettingsHelper.getSitePass(context, TorrentSite.Ncore);
+        String username = SettingsHelper.getSiteUser(prefs, TorrentSite.Ncore);
+        String password = SettingsHelper.getSitePass(prefs, TorrentSite.Ncore);
         if (username == null || password == null) {
             throw new InvalidParameterException("No username or password was provided, while this is required for this private site.");
         }
@@ -78,9 +78,9 @@ public class NcoreAdapter implements ISearchAdapter {
     }
 
     @Override
-    public List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception {
+    public List<SearchResult> search(SharedPreferences prefs, String query, SortOrder order, int maxResults) throws Exception {
 
-        HttpClient httpclient = prepareRequest(context);
+        HttpClient httpclient = prepareRequest(prefs);
 
         final String url = String.format(QUERYURL, URLEncoder.encode(query, "UTF-8"), (order == SortOrder.BySeeders ? SORT_SEEDS : SORT_COMPOSITE));
 
@@ -99,10 +99,10 @@ public class NcoreAdapter implements ISearchAdapter {
     }
 
     @Override
-    public InputStream getTorrentFile(Context context, String url) throws Exception {
+    public InputStream getTorrentFile(SharedPreferences prefs, String url) throws Exception {
 
         // Provide an authenticated file handle to the requested url
-        HttpClient httpclient = prepareRequest(context);
+        HttpClient httpclient = prepareRequest(prefs);
         HttpResponse response = httpclient.execute(new HttpGet(url));
         return response.getEntity().getContent();
 

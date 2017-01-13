@@ -14,3 +14,6 @@ signing.gradle
 
 # Mac
 .DS_Store
+
+# Never dd my local passwords file to git
+app/src/androidTest/res/values/test_passwords.xml

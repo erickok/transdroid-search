@@ -39,7 +39,7 @@ import org.transdroid.search.SearchResult;
 import org.transdroid.search.SortOrder;
 import org.transdroid.util.HttpHelper;
 
-import android.content.Context;
+import android.content.SharedPreferences;
 
 /**
  * An adapter that provides access to demonoid torrent searches by parsing
@@ -59,7 +59,7 @@ public class DemonoidAdapter implements ISearchAdapter {
 	private int maxResults;
 
 	@Override
-	public List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception {
+	public List<SearchResult> search(SharedPreferences prefs, String query, SortOrder order, int maxResults) throws Exception {
 		
 		if (query == null) {
 			return null;
@@ -100,7 +100,7 @@ public class DemonoidAdapter implements ISearchAdapter {
 	}
 
 	@Override
-	public InputStream getTorrentFile(Context context, String url) throws Exception {
+	public InputStream getTorrentFile(SharedPreferences prefs, String url) throws Exception {
 
 		// Provide a simple file handle to the requested url
 		HttpParams httpparams = new BasicHttpParams();

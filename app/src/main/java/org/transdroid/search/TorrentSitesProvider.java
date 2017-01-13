@@ -18,14 +18,16 @@
  */
 package org.transdroid.search;
 
-import org.transdroid.search.gui.SettingsHelper;
-
 import android.content.ContentProvider;
 import android.content.ContentValues;
+import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.database.MatrixCursor;
 import android.net.Uri;
+import android.preference.PreferenceManager;
 import android.util.Log;
+
+import org.transdroid.search.gui.SettingsHelper;
 
 /**
  * Provider of a list of available torrent sites.
@@ -93,13 +95,14 @@ public class TorrentSitesProvider extends ContentProvider {
 		MatrixCursor curs = new MatrixCursor(columnNames);
 
 		TorrentSite[] sites = TorrentSite.values();
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
 		
 		// Return the enabled results as MatrixCursor
 		int id = 0;
 		for (TorrentSite site : sites) {
 			
 			// Don't include this site if the user disabled it (or it is private and no credentials are specified)
-			if (!SettingsHelper.isSiteEnabled(getContext(), site))
+			if (!SettingsHelper.isSiteEnabled(prefs, site))
 				continue;
 			
 			Object[] values = new Object[5];

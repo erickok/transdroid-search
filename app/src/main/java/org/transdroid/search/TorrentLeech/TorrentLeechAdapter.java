@@ -18,7 +18,7 @@
  */
 package org.transdroid.search.TorrentLeech;
 
-import android.content.Context;
+import android.content.SharedPreferences;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -26,7 +26,6 @@ import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicNameValuePair;
 import org.transdroid.search.ISearchAdapter;
 import org.transdroid.search.SearchResult;
@@ -36,7 +35,6 @@ import org.transdroid.search.gui.SettingsHelper;
 import org.transdroid.util.HttpHelper;
 
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.InvalidParameterException;
 import java.util.ArrayList;
@@ -55,10 +53,10 @@ public class TorrentLeechAdapter implements ISearchAdapter {
 	private static final String SORT_COMPOSITE = "";
 	private static final String SORT_SEEDS = "/orderby/seeders/order/desc";
 
-	private HttpClient prepareRequest(Context context) throws Exception {
+	private HttpClient prepareRequest(SharedPreferences prefs) throws Exception {
 
-		String username = SettingsHelper.getSiteUser(context, TorrentSite.TorrentLeech);
-		String password = SettingsHelper.getSitePass(context, TorrentSite.TorrentLeech);
+		String username = SettingsHelper.getSiteUser(prefs, TorrentSite.TorrentLeech);
+		String password = SettingsHelper.getSitePass(prefs, TorrentSite.TorrentLeech);
 		if (username == null || password == null) {
 			throw new InvalidParameterException("No username or password was provided, while this is required for this private site.");
 		}
@@ -84,9 +82,9 @@ public class TorrentLeechAdapter implements ISearchAdapter {
 	}
 
 	@Override
-	public List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception {
+	public List<SearchResult> search(SharedPreferences prefs, String query, SortOrder order, int maxResults) throws Exception {
 
-		HttpClient httpclient = prepareRequest(context);
+		HttpClient httpclient = prepareRequest(prefs);
 
 		// Build a search request parameters
 		final String url = String.format(QUERYURL, URLEncoder.encode(query, "UTF-8"), (order == SortOrder.BySeeders ? SORT_SEEDS : SORT_COMPOSITE));
@@ -104,10 +102,10 @@ public class TorrentLeechAdapter implements ISearchAdapter {
 	}
 
 	@Override
-	public InputStream getTorrentFile(Context context, String url) throws Exception {
+	public InputStream getTorrentFile(SharedPreferences prefs, String url) throws Exception {
 
 		// Provide an authenticated file handle to the requested url
-		HttpClient httpclient = prepareRequest(context);
+		HttpClient httpclient = prepareRequest(prefs);
 		HttpResponse response = httpclient.execute(new HttpGet(url));
 		return response.getEntity().getContent();
 

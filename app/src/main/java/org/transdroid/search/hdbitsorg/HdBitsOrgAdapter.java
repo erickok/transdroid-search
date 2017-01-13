@@ -48,7 +48,7 @@ import org.transdroid.search.TorrentSite;
 import org.transdroid.search.gui.SettingsHelper;
 import org.transdroid.util.HttpHelper;
 
-import android.content.Context;
+import android.content.SharedPreferences;
 import android.util.Log;
 
 /**
@@ -102,9 +102,9 @@ public class HdBitsOrgAdapter implements ISearchAdapter {
     }
 
     @Override
-    public List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception {
+    public List<SearchResult> search(SharedPreferences prefs, String query, SortOrder order, int maxResults) throws Exception {
         
-        DefaultHttpClient client = prepareRequest(context);
+        DefaultHttpClient client = prepareRequest(prefs);
 
         // build search query
         String encodedQuery = URLEncoder.encode(query, "UTF-8");
@@ -129,9 +129,9 @@ public class HdBitsOrgAdapter implements ISearchAdapter {
     }
 
     @Override
-    public InputStream getTorrentFile(Context context, String url) throws Exception {
+    public InputStream getTorrentFile(SharedPreferences prefs, String url) throws Exception {
         // Provide an authenticated file handle to the requested url
-        DefaultHttpClient client = prepareRequest(context);
+        DefaultHttpClient client = prepareRequest(prefs);
         HttpResponse response = client.execute(new HttpGet(url));
         return response.getEntity().getContent();
 
@@ -141,12 +141,12 @@ public class HdBitsOrgAdapter implements ISearchAdapter {
     // LOGIN LOGIC
     // =========================================================
 
-    private DefaultHttpClient prepareRequest(Context context) throws Exception {
+    private DefaultHttpClient prepareRequest(SharedPreferences prefs) throws Exception {
         Log.d(LOG_TAG, "Preparing login attempt.");
 
         // retrieve stored login info
-        String username = SettingsHelper.getSiteUser(context, TorrentSite.HdBitsOrg);
-        String password = SettingsHelper.getSitePass(context, TorrentSite.HdBitsOrg);
+        String username = SettingsHelper.getSiteUser(prefs, TorrentSite.HdBitsOrg);
+        String password = SettingsHelper.getSitePass(prefs, TorrentSite.HdBitsOrg);
 
         // verify we have login credentials. does this ever get hit?
         if (username == null || password == null) {

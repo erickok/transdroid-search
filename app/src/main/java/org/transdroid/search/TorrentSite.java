@@ -18,17 +18,13 @@
  */
 package org.transdroid.search;
 
-import android.content.Context;
+import android.content.SharedPreferences;
 
 import org.transdroid.search.AsiaTorrents.AsiaTorrentsAdapter;
 import org.transdroid.search.BTN.BTNAdapter;
-import org.transdroid.search.WhatCd.WhatCdAdapter;
-import org.transdroid.search.ncore.NcoreAdapter;
 import org.transdroid.search.BitHdtv.BitHdtvAdapter;
 import org.transdroid.search.Danishbits.DanishbitsAdapter;
 import org.transdroid.search.HoundDawgs.HoundDawgsAdapter;
-import org.transdroid.search.StrikeSearch.StrikeSearchAdapter;
-import org.transdroid.search.RssFeedSearch.BitSnoopAdapter;
 import org.transdroid.search.RssFeedSearch.ExtraTorrentAdapter;
 import org.transdroid.search.RssFeedSearch.LimeTorrentsAdapter;
 import org.transdroid.search.RssFeedSearch.MininovaAdapter;
@@ -41,6 +37,7 @@ import org.transdroid.search.TorrentLeech.TorrentLeechAdapter;
 import org.transdroid.search.YTS.YtsAdapter;
 import org.transdroid.search.hdbitsorg.HdBitsOrgAdapter;
 import org.transdroid.search.hdtorrents.HdTorrentsAdapter;
+import org.transdroid.search.ncore.NcoreAdapter;
 import org.transdroid.search.rarbg.RarbgAdapter;
 import org.transdroid.search.revolutiontt.RevolutionTTAdapter;
 
@@ -56,12 +53,6 @@ public enum TorrentSite {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new AsiaTorrentsAdapter();
-		}
-	},
-	BitSnoop {
-		@Override
-		public ISearchAdapter getAdapter() {
-			return new BitSnoopAdapter();
 		}
 	},
 	BitHdtv {
@@ -142,12 +133,6 @@ public enum TorrentSite {
 			return new ScambioEtico();
 		}
 	},
-	StrikeSearch {
-		@Override
-		public ISearchAdapter getAdapter() {
-			return new StrikeSearchAdapter();
-		}
-	},
 	RevolutionTT {
 		@Override
 		public ISearchAdapter getAdapter() {
@@ -177,44 +162,32 @@ public enum TorrentSite {
 		public ISearchAdapter getAdapter() {
 			return new TorrentLeechAdapter();
 		}
-	},
-	WhatCd {
-		@Override
-		public ISearchAdapter getAdapter() {
-			return new WhatCdAdapter();
-		}
-	},
-	YTS {
-		@Override
-		public ISearchAdapter getAdapter() {
-			return new YtsAdapter();
-		}
 	};
 
 	/**
 	 * Directly and synchronously perform the search for torrents matching the given query string.
-	 * @param context The Android activity/provider context from which the shared preferences can be accessed
+	 * @param prefs The Android shared preferences to read credentials from
 	 * @param query The raw (non-urlencoded) query to search for
 	 * @param order The preferred order in which results are sorted
 	 * @param maxResults Maximum number of results to return
 	 * @return The list of found torrents on the site matching the search query
 	 * @throws Exception When an exception occurred during the loading or parsing of the search results
 	 */
-	public List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception {
-		return getAdapter().search(context, query, order, maxResults);
+	public List<SearchResult> search(SharedPreferences prefs, String query, SortOrder order, int maxResults) throws Exception {
+		return getAdapter().search(prefs, query, order, maxResults);
 	}
 
 	/**
 	 * Synchronously set up a connection to download a specific torrent file and return an input stream to this. Authentication and authorization is
 	 * off-loaded to the implementing torrent site.
-	 * @param context The Android activity/provider context from which the shared preferences can be accessed
+	 * @param prefs The Android shared preferences to read credentials from
 	 * @param url The full url of the torrent file to download
 	 * @return An InputStream handle to the requested file so it can be further downloaded, or null if no connection is possible (like when the device
 	 * is offline or when the user is not authorized)
 	 * @throws Exception When an exception occurred during the retrieval of the request url
 	 */
-	public InputStream getTorrentFile(Context context, String url) throws Exception {
-		return getAdapter().getTorrentFile(context, url);
+	public InputStream getTorrentFile(SharedPreferences prefs, String url) throws Exception {
+		return getAdapter().getTorrentFile(prefs, url);
 	}
 
 	public abstract ISearchAdapter getAdapter();

@@ -19,7 +19,6 @@
 package org.transdroid.search.ThePirateBay;
 
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -40,12 +39,12 @@ import org.transdroid.search.SearchResult;
 import org.transdroid.search.SortOrder;
 import org.transdroid.util.HttpHelper;
 
-import android.content.Context;
+import android.content.SharedPreferences;
 
 /**
  * An adapter that provides access to The Pirate Bay torrent searches by parsing
  * the raw HTML output.
- * 
+ *
  * @author Eric Kok
  */
 public class ThePirateBayAdapter implements ISearchAdapter {
@@ -57,15 +56,15 @@ public class ThePirateBayAdapter implements ISearchAdapter {
 	private static final int CONNECTION_TIMEOUT = 20000;
 
 	@Override
-	public List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception {
-		
+	public List<SearchResult> search(SharedPreferences prefs, String query, SortOrder order, int maxResults) throws Exception {
+
 		if (query == null) {
 			return null;
 		}
-		
+
 		// Build full URL string
 		final String url = String.format(QUERYURL, URLEncoder.encode(query, "UTF-8"), (order == SortOrder.BySeeders? SORT_SEEDS: SORT_COMPOSITE));
-		
+
 		// Start synchronous search
 
         // Setup request using GET
@@ -73,7 +72,7 @@ public class ThePirateBayAdapter implements ISearchAdapter {
         // Spoof Firefox user agent to force a result from The Pirate Bay
         httpclient.getParams().setParameter("http.useragent", "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
         HttpGet httpget = new HttpGet(url);
-        
+
         // Make request
         HttpResponse response = httpclient.execute(httpget);
 
@@ -82,11 +81,11 @@ public class ThePirateBayAdapter implements ISearchAdapter {
         String html = HttpHelper.convertStreamToString(instream);
         instream.close();
         return parseHtml(html);
-        
+
 	}
 
 	@Override
-	public InputStream getTorrentFile(Context context, String url) throws Exception {
+	public InputStream getTorrentFile(SharedPreferences prefs, String url) throws Exception {
 
 		// Provide a simple file handle to the requested url
 		HttpParams httpparams = new BasicHttpParams();
@@ -95,11 +94,11 @@ public class ThePirateBayAdapter implements ISearchAdapter {
 		DefaultHttpClient httpclient = new DefaultHttpClient(httpparams);
 		HttpResponse response = httpclient.execute(new HttpGet(url));
 		return response.getEntity().getContent();
-		
+
 	}
-	
+
 	protected List<SearchResult> parseHtml(String html) throws Exception {
-		
+
 		// Texts to find subsequently
 		final String RESULTS = "<table id=\"searchResult\">";
 		final String TORRENT = "<div class=\"detName\">";
@@ -119,7 +118,7 @@ public class ThePirateBayAdapter implements ISearchAdapter {
 			torStart = nextTorrentIndex;
 		}
 		return results;
-			
+
 	}
 
 	@Override
@@ -132,9 +131,9 @@ public class ThePirateBayAdapter implements ISearchAdapter {
 	public String getSiteName() {
 		return "The Pirate Bay (proxied)";
 	}
-	
+
 	private SearchResult parseHtmlItem(String htmlItem) {
-		
+
 		// Texts to find subsequently
 		final String DETAILS = "<a href=\"";
 		final String DETAILS_END = "\" class=\"detLink\"";
@@ -154,28 +153,34 @@ public class ThePirateBayAdapter implements ISearchAdapter {
 		String prefixYear = (new Date().getYear() + 1900) + " "; // Date.getYear() gives the current year - 1900
 		SimpleDateFormat df1 = new SimpleDateFormat("yyyy MM-dd HH:mm", Locale.US);
 		SimpleDateFormat df2 = new SimpleDateFormat("MM-dd yyyy", Locale.US);
-		
+
 		int detailsStart = htmlItem.indexOf(DETAILS) + DETAILS.length();
 		String details = htmlItem.substring(detailsStart, htmlItem.indexOf(DETAILS_END, detailsStart));
 		details = prefixDetails + details;
 		int nameStart = htmlItem.indexOf(NAME, detailsStart) + NAME.length();
 		String name = htmlItem.substring(nameStart, htmlItem.indexOf(NAME_END, nameStart));
-		
+
 		// Magnet link is first
 		int magnetLinkStart = htmlItem.indexOf(MAGNET_LINK, nameStart) + MAGNET_LINK.length();
 		String magnetLink = htmlItem.substring(magnetLinkStart, htmlItem.indexOf(MAGNET_LINK_END, magnetLinkStart));
-		
+
 		int dateStart = htmlItem.indexOf(DATE, magnetLinkStart) + DATE.length();
 		String dateText = htmlItem.substring(dateStart, htmlItem.indexOf(DATE_END, dateStart));
 		dateText = dateText.replace("&nbsp;", " ");
 		Date date = null;
-		try {
-			date = df1.parse(prefixYear + dateText);
-		} catch (ParseException e) {
+		if (dateText.startsWith("Today")) {
+			date = new Date();
+		} else if (dateText.startsWith("Y-day")) {
+			date = new Date(new Date().getTime() - 86400000L);
+		} else {
 			try {
-				date = df2.parse(dateText);
-			} catch (ParseException e1) {
-				// Not parsable at all; just leave it at null
+				date = df1.parse(prefixYear + dateText);
+			} catch (ParseException e) {
+				try {
+					date = df2.parse(dateText);
+				} catch (ParseException e1) {
+					// Not parsable at all; just leave it at null
+				}
 			}
 		}
 		int sizeStart = htmlItem.indexOf(SIZE, dateStart) + SIZE.length();
@@ -187,7 +192,7 @@ public class ThePirateBayAdapter implements ISearchAdapter {
 		int leechersStart = htmlItem.indexOf(LEECHERS, seedersStart) + LEECHERS.length();
 		String leechersText = htmlItem.substring(leechersStart, htmlItem.indexOf(LEECHERS_END, leechersStart));
 		int leechers = Integer.parseInt(leechersText);
-		
+
 		return new SearchResult(name, magnetLink, details, size, date, seeders, leechers);
 	}
 

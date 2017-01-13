@@ -18,7 +18,7 @@
  */
 package org.transdroid.search.Danishbits;
 
-import android.content.Context;
+import android.content.SharedPreferences;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -57,10 +57,10 @@ public class DanishbitsAdapter implements ISearchAdapter {
 	private static final String SORT_COMPOSITE = "";
 	private static final String SORT_SEEDS = "&sort_Seeders=DESC";
 
-	private HttpClient prepareRequest(Context context) throws Exception {
+	private HttpClient prepareRequest(SharedPreferences prefs) throws Exception {
 
-		String username = SettingsHelper.getSiteUser(context, TorrentSite.Danishbits);
-		String password = SettingsHelper.getSitePass(context, TorrentSite.Danishbits);
+		String username = SettingsHelper.getSiteUser(prefs, TorrentSite.Danishbits);
+		String password = SettingsHelper.getSitePass(prefs, TorrentSite.Danishbits);
 		if (username == null || password == null) {
 			throw new InvalidParameterException("No username or password was provided, while this is required for this private site.");
 		}
@@ -86,9 +86,9 @@ public class DanishbitsAdapter implements ISearchAdapter {
 	}
 
 	@Override
-	public List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception {
+	public List<SearchResult> search(SharedPreferences prefs, String query, SortOrder order, int maxResults) throws Exception {
 
-		HttpClient httpclient = prepareRequest(context);
+		HttpClient httpclient = prepareRequest(prefs);
 
 		// Build a search request parameters
 		final String url = String.format(QUERYURL, URLEncoder.encode(query, "UTF-8"), (order == SortOrder.BySeeders ? SORT_SEEDS : SORT_COMPOSITE));
@@ -106,10 +106,10 @@ public class DanishbitsAdapter implements ISearchAdapter {
 	}
 
 	@Override
-	public InputStream getTorrentFile(Context context, String url) throws Exception {
+	public InputStream getTorrentFile(SharedPreferences prefs, String url) throws Exception {
 
 		// Provide an authenticated file handle to the requested url
-		HttpClient httpclient = prepareRequest(context);
+		HttpClient httpclient = prepareRequest(prefs);
 		HttpResponse response = httpclient.execute(new HttpGet(url));
 		return response.getEntity().getContent();
 

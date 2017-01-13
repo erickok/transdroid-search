@@ -18,7 +18,7 @@
  */
 package org.transdroid.search.BTN;
 
-import android.content.Context;
+import android.content.SharedPreferences;
 
 import org.alexd.jsonrpc.JSONRPCException;
 import org.alexd.jsonrpc.JSONRPCParams;
@@ -57,9 +57,9 @@ public class BTNAdapter implements ISearchAdapter {
 	private static final String API_SEARCH = "getTorrents";
 
 	@Override
-	public List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception {
+	public List<SearchResult> search(SharedPreferences prefs, String query, SortOrder order, int maxResults) throws Exception {
 
-		String apikey = SettingsHelper.getSiteToken(context, TorrentSite.BTN);
+		String apikey = SettingsHelper.getSiteToken(prefs, TorrentSite.BTN);
 
 		if (apikey == null)
 			throw new LoginException("The BTN user API key was not provided, please configure BTN site settings");
@@ -147,7 +147,7 @@ public class BTNAdapter implements ISearchAdapter {
 	}
 
 	@Override
-	public InputStream getTorrentFile(Context context, String link) throws Exception {
+	public InputStream getTorrentFile(SharedPreferences prefs, String link) throws Exception {
 		URL url = new URL(link);
 		URLConnection urlConnection = url.openConnection();
 		return new BufferedInputStream(urlConnection.getInputStream());

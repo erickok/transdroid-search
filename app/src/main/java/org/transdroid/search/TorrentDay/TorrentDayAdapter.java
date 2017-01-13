@@ -19,7 +19,6 @@
 package org.transdroid.search.TorrentDay;
 
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.InvalidParameterException;
 import java.text.SimpleDateFormat;
@@ -49,7 +48,7 @@ import org.transdroid.search.TorrentSite;
 import org.transdroid.search.gui.SettingsHelper;
 import org.transdroid.util.HttpHelper;
 
-import android.content.Context;
+import android.content.SharedPreferences;
 
 /**
  * An adapter that provides access to TorrentDay searches by parsing their AJAX JSON API.
@@ -60,10 +59,10 @@ public class TorrentDayAdapter implements ISearchAdapter {
 	private static final String QUERYURL = "https://torrentday.eu/V3/API/API.php";
 	private static final int CONNECTION_TIMEOUT = 8000;
 
-	private DefaultHttpClient prepareRequest(Context context) throws Exception {
+	private DefaultHttpClient prepareRequest(SharedPreferences prefs) throws Exception {
 
-		String username = SettingsHelper.getSiteUser(context, TorrentSite.TorrentDay);
-		String password = SettingsHelper.getSitePass(context, TorrentSite.TorrentDay);
+		String username = SettingsHelper.getSiteUser(prefs, TorrentSite.TorrentDay);
+		String password = SettingsHelper.getSitePass(prefs, TorrentSite.TorrentDay);
 		if (username == null || password == null) {
 			throw new InvalidParameterException(
 					"No username or password was provided, while this is required for this private site.");
@@ -90,9 +89,9 @@ public class TorrentDayAdapter implements ISearchAdapter {
 	}
 
 	@Override
-	public List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception {
+	public List<SearchResult> search(SharedPreferences prefs, String query, SortOrder order, int maxResults) throws Exception {
 
-		DefaultHttpClient httpclient = prepareRequest(context);
+		DefaultHttpClient httpclient = prepareRequest(prefs);
 
 		// Start synchronous search via the JSON API
 		HttpPost queryPost = new HttpPost(QUERYURL);
@@ -139,10 +138,10 @@ public class TorrentDayAdapter implements ISearchAdapter {
 	}
 
 	@Override
-	public InputStream getTorrentFile(Context context, String url) throws Exception {
+	public InputStream getTorrentFile(SharedPreferences prefs, String url) throws Exception {
 
 		// Provide an authenticated file handle to the requested url
-		DefaultHttpClient httpclient = prepareRequest(context);
+		DefaultHttpClient httpclient = prepareRequest(prefs);
 		HttpResponse response = httpclient.execute(new HttpGet(url));
 		return response.getEntity().getContent();
 

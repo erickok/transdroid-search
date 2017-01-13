@@ -18,6 +18,22 @@
  */
 package org.transdroid.search;
 
+import android.content.ContentProvider;
+import android.content.ContentResolver;
+import android.content.ContentValues;
+import android.content.Context;
+import android.content.SharedPreferences;
+import android.content.UriMatcher;
+import android.database.Cursor;
+import android.database.MatrixCursor;
+import android.net.Uri;
+import android.os.Handler;
+import android.os.Looper;
+import android.os.ParcelFileDescriptor;
+import android.preference.PreferenceManager;
+import android.util.Log;
+import android.widget.Toast;
+
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
@@ -26,20 +42,6 @@ import java.io.InputStream;
 import java.util.List;
 
 import javax.security.auth.login.LoginException;
-
-import android.content.ContentProvider;
-import android.content.ContentResolver;
-import android.content.ContentValues;
-import android.content.Context;
-import android.content.UriMatcher;
-import android.database.Cursor;
-import android.database.MatrixCursor;
-import android.net.Uri;
-import android.os.Handler;
-import android.os.Looper;
-import android.os.ParcelFileDescriptor;
-import android.util.Log;
-import android.widget.Toast;
 
 /**
  * Main entry point for Android applications that want to query for torrent search results.
@@ -143,6 +145,7 @@ public class TorrentSearchProvider extends ContentProvider {
 		SortOrder order = SortOrder.BySeeders; // Use BySeeders as default
 		final int maxResults = 30;
 		TorrentSite site = TorrentSite.Mininova; // Use Mininova as default
+		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
 
 		// Retrieve the search term, site and order
 		if (uriMatcher.match(uriP) == SEARCH_TERM) {
@@ -171,7 +174,7 @@ public class TorrentSearchProvider extends ContentProvider {
 
 			// Perform the actual search
 			try {
-				List<SearchResult> results = site.search(getContext(), term, order, maxResults);
+				List<SearchResult> results = site.search(prefs, term, order, maxResults);
 				// Return the results as MatrixCursor
 				int id = 0;
 				for (SearchResult result : results) {
@@ -223,6 +226,7 @@ public class TorrentSearchProvider extends ContentProvider {
 			// Get the torrent site and url to download from the Uri specifier (which is URL-decoded by the Uri class)
 			String url = uri.getPathSegments().get(2);
 			TorrentSite site = TorrentSite.fromCode(uri.getPathSegments().get(1));
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
 
 			// Download the requested file and store it locally
 			InputStream input = null;
@@ -230,7 +234,7 @@ public class TorrentSearchProvider extends ContentProvider {
 			try {
 
 				// Request the file handle from the search site adapter, which takes case or user credentials too
-				input = site.getTorrentFile(getContext(), url);
+				input = site.getTorrentFile(prefs, url);
 
 				// Write a temporary file with the torrent contents
 				tempFile = File.createTempFile("transdroidsearch_", ".torrent", getContext().getCacheDir());

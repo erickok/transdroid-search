@@ -1,6 +1,6 @@
 package org.transdroid.search.YTS;
 
-import android.content.Context;
+import android.content.SharedPreferences;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpGet;
@@ -34,7 +34,7 @@ import java.util.Locale;
  */
 public class YtsAdapter implements ISearchAdapter {
 
-    private static final String BASE_URL = "https://yts.immunicity.date/api/v2/list_movies.json";
+    private static final String BASE_URL = "https://yts.immunicity.world/api/v2/list_movies.json";
     private static final int CONNECTION_TIMEOUT = 10000;
 
     /**
@@ -59,7 +59,7 @@ public class YtsAdapter implements ISearchAdapter {
     }
 
     @Override
-    public List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception {
+    public List<SearchResult> search(SharedPreferences prefs, String query, SortOrder order, int maxResults) throws Exception {
         return performSearch(query, order);
     }
 
@@ -71,7 +71,7 @@ public class YtsAdapter implements ISearchAdapter {
         HttpConnectionParams.setConnectionTimeout(httpparams, CONNECTION_TIMEOUT);
         HttpConnectionParams.setSoTimeout(httpparams, CONNECTION_TIMEOUT);
         DefaultHttpClient httpclient = new DefaultHttpClient(httpparams);
-        httpclient.getParams().setParameter("http.useragent", "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
+        //httpclient.getParams().setParameter("http.useragent", "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
         HttpResponse response = httpclient.execute(new HttpGet(BASE_URL + (query.length() > 0 ? q : "")));
 
         // Read JSON response
@@ -140,7 +140,7 @@ public class YtsAdapter implements ISearchAdapter {
     }
 
     @Override
-    public InputStream getTorrentFile(Context context, String url) throws Exception {
+    public InputStream getTorrentFile(SharedPreferences prefs, String url) throws Exception {
         return null;
     }
 

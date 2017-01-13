@@ -20,9 +20,7 @@ package org.transdroid.search.gui;
 
 import org.transdroid.search.TorrentSite;
 
-import android.content.Context;
 import android.content.SharedPreferences;
-import android.preference.PreferenceManager;
 
 /**
  * A helper class to access user settings form the {@link SharedPreferences} and gives access to the used preferences
@@ -43,14 +41,12 @@ public class SettingsHelper {
 	 * Determines if a torrent site is currently enabled by the user, based on the user settings. Public sites are
 	 * simply enabled/disabled with a check box but private sites are only enabled when proper user credentials have
 	 * been supplied.
-	 * @param context The android activity or prodiver context to access shared preferences from
+	 * @param prefs The shared preferences to read from
 	 * @param site The site for which to determine if it is enabled
 	 * @return True if the site is enabled and should be available in the search and torrent site providers; false
 	 *         otherwise
 	 */
-	public static boolean isSiteEnabled(Context context, TorrentSite site) {
-
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+	public static boolean isSiteEnabled(SharedPreferences prefs, TorrentSite site) {
 
 		// For public sites use the PREF_SITE_ENABLED-based preference only
 		if (!site.getAdapter().isPrivateSite())
@@ -74,37 +70,34 @@ public class SettingsHelper {
 
 	/**
 	 * Returns the name that the user specified in the settings as site-specific credentials.
-	 * @param context The android activity or provider context to access shared preferences from
+	 * @param prefs The shared preferences to read from
 	 * @param site The site for which to retrieve the user name
 	 * @return The name that the user entered in the settings as site-specific user name, or null if no user name was
 	 *         entered
 	 */
-	public static String getSiteUser(Context context, TorrentSite site) {
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+	public static String getSiteUser(SharedPreferences prefs, TorrentSite site) {
 		return prefs.getString(PREF_SITE_USER + site.name(), null);
 	}
 
 	/**
 	 * Returns the password that the user specified in the settings as site-specific credentials.
-	 * @param context The android activity or provider context to access shared preferences from
+	 * @param prefs The shared preferences to read from
 	 * @param site The site for which to retrieve the password
 	 * @return The password that the user entered in the settings as site-specific user pass, or null if no password was
 	 *         entered
 	 */
-	public static String getSitePass(Context context, TorrentSite site) {
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+	public static String getSitePass(SharedPreferences prefs, TorrentSite site) {
 		return prefs.getString(PREF_SITE_PASS + site.name(), null);
 	}
 	
 	/**
 	 * Returns the API token that the user specified in the settings as site-specific credentials.
-	 * @param context The android activity or provider context to access shared preferences from
+	 * @param prefs The shared preferences to read from
 	 * @param site The site for which to retrieve the API key/access token
 	 * @return The API token that the user entered in the settings as site-specific user pass, or null if none
 	 *         entered
 	 */
-	public static String getSiteToken(Context context, TorrentSite site) {
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+	public static String getSiteToken(SharedPreferences prefs, TorrentSite site) {
 		return prefs.getString(PREF_SITE_TOKEN + site.name(), null);
 	}
 

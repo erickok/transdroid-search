@@ -25,10 +25,6 @@ import java.util.List;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.DefaultHttpClient;
-import org.apache.http.params.BasicHttpParams;
-import org.apache.http.params.HttpConnectionParams;
-import org.apache.http.params.HttpParams;
 import org.ifies.android.sax.Item;
 import org.ifies.android.sax.RssParser;
 import org.transdroid.search.ISearchAdapter;
@@ -36,7 +32,7 @@ import org.transdroid.search.SearchResult;
 import org.transdroid.search.SortOrder;
 import org.transdroid.util.HttpHelper;
 
-import android.content.Context;
+import android.content.SharedPreferences;
 
 /**
  * An abstract class providing functionality to easily build search engine support for torrent sites that use RSS feeds.
@@ -79,7 +75,7 @@ public abstract class RssFeedSearchAdapter implements ISearchAdapter {
 	}
 
 	@Override
-	public List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception {
+	public List<SearchResult> search(SharedPreferences prefs, String query, SortOrder order, int maxResults) throws Exception {
 
 		// Parse the RSS feeds
 		RssParser parser = getRssParser(getUrl(query, order));
@@ -103,7 +99,7 @@ public abstract class RssFeedSearchAdapter implements ISearchAdapter {
 	}
 
 	@Override
-	public InputStream getTorrentFile(Context context, String url) throws Exception {
+	public InputStream getTorrentFile(SharedPreferences prefs, String url) throws Exception {
 
 		// Provide a simple file handle to the requested url
 		HttpClient httpclient = HttpHelper.buildDefaultSearchHttpClient(false);

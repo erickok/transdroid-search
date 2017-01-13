@@ -1,6 +1,6 @@
 package org.transdroid.search.rarbg;
 
-import android.content.Context;
+import android.content.SharedPreferences;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -17,7 +17,6 @@ import org.transdroid.util.HttpHelper;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.net.URLDecoder;
 import java.net.URLEncoder;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
@@ -54,7 +53,7 @@ public class RarbgAdapter implements ISearchAdapter {
 	}
 
 	@Override
-	public List<SearchResult> search(Context context, String query, SortOrder order, int maxResults) throws Exception {
+	public List<SearchResult> search(SharedPreferences prefs, String query, SortOrder order, int maxResults) throws Exception {
 
 		if (httpclient == null) {
 			httpclient = HttpHelper.buildDefaultSearchHttpClient(false);
@@ -154,7 +153,13 @@ public class RarbgAdapter implements ISearchAdapter {
 			} catch (Exception e) {
 				// Ignore; we rather have no date and results than stop on this error
 			}
-			results.add(new SearchResult(item.getString("title"), item.getString("download"), null, size, date, item.getInt("seeders"),
+			results.add(new SearchResult(
+					item.getString("title"),
+					item.getString("download"),
+					item.getString("info_page"),
+					size,
+					date,
+					item.getInt("seeders"),
 					item.getInt("leechers")));
 		}
 		return results;
@@ -168,7 +173,7 @@ public class RarbgAdapter implements ISearchAdapter {
 	}
 
 	@Override
-	public InputStream getTorrentFile(Context context, String url) throws Exception {
+	public InputStream getTorrentFile(SharedPreferences prefs, String url) throws Exception {
 		// Only for private sites
 		return null;
 	}
