@@ -37,9 +37,13 @@ import org.transdroid.util.HttpHelper;
 import java.io.InputStream;
 import java.net.URLEncoder;
 import java.security.InvalidParameterException;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 import javax.security.auth.login.LoginException;
 
@@ -52,6 +56,7 @@ public class TorrentLeechAdapter implements ISearchAdapter {
 	private static final String QUERYURL = "https://classic.torrentleech.org/torrents/browse/index/query/%1$s%2$s";
 	private static final String SORT_COMPOSITE = "";
 	private static final String SORT_SEEDS = "/orderby/seeders/order/desc";
+	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 
 	private HttpClient prepareRequest(SharedPreferences prefs) throws Exception {
 
@@ -145,6 +150,8 @@ public class TorrentLeechAdapter implements ISearchAdapter {
 		final String DETAILS = "title\"><a href=\"";
 		final String DETAILS_END = "\">";
 		final String NAME_END = "<";
+		final String DATE = "</b> on";
+		final String DATE_END = "</td>";
 		final String LINK = "<td class=\"quickdownload\">\n                									<a href=\"";
 		final String LINK_END = "\">";
 		final String COMMENTS = "#comments\">";
@@ -163,6 +170,15 @@ public class TorrentLeechAdapter implements ISearchAdapter {
 		// Name starts right after the link of an item
 		int nameStart = htmlItem.indexOf(DETAILS_END, detailsStart) + DETAILS_END.length();
 		String name = htmlItem.substring(nameStart, htmlItem.indexOf(NAME_END, nameStart));
+
+		int dateStart = htmlItem.indexOf(DATE, nameStart) + DATE.length();
+		String dateText = htmlItem.substring(dateStart, htmlItem.indexOf(DATE_END, dateStart));
+		Date date = new Date();
+		try {
+			date = DATE_FORMAT.parse(dateText.trim());
+		} catch (ParseException e1) {
+			// Not parsable at all; just leave it at null
+		}
 
 		int linkStart = htmlItem.indexOf(LINK, nameStart) + LINK.length();
 		String link = htmlItem.substring(linkStart, htmlItem.indexOf(LINK_END, linkStart));
@@ -194,7 +210,7 @@ public class TorrentLeechAdapter implements ISearchAdapter {
 			}
 		}
 
-		return new SearchResult(name, link, details, size, null, seeders, leechers);
+		return new SearchResult(name, link, details, size, date, seeders, leechers);
 
 	}
 
