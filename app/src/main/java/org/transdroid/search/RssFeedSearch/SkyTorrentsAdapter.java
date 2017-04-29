@@ -99,17 +99,17 @@ public class SkyTorrentsAdapter extends RssFeedSearchAdapter {
       return new SkyTorrentsItem();
     }
 
-      public void addAdditionalData(String localName, Item item, String text) {
+    public void addAdditionalData(String localName, Item item, String text) {
       if (item == null) {
         return;
       }
-        SkyTorrentsItem theItem = (SkyTorrentsItem) item;
+      SkyTorrentsItem theItem = (SkyTorrentsItem) item;
       if (localName.equalsIgnoreCase("description")) {
         // Contains the seeders, leechers and size, which looks something like '4 seeder(s), 1 leecher(s), 18 file(s) 204.4 MB'
         Matcher matcher = DESCRIPTION_PATTERN.matcher(text.trim());
         if (matcher == null || !matcher.matches()) {
           throw new IllegalStateException(
-              "Impossible to parse Sky Torrents description.");
+                  "Impossible to parse Sky Torrents description.");
         }
 
         theItem.setSeeders(Integer.parseInt(matcher.group(1)));
@@ -119,13 +119,13 @@ public class SkyTorrentsAdapter extends RssFeedSearchAdapter {
 
       }
       if (localName.equalsIgnoreCase("guid")) {
-          try {
-            theItem.setGUID(text.trim());
-          } catch (Exception e) {
-            theItem.setGUID("");
-        }
+        try {
+          theItem.setGUID(text.trim());
+        } catch (Exception e) {
+          theItem.setGUID("");
         }
       }
+    }
   }
 
   @Override
