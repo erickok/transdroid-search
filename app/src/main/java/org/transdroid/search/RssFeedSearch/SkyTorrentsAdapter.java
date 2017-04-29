@@ -28,6 +28,9 @@ import org.transdroid.search.SortOrder;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.net.URL;
+import java.net.URI;
+import java.net.URISyntaxException;
 
 /**
  * Search adapter for the Sky Torrents torrent site (based on custom search RSS feeds)
@@ -44,7 +47,7 @@ public class SkyTorrentsAdapter extends RssFeedSearchAdapter {
     SkyTorrentsItem theItem = (SkyTorrentsItem) item;
     return new SearchResult(
         item.getTitle(),
-        item.getLink(),
+        theItem.getTorrentURL(),
         theItem.getGUID(),
         theItem.getSize(),
         item.getPubdate(),
@@ -76,14 +79,17 @@ public class SkyTorrentsAdapter extends RssFeedSearchAdapter {
     private int seeders;
     private int leechers;
     private String GUID;
+    private String torrentURL;
     public void setSize(String size) { this.size = size; }
     public void setSeeders(int seeders) { this.seeders = seeders; }
     public void setLeechers(int leechers) { this.leechers = leechers; }
     public void setGUID(String GUID) { this.GUID = GUID; }
+    public void setTorrentURL(String torrentURL) { this.torrentURL = torrentURL; }
     public String getSize() { return size; }
     public int getSeeders() { return seeders; }
     public int getLeechers() { return leechers; }
     public String getGUID() { return GUID; }
+    public String getTorrentURL() { return torrentURL; }
   }
 
   /**
@@ -123,6 +129,28 @@ public class SkyTorrentsAdapter extends RssFeedSearchAdapter {
           theItem.setGUID(text.trim());
         } catch (Exception e) {
           theItem.setGUID("");
+        }
+      }
+      if (localName.equalsIgnoreCase("link")) {
+        try {
+          // Fix invalid unescaped URL from SkyTorrens RSS: the path part is currently not URL-escaped
+          URI uri;
+          try {
+            uri = new URI(text.trim());
+          } catch (URISyntaxException e) {
+            // original URL is invalid, let's try to fix it: use URI constructor to escape the path
+            URL originalURL = new URL(text.trim());
+            uri = new URI(
+                    originalURL.getProtocol(),
+                    originalURL.getHost(),
+                    originalURL.getPath(),
+                    null);
+          }
+
+          theItem.setTorrentURL(uri.toString());
+        } catch (Exception e) {
+          throw new IllegalStateException(
+                  "Impossible to parse Sky Torrents link.");
         }
       }
     }
