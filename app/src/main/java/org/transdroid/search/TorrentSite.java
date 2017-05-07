@@ -152,12 +152,6 @@ public enum TorrentSite {
 			return new SkyTorrentsAdapter();
 		}
 	},
-	TorrentDay {
-		@Override
-		public ISearchAdapter getAdapter() {
-			return new TorrentDayAdapter();
-		}
-	},
 	TorrentDownloads {
 		@Override
 		public ISearchAdapter getAdapter() {

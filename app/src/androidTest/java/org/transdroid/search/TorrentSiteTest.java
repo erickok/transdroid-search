@@ -122,11 +122,6 @@ public class TorrentSiteTest {
 	}
 
 	@Test
-	public void search_TorrentDay() throws Exception {
-		searchSite(TorrentSite.TorrentDay);
-	}
-
-	@Test
 	public void search_TorrentDownloads() throws Exception {
 		searchSite(TorrentSite.TorrentDownloads);
 	}
