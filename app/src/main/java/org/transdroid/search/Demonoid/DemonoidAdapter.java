@@ -45,13 +45,11 @@ import android.content.SharedPreferences;
  * An adapter that provides access to demonoid torrent searches by parsing
  * the raw HTML output.
  * 
- * NOTE: Currently disabled since the site is on (permanent?) hiatus.
- * 
  * @author Gabor Tanka
  */
 public class DemonoidAdapter implements ISearchAdapter {
 
-	private static final String QUERYURL = "http://www.demonoid.me/files/?to=0&uid=0&category=0&subcategory=0&language=0&seeded=2&quality=0&external=2&query=%s&sort=%s&page=0";
+	private static final String QUERYURL = "http://www.demonoid.pw/files/?to=0&uid=0&category=0&subcategory=0&language=0&seeded=2&quality=0&external=2&query=%s&sort=%s&page=0";
 	private static final String SORT_COMPOSITE = "H";
 	private static final String SORT_SEEDS = "S";
 	private static final int CONNECTION_TIMEOUT = 10000;

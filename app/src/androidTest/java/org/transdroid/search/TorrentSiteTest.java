@@ -102,6 +102,11 @@ public class TorrentSiteTest {
 	}
 
 	@Test
+	public void search_Pretome() throws Exception {
+		searchSite(TorrentSite.Pretome);
+	}
+
+	@Test
 	public void search_ScambioEtico() throws Exception {
 		searchSite(TorrentSite.ScambioEtico);
 	}

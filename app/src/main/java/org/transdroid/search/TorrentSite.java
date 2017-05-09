@@ -24,11 +24,13 @@ import org.transdroid.search.AsiaTorrents.AsiaTorrentsAdapter;
 import org.transdroid.search.BTN.BTNAdapter;
 import org.transdroid.search.BitHdtv.BitHdtvAdapter;
 import org.transdroid.search.Danishbits.DanishbitsAdapter;
+import org.transdroid.search.Demonoid.DemonoidAdapter;
 import org.transdroid.search.HoundDawgs.HoundDawgsAdapter;
 import org.transdroid.search.RssFeedSearch.ExtraTorrentAdapter;
 import org.transdroid.search.RssFeedSearch.LimeTorrentsAdapter;
 import org.transdroid.search.RssFeedSearch.MininovaAdapter;
 import org.transdroid.search.RssFeedSearch.NyaaTorrentsAdapter;
+import org.transdroid.search.RssFeedSearch.PretomeAdapter;
 import org.transdroid.search.RssFeedSearch.SkyTorrentsAdapter;
 import org.transdroid.search.RssFeedSearch.TorrentDownloadsAdapter;
 import org.transdroid.search.ScambioEtico.ScambioEtico;
@@ -70,6 +72,12 @@ public enum TorrentSite {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new DanishbitsAdapter();
+		}
+	},
+	Demonoid {
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new DemonoidAdapter();
 		}
 	},
 	ExtraTorrent {
@@ -124,6 +132,12 @@ public enum TorrentSite {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new ThePirateBayAdapter();
+		}
+	},
+	Pretome {
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new PretomeAdapter();
 		}
 	},
 	ScambioEtico {
