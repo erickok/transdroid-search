@@ -178,7 +178,7 @@ public class RevolutionTTAdapter implements ISearchAdapter {
 		String dateString = htmlItem.substring(dateStart, htmlItem.indexOf(DATE_END, dateStart));
 		Date date = null;
 		try {
-			date = parseDateFormat.parse(dateString.replace("<br/>", " "));
+			date = parseDateFormat.parse(dateString.replace("<br />", " "));
 		} catch (Exception e) {
 			// Ignore; just leave date null
 		}

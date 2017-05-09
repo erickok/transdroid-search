@@ -163,7 +163,6 @@ public class RarbgAdapter implements ISearchAdapter {
 					item.getInt("leechers")));
 		}
 		return results;
-
 	}
 
 	@Override
