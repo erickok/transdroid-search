@@ -82,11 +82,6 @@ public class TorrentSiteTest {
 	}
 
 	@Test
-	public void search_Mininova() throws Exception {
-		searchSite(TorrentSite.Mininova);
-	}
-
-	@Test
 	public void search_NyaaTorrents() throws Exception {
 		searchSite(TorrentSite.NyaaTorrents);
 	}

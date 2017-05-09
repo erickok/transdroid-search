@@ -144,7 +144,7 @@ public class TorrentSearchProvider extends ContentProvider {
 		String term = "";
 		SortOrder order = SortOrder.BySeeders; // Use BySeeders as default
 		final int maxResults = 30;
-		TorrentSite site = TorrentSite.Mininova; // Use Mininova as default
+		TorrentSite site = TorrentSite.Rarbg;
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
 
 		// Retrieve the search term, site and order
