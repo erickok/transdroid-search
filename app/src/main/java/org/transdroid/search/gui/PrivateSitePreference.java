@@ -18,7 +18,9 @@
  */
 package org.transdroid.search.gui;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -74,6 +76,19 @@ public class PrivateSitePreference extends DialogPreference {
 			case COOKIES:
 				setDialogLayoutResource(R.layout.dialog_cookies);
 				setDialogTitle(R.string.pref_cookies);
+				final String[] requiredCookies = this.torrentSite.getAdapter().getRequiredCookies();
+				final List<String> setCookies = new ArrayList<>();
+				final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
+				for (String cookieName : requiredCookies) {
+                    final String value = SettingsHelper.getSiteCookie(prefs, this.torrentSite, cookieName);
+                    if (value != null) {
+                        setCookies.add(cookieName);
+                    }
+                }
+				if (setCookies.size() > 0) {
+					setSummary(context.getString(R.string.pref_cookies_set,
+						TextUtils.join(context.getString(R.string.list_delimiter), setCookies)));
+                }
 				break;
 		}
 	}
@@ -161,14 +176,22 @@ public class PrivateSitePreference extends DialogPreference {
 	}
 
 	private void persistCookies() {
-		final Editor edit = PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
+		final Context context = getContext();
+		final Editor edit = PreferenceManager.getDefaultSharedPreferences(context).edit();
+		final List<String> setCookies = new ArrayList<>();
 		for (Entry<String, EditText> entry : cookieEdits.entrySet()) {
 			final String cookieName = entry.getKey();
 			String cookieValue = entry.getValue().getText().toString();
 			if (TextUtils.isEmpty(cookieValue)) {
 				cookieValue = null;
+			} else {
+				setCookies.add(cookieValue);
 			}
 			SettingsHelper.setSiteCookie(edit, torrentSite, cookieName, cookieValue);
+		}
+		if (setCookies.size() > 0) {
+			setSummary(context.getString(R.string.pref_cookies_set,
+				TextUtils.join(context.getString(R.string.list_delimiter), setCookies)));
 		}
 		edit.commit();
 	}
