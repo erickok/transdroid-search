@@ -243,14 +243,12 @@ public class AsiaTorrentsAdapter implements ISearchAdapter {
 		return "AsiaTorrents";
 	}
 
-	@Override
-	public boolean isPrivateSite() {
-		return true;
+	public AuthType getAuthType() {
+		return AuthType.USERNAME;
 	}
 
-	@Override
-	public boolean usesToken() {
-		return false;
+	public String[] getRequiredCookies() {
+		return null;
 	}
 
 }

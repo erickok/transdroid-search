@@ -161,14 +161,12 @@ public class SkyTorrentsAdapter extends RssFeedSearchAdapter {
     return "Sky Torrents";
   }
 
-  @Override
-  public boolean isPrivateSite() {
-    return false;
+  public AuthType getAuthType() {
+    return AuthType.NONE;
   }
 
-  @Override
-  public boolean usesToken() {
-    return false;
+  public String[] getRequiredCookies() {
+    return null;
   }
 
 }

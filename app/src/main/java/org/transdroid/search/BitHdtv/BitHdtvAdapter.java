@@ -219,14 +219,12 @@ public class BitHdtvAdapter implements ISearchAdapter {
 		return "BIT-HDTV";
 	}
 
-	@Override
-	public boolean isPrivateSite() {
-		return true;
+	public AuthType getAuthType() {
+		return AuthType.USERNAME;
 	}
 
-	@Override
-	public boolean usesToken() {
-		return false;
+	public String[] getRequiredCookies() {
+		return null;
 	}
 
 }

@@ -20,6 +20,7 @@ android {
 }
 dependencies {
     compile files('libs/android-json-rpc-0.3.4.jar')
+    compile 'org.jsoup:jsoup:1.11.2'
 
     androidTestCompile 'com.android.support.test:runner:0.5'
     androidTestCompile "com.google.truth:truth:0.30"

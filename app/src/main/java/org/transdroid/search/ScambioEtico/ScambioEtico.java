@@ -67,17 +67,17 @@ public class ScambioEtico implements ISearchAdapter {
 	private static final String SORT_SEEDS = "&sb=4";
 	private static final int CONNECTION_TIMEOUT = 8000;
 	private static final String ENCODING = "ISO-8859-1";
-	
+
 	private static final String WRONG_PASSWORD = "Password errata. Inserisci la password rispettando "
 			+ "i caratteri MAIUSCOLI e minuscoli.";
 	private static final String WRONG_LOGIN = "Non &#232; possibile trovare un utente del Forum "
 			+ "chiamato <b>";
-	
+
 	// Texts to find subsequently (Used in parseHtml)
 	private static final String START_RESULTS = "<!--TORRENT TABLE-->";
 	private static final String END_RESULTS = "<!--END TORRENT TABLE-->";
 	private static final String ITEM_PREFIX = "<tr class=\"row4\">";
-	
+
 	// Regexps for extracting the informations that we care (Used in parseHtmlItem)
 	private static final String MAIN_EXTRACTOR =
 			"<a [^>]*href='(http://forum.tntvillage.scambioetico.org/"
@@ -90,7 +90,7 @@ public class ScambioEtico implements ISearchAdapter {
 	private static final String SEEDS_EXTRACTOR =
 			"\\[<span [^>]*style='color:red'[^>]*>[^0-9\\.>]*([0-9]+)[^0-9\\.>]*</span>\\]";
 	private static final String LEECHERS_EXTRACTOR =
-			"\\[<span [^>]*style='color:green'[^>]*>[^0-9\\.>]*([0-9]+)[^0-9\\.>]*</span>\\]";	
+			"\\[<span [^>]*style='color:green'[^>]*>[^0-9\\.>]*([0-9]+)[^0-9\\.>]*</span>\\]";
 
 	private DefaultHttpClient prepareRequest(SharedPreferences prefs) throws Exception {
 
@@ -171,7 +171,7 @@ public class ScambioEtico implements ISearchAdapter {
 	protected List<SearchResult> parseHtml(String html, int maxResults) throws Exception {
 		int startResults = html.indexOf(START_RESULTS);
 		int endResults = html.indexOf(END_RESULTS);
-		
+
 		List<SearchResult> results = new ArrayList<SearchResult>();
 
 		if (startResults < 0) {
@@ -183,7 +183,7 @@ public class ScambioEtico implements ISearchAdapter {
 			// pragmatic approach... and parsing html without a clear interface is fragile anyway.
 			endResults = html.length();
 		}
-		
+
 		startResults += START_RESULTS.length();
 		String resultsTable = html.substring(startResults, endResults);
 
@@ -192,9 +192,9 @@ public class ScambioEtico implements ISearchAdapter {
 			itemsPointer += ITEM_PREFIX.length();
 			int nextItem = resultsTable.indexOf(ITEM_PREFIX, itemsPointer);
 			nextItem = (nextItem >= 0) ? nextItem : resultsTable.length();
-			
+
 			results.add(parseHtmlItem(resultsTable.substring(itemsPointer, nextItem)));
-			
+
 			itemsPointer = nextItem;
 		} while (itemsPointer < resultsTable.length() && results.size() < maxResults);
 		return results;
@@ -203,7 +203,7 @@ public class ScambioEtico implements ISearchAdapter {
 	private String extractData(String regexp, String htmlItem) {
 		return extractData(regexp, htmlItem, 1);
 	}
-	
+
 	private String extractData(String regexp, String htmlItem, int group) {
 		Pattern pattern = Pattern.compile(regexp);
 		Matcher matcher = pattern.matcher(htmlItem);
@@ -211,10 +211,10 @@ public class ScambioEtico implements ISearchAdapter {
 			throw new IllegalStateException(
 					"Impossible to parse results. Probably Scambio Etico refactored its html and this application must be updated.");
 		}
-		
+
 		return matcher.group(group);
 	}
-	
+
 	private SearchResult parseHtmlItem(String htmlItem) throws UnsupportedEncodingException {
 		String title = Html.fromHtml(extractData(MAIN_EXTRACTOR, htmlItem, 2)).toString();
 		String detailsUrl = Html.fromHtml(extractData(MAIN_EXTRACTOR, htmlItem, 1)).toString();
@@ -222,8 +222,8 @@ public class ScambioEtico implements ISearchAdapter {
 		String size = extractData(SIZE_EXTRACTOR, htmlItem) + " GiB";
 		int seeds = Integer.parseInt(extractData(SEEDS_EXTRACTOR, htmlItem));
 		int leechers = Integer.parseInt(extractData(LEECHERS_EXTRACTOR, htmlItem));
-		
-		
+
+
 		return new SearchResult(title, String.format(TORRENT_URL, torrentId), detailsUrl, size, null, seeds, leechers);
 
 	}
@@ -239,15 +239,12 @@ public class ScambioEtico implements ISearchAdapter {
 		return "Scambio Etico";
 	}
 
-	@Override
-	public boolean isPrivateSite() {
-		// Not really private, still it requires registration.
-		return true;
+	public AuthType getAuthType() {
+		return AuthType.USERNAME;
 	}
 
-	@Override
-	public boolean usesToken() {
-		return false;
+	public String[] getRequiredCookies() {
+		return null;
 	}
 
 }
