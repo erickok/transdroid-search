@@ -48,7 +48,7 @@ public class PrivateSitePreference extends DialogPreference {
 	private final TorrentSite torrentSite;
 	private final AuthType authType;
 	private EditText userEdit, passEdit, tokenEdit;
-	private Map<String, EditText> cookies;
+	private Map<String, EditText> cookieEdits;
 
 	public PrivateSitePreference(Context context, int sortOrder, TorrentSite torrentSite) {
 		super(context, null);
@@ -102,13 +102,13 @@ public class PrivateSitePreference extends DialogPreference {
 				userEdit.setText(prefs.getString(SettingsHelper.PREF_SITE_USER + torrentSite.name(), ""));
 				break;
 			case COOKIES:
-				cookies = new HashMap<>();
+				cookieEdits = new HashMap<>();
 				final LinearLayout layout = (LinearLayout) dialog.findViewById(R.id.dialog_cookies_layout);
 				for (String cookieName : torrentSite.getAdapter().getRequiredCookies()) {
 					final EditText cookieEdit = new EditText(dialog.getContext());
 					cookieEdit.setText(SettingsHelper.getSiteCookie(prefs, torrentSite, cookieName));
 					cookieEdit.setHint(cookieName);
-					cookies.put(cookieName, cookieEdit);
+					cookieEdits.put(cookieName, cookieEdit);
 					layout.addView(cookieEdit);
 				}
 				break;
@@ -162,7 +162,7 @@ public class PrivateSitePreference extends DialogPreference {
 
 	private void persistCookies() {
 		final Editor edit = PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
-		for (Entry<String, EditText> entry : cookies.entrySet()) {
+		for (Entry<String, EditText> entry : cookieEdits.entrySet()) {
 			final String cookieName = entry.getKey();
 			String cookieValue = entry.getValue().getText().toString();
 			if (TextUtils.isEmpty(cookieValue)) {

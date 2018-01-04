@@ -107,5 +107,9 @@ public abstract class RssFeedSearchAdapter implements ISearchAdapter {
 		return response.getEntity().getContent();
 		
 	}
-	
+
+	@Override
+	public String[] getRequiredCookies() {
+		return null;
+	}
 }
