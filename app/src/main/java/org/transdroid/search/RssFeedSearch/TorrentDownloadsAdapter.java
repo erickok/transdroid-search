@@ -29,22 +29,22 @@ import org.transdroid.util.FileSizeConverter;
 
 /**
  * Search adapter for the Torrent Downloads torrent site (based on custom search RSS feeds)
- * 
+ *
  * @author Eric Kok
  */
 public class TorrentDownloadsAdapter extends RssFeedSearchAdapter {
-	
+
 	protected SearchResult fromRssItemToSearchResult(Item item) {
 		// Direct .torrent file download in style http://www.torrentdownloads.me/torrent/<id>/<title>
 		// Web links (as appearing in the RSS item) in style http://www.torrentdownloads.me/download/<id>/<title>
 		TorrentDownloadsItem theItem = (TorrentDownloadsItem) item;
 		return new SearchResult(
-				item.getTitle(), 
+				item.getTitle(),
 				"http://www.torrentdownloads.me" + item.getLink().replace("/torrent/", "/download/"),
 				"http://www.torrentdownloads.me" + item.getLink(),
-				FileSizeConverter.getSize(theItem.getSize()),  
+				FileSizeConverter.getSize(theItem.getSize()),
 				item.getPubdate(),
-				theItem.getSeeders(), 
+				theItem.getSeeders(),
 				theItem.getLeechers());
 	}
 
@@ -63,7 +63,7 @@ public class TorrentDownloadsAdapter extends RssFeedSearchAdapter {
 	protected RssParser getRssParser(String url) {
 		return new TorrentDownloadsRssParser(url);
 	}
-	
+
 	/**
 	 * Custom Item with addition size, seeders and leechers data properties
 	 */
@@ -78,7 +78,7 @@ public class TorrentDownloadsAdapter extends RssFeedSearchAdapter {
 		public int getSeeders() { return seeders; }
 		public int getLeechers() { return leechers; }
 	}
-	
+
 	/**
 	 * Custom parser to parse the additional size, seeders and leechers data properties
 	 */
@@ -87,7 +87,7 @@ public class TorrentDownloadsAdapter extends RssFeedSearchAdapter {
 		public TorrentDownloadsRssParser(String url) {
 			super(url);
 		}
-		
+
 		public Item createNewItem() {
 			return new TorrentDownloadsItem();
 		}
@@ -116,9 +116,12 @@ public class TorrentDownloadsAdapter extends RssFeedSearchAdapter {
 		return false;
 	}
 
-	@Override
-	public boolean usesToken() {
-		return false;
+	public AuthType getAuthType() {
+		return AuthType.USERNAME;
+	}
+
+	public String[] getRequiredCookies() {
+		return null;
 	}
 
 }

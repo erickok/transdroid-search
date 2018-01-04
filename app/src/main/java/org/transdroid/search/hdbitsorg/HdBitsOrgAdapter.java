@@ -53,7 +53,7 @@ import android.util.Log;
 
 /**
  * An adapter that provides access to hdbits.org searches by parsing the raw HTML output.
- * 
+ *
  * @author John Conrad
  */
 public class HdBitsOrgAdapter implements ISearchAdapter {
@@ -62,23 +62,23 @@ public class HdBitsOrgAdapter implements ISearchAdapter {
     private static final String LOGIN_FORM_URL = "https://hdbits.org/login";
     private static final String LOGIN_URL = "https://hdbits.org/login/doLogin";
 
-    private static final String LOGIN_TOKEN_REGEX = "<input[^>]*name=\"lol\"[^>]*value=\"([^\"]+)\"[^>]*>"; 
+    private static final String LOGIN_TOKEN_REGEX = "<input[^>]*name=\"lol\"[^>]*value=\"([^\"]+)\"[^>]*>";
     // without escapes                               <input[^>]*name="lol"[^>]*value="([^"]+)"[^>]*>
 
     private static final String LOGIN_POST_USERNAME = "uname";
     private static final String LOGIN_POST_PASSWORD = "password";
     private static final String LOGIN_POST_TOKEN = "lol";
-        
-    
-    
+
+
+
     private static final String SEARCH_URL = "http://hdbits.org/browse.php?search=%1$s";
     private static final String SEARCH_SORT_BY_SEEDERS_SUFFIX = "&sort=seeders&d=DESC";
-    
-    private static final String SEARCH_REGEX = "<tr id='t[^']+'[^>]*>.*?href=\"/(details.php?[^\"]+)\"[^>]*?>([^<]*?)<.*?href=\"(download.php/[^\"]*?)\".*?<td[^>]*>(\\d*)\\W(day|month).*?<br />(\\d*)\\W*(day|hour).*?>([^<]*)<br>(GB|MB).*?toseeders=1\"><[^>]*>([^<]*).*?<td[^>]+.*?>(\\d+)"; 
+
+    private static final String SEARCH_REGEX = "<tr id='t[^']+'[^>]*>.*?href=\"/(details.php?[^\"]+)\"[^>]*?>([^<]*?)<.*?href=\"(download.php/[^\"]*?)\".*?<td[^>]*>(\\d*)\\W(day|month).*?<br />(\\d*)\\W*(day|hour).*?>([^<]*)<br>(GB|MB).*?toseeders=1\"><[^>]*>([^<]*).*?<td[^>]+.*?>(\\d+)";
     // without escapes:                         <tr id='t[^']+'[^>]*>.*?href="/(details.php?[^"]+)"[^>]*?>([^<]*?)<.*?href="(download.php/[^"]*?)".*?<td[^>]*>(\d*)\W(day|month).*?<br />(\d*)\W*(day|hour).*?>([^<]*)<br>(GB|MB).*?toseeders=1"><[^>]*>([^<]*).*?<td[^>]+.*?>(\d+)
 
 
-    
+
     private static final String URL_PREFIX = "https://hdbits.org/";
     private static final int CONNECTION_TIMEOUT = 8000;
 
@@ -96,14 +96,17 @@ public class HdBitsOrgAdapter implements ISearchAdapter {
         return true;
     }
 
-    @Override
-    public boolean usesToken() {
-        return false;
+    public AuthType getAuthType() {
+        return AuthType.USERNAME;
+    }
+
+    public String[] getRequiredCookies() {
+        return null;
     }
 
     @Override
     public List<SearchResult> search(SharedPreferences prefs, String query, SortOrder order, int maxResults) throws Exception {
-        
+
         DefaultHttpClient client = prepareRequest(prefs);
 
         // build search query
@@ -153,7 +156,7 @@ public class HdBitsOrgAdapter implements ISearchAdapter {
             throw new InvalidParameterException(
                     "No username or password was provided, while this is required for this private site.");
         }
-        
+
         // setup our http client
         HttpParams params = new BasicHttpParams();
         HttpConnectionParams.setConnectionTimeout(params, CONNECTION_TIMEOUT);
@@ -213,16 +216,16 @@ public class HdBitsOrgAdapter implements ISearchAdapter {
         for (Cookie cookie : client.getCookieStore().getCookies()) {
             if ("uid".equals(cookie.getName())) uid = true;
             if ("pass".equals(cookie.getName())) pass = true;
-            if ("hash".equals(cookie.getName())) hash = true;            
+            if ("hash".equals(cookie.getName())) hash = true;
         }
-        
+
         // if we don't have the correct cookies, login failed. notify user with a toast and toss an exception.
         success = uid && pass && hash;
         if (!success) {
         	Log.e(LOG_TAG, "Failed to log into hdbits.org as '" + username + "'. Did not receive expected login cookies!");
-            throw new LoginException("Failed to log into hdbits.org as '" + username + "'. Did not receive expected login cookies!");            
+            throw new LoginException("Failed to log into hdbits.org as '" + username + "'. Did not receive expected login cookies!");
         }
-        
+
         Log.d(LOG_TAG, "Successfully logged in to hdbits.org.");
     }
 
@@ -231,12 +234,12 @@ public class HdBitsOrgAdapter implements ISearchAdapter {
     // =========================================================
 
     protected List<SearchResult> parseHtml(String html, int maxResults) throws Exception {
-        Log.d(LOG_TAG, "Parsing search results.");        
-        
+        Log.d(LOG_TAG, "Parsing search results.");
+
         List<SearchResult> results = new ArrayList<SearchResult>();
         int matchCount = 0;
         int errorCount = 0;
-        
+
         Pattern regex = Pattern.compile(SEARCH_REGEX, Pattern.DOTALL);
         Matcher match = regex.matcher(html);
         while (match.find() && matchCount < maxResults) {
@@ -245,19 +248,19 @@ public class HdBitsOrgAdapter implements ISearchAdapter {
                 errorCount++;
                 continue;
             }
-            
+
             String detailsUrl = URL_PREFIX + match.group(1);
             String title      = match.group(2);
             String torrentUrl = URL_PREFIX + match.group(3);
             String size       = match.group(8) + match.group(9); // size + unit
             int seeders       = Integer.parseInt(match.group(10));
             int leechers      = Integer.parseInt(match.group(11));
-            
+
             int time1         = Integer.parseInt(match.group(4));
             String timeUnit1  = match.group(5);
             int time2         = Integer.parseInt(match.group(6));
             String timeUnit2  = match.group(7);
-            
+
             // hdbits.org lists "added date" in a relative format (i.e. 8 months 7 days ago)
             // we roughly calculate the number of MS elapsed then subtract that from "now"
             // could be a day or two off depending on month lengths, it's just imprecise data
@@ -272,9 +275,9 @@ public class HdBitsOrgAdapter implements ISearchAdapter {
 
             // build our search result
             SearchResult torrent = new SearchResult(title, torrentUrl, detailsUrl, size, addedDate, seeders, leechers);
-            results.add(torrent);                
+            results.add(torrent);
         }
-        
+
         Log.d(LOG_TAG, "Found " + matchCount + " matches and successfully parsed " + (matchCount - errorCount) + " of those matches.");
         return results;
     }

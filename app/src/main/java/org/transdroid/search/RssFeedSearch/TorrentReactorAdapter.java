@@ -27,9 +27,9 @@ import org.transdroid.search.SortOrder;
 
 /**
  * Search adapter for the Torrentreactor.net torrent site (based on custom search RSS feeds).
- * 
+ *
  * NOTE: Currently doesn't provides a direct .torrent link, so it is disabled.
- * 
+ *
  * @author Eric Kok
  */
 public class TorrentReactorAdapter extends RssFeedSearchAdapter {
@@ -44,11 +44,11 @@ public class TorrentReactorAdapter extends RssFeedSearchAdapter {
 		int seeders = Integer.parseInt(d.substring(statusStart, d.indexOf(" ", statusStart)));
 		int leechersStart = d.indexOf("seeder, ", statusStart) + "seeder, ".length();
 		int leechers = Integer.parseInt(d.substring(leechersStart, d.indexOf(" ", leechersStart)));
-		
+
 		return new SearchResult(
-				item.getTitle(), 
-				item.getEnclosureUrl(), 
-				item.getLink(),  
+				item.getTitle(),
+				item.getEnclosureUrl(),
+				item.getLink(),
 				size,
 				item.getPubdate(),
 				seeders,
@@ -76,9 +76,12 @@ public class TorrentReactorAdapter extends RssFeedSearchAdapter {
 		return false;
 	}
 
-	@Override
-	public boolean usesToken() {
-		return false;
+	public AuthType getAuthType() {
+		return AuthType.USERNAME;
+	}
+
+	public String[] getRequiredCookies() {
+		return null;
 	}
 
 }

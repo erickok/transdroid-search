@@ -44,7 +44,7 @@ import android.content.SharedPreferences;
 /**
  * An adapter that provides access to demonoid torrent searches by parsing
  * the raw HTML output.
- * 
+ *
  * @author Gabor Tanka
  */
 public class DemonoidAdapter implements ISearchAdapter {
@@ -53,18 +53,18 @@ public class DemonoidAdapter implements ISearchAdapter {
 	private static final String SORT_COMPOSITE = "H";
 	private static final String SORT_SEEDS = "S";
 	private static final int CONNECTION_TIMEOUT = 10000;
-	
+
 	private int maxResults;
 
 	@Override
 	public List<SearchResult> search(SharedPreferences prefs, String query, SortOrder order, int maxResults) throws Exception {
-		
+
 		if (query == null) {
 			return null;
 		}
-		
+
 		this.maxResults = maxResults;
-		
+
 		// Build a search request parameters
 		String encodedQuery = "";
 		try {
@@ -74,18 +74,18 @@ public class DemonoidAdapter implements ISearchAdapter {
 		}
 
 		final String url = String.format(QUERYURL, encodedQuery, (order == SortOrder.BySeeders? SORT_SEEDS: SORT_COMPOSITE));
-		
+
 		// Start synchronous search
 
         // Setup request using GET
         HttpParams httpparams = new BasicHttpParams();
         HttpConnectionParams.setConnectionTimeout(httpparams, CONNECTION_TIMEOUT);
-        HttpConnectionParams.setSoTimeout(httpparams, CONNECTION_TIMEOUT); 
+        HttpConnectionParams.setSoTimeout(httpparams, CONNECTION_TIMEOUT);
         DefaultHttpClient httpclient = new DefaultHttpClient(httpparams);
         // Spoof Firefox user agent to force a result
         httpclient.getParams().setParameter("http.useragent", "Mozilla/5.0 (Windows; U; Windows NT 6.1; en-US; rv:1.9.2.2) Gecko/20100316 Firefox/3.6.2");
         HttpGet httpget = new HttpGet(url);
-        
+
         // Make request
         HttpResponse response = httpclient.execute(httpget);
 
@@ -94,7 +94,7 @@ public class DemonoidAdapter implements ISearchAdapter {
         String html = HttpHelper.convertStreamToString(instream);
         instream.close();
         return parseHtml(html);
-        
+
 	}
 
 	@Override
@@ -107,21 +107,21 @@ public class DemonoidAdapter implements ISearchAdapter {
 		DefaultHttpClient httpclient = new DefaultHttpClient(httpparams);
 		HttpResponse response = httpclient.execute(new HttpGet(url));
 		return response.getEntity().getContent();
-		
+
 	}
-	
+
 	protected List<SearchResult> parseHtml(String html) throws Exception {
-		
+
 		try {
-			
+
 			// Texts to find subsequently
 			final String RESULTS = "<td class=\"torrent_header_2\">";
 			final String TORRENT = "<!-- tstart -->";
-			
+
 			// Parse the search results from HTML by looking for the identifying texts
 			List<SearchResult> results = new ArrayList<SearchResult>();
 			int resultsStart = html.indexOf(RESULTS)+ RESULTS.length();
-			
+
 			int torStart = html.indexOf(TORRENT,resultsStart);
 			while (torStart >= 0 && results.size() < maxResults) {
 				int nextTorrentIndex = html.indexOf(TORRENT,torStart + TORRENT.length());
@@ -133,7 +133,7 @@ public class DemonoidAdapter implements ISearchAdapter {
 				torStart = nextTorrentIndex;
 			}
 			return results;
-			
+
 		} catch (OutOfMemoryError e) {
 			throw new Exception(e);
 		} catch (Exception e) {
@@ -151,9 +151,9 @@ public class DemonoidAdapter implements ISearchAdapter {
 	public String getSiteName() {
 		return "Demonoid";
 	}
-	
+
 	private SearchResult parseHtmlItem(String htmlItem) {
-		
+
 		// Texts to find subsequently
 		final String DETAILS = "><a href=\"";
 		final String DETAILS_END = "\" target=\"_blank";
@@ -171,36 +171,36 @@ public class DemonoidAdapter implements ISearchAdapter {
 		final String DATE_END = "</td>";
 		String prefix = "http://www.demonoid.me";
 		SimpleDateFormat df = new SimpleDateFormat("EEEE, MMM dd, yyyy", Locale.US);
-		
+
 		int detailsStart = htmlItem.indexOf(DETAILS) + DETAILS.length();
 		String details = htmlItem.substring(detailsStart, htmlItem.indexOf(DETAILS_END, detailsStart));
 		details = prefix + details;
 		int nameStart = htmlItem.indexOf(NAME, detailsStart) + NAME.length();
 		String name = htmlItem.substring(nameStart, htmlItem.indexOf(NAME_END, nameStart));
-		
+
 		int linkStart = htmlItem.indexOf(LINK, nameStart) + LINK.length();
 		String link = htmlItem.substring(linkStart, htmlItem.indexOf(LINK_END, linkStart));
 		link = prefix + link;
-		
+
 		int sizeStart = htmlItem.indexOf(SIZE, linkStart) + SIZE.length();
 		String size = htmlItem.substring(sizeStart, htmlItem.indexOf(SIZE_END, sizeStart));
-		
+
 		int seedersStart = htmlItem.indexOf(SEEDERS, sizeStart) + SEEDERS.length();
 		String seedersText = htmlItem.substring(seedersStart, htmlItem.indexOf(SEEDERS_END, seedersStart));
 		int seeders = Integer.parseInt(seedersText);
 		int leechersStart = htmlItem.indexOf(LEECHERS, seedersStart) + LEECHERS.length();
 		String leechersText = htmlItem.substring(leechersStart, htmlItem.indexOf(LEECHERS_END, leechersStart));
 		int leechers = Integer.parseInt(leechersText);
-		
+
 		int dateStart = htmlItem.indexOf(DATE, leechersStart) + DATE.length();
 		String dateText = htmlItem.substring(dateStart, htmlItem.indexOf(DATE_END, dateStart));
 		Date date = null;
 		try {
 			date = df.parse(dateText);
-		} catch (ParseException e) {			
+		} catch (ParseException e) {
 			// Not parsable; just leave it at null
 		}
-		
+
 		return new SearchResult(name, link, details, size, date, seeders, leechers);
 	}
 
@@ -209,9 +209,12 @@ public class DemonoidAdapter implements ISearchAdapter {
 		return false;
 	}
 
-	@Override
-	public boolean usesToken() {
-		return false;
+	public AuthType getAuthType() {
+		return AuthType.USERNAME;
+	}
+
+	public String[] getRequiredCookies() {
+		return null;
 	}
 
 }

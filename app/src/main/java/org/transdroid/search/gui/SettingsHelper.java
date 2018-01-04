@@ -21,6 +21,7 @@ package org.transdroid.search.gui;
 import org.transdroid.search.TorrentSite;
 
 import android.content.SharedPreferences;
+import android.content.SharedPreferences.Editor;
 
 /**
  * A helper class to access user settings form the {@link SharedPreferences} and gives access to the used preferences
@@ -36,6 +37,7 @@ public class SettingsHelper {
 	static final String PREF_SITE_USER = "pref_key_user_";
 	static final String PREF_SITE_PASS = "pref_key_pass_";
 	static final String PREF_SITE_TOKEN = "pref_key_token_";
+	static final String PREF_SITE_COOKIE = "pref_key_cookie_";
 
 	/**
 	 * Determines if a torrent site is currently enabled by the user, based on the user settings. Public sites are
@@ -55,17 +57,23 @@ public class SettingsHelper {
 		// For private sites see if a token or username and password are specified as well
 		if (!prefs.getBoolean(PREF_SITE_ENABLED + site.name(), true))
 			return false;
-		if (site.getAdapter().usesToken()) {
-			if (prefs.getString(PREF_SITE_TOKEN + site.name(), null) == null)
-				return false;
-		} else {
-			if (prefs.getString(PREF_SITE_USER + site.name(), null) == null)
-				return false;
-			if (prefs.getString(PREF_SITE_PASS + site.name(), null) == null)
-				return false;
+
+		switch (site.getAdapter().getAuthType()) {
+			case TOKEN:
+				return prefs.getString(PREF_SITE_TOKEN + site.name(), null) != null;
+			case USERNAME:
+				return prefs.getString(PREF_SITE_USER + site.name(), null) != null
+						&& prefs.getString(PREF_SITE_PASS + site.name(), null) != null;
+			case COOKIES:
+				for (String cookie : site.getAdapter().getRequiredCookies()) {
+					final String cookieValue = getSiteCookie(prefs, site, cookie);
+					if (cookieValue == null) {
+						return false;
+					}
+				}
+				return true;
 		}
 		return true;
-
 	}
 
 	/**
@@ -101,4 +109,11 @@ public class SettingsHelper {
 		return prefs.getString(PREF_SITE_TOKEN + site.name(), null);
 	}
 
+	public static void setSiteCookie(Editor editor, TorrentSite site, String name, String value) {
+		editor.putString(PREF_SITE_COOKIE + site.name() + "_" + name, value);
+	}
+
+	public static String getSiteCookie(SharedPreferences prefs, TorrentSite site, String name) {
+		return prefs.getString(PREF_SITE_COOKIE + site.name() + "_" + name, null);
+	}
 }

@@ -126,7 +126,7 @@ public class NcoreAdapter implements ISearchAdapter {
         int torStart = html.indexOf(TORRENT, resultsStart);
         while (torStart >= 0 && results.size() < maxResults) {
             int nextTorrentIndex = html.indexOf(TORRENT, torStart + TORRENT.length());
-            int endTorrentIndex  = html.indexOf(TORRENT_END, torStart);
+            int endTorrentIndex = html.indexOf(TORRENT_END, torStart);
             if (nextTorrentIndex >= 0) {
                 results.add(parseHtmlItem(html.substring(torStart + TORRENT.length(), endTorrentIndex)));
             } else {
@@ -221,9 +221,12 @@ public class NcoreAdapter implements ISearchAdapter {
         return true;
     }
 
-    @Override
-    public boolean usesToken() {
-        return false;
+    public AuthType getAuthType() {
+        return AuthType.USERNAME;
+    }
+
+    public String[] getRequiredCookies() {
+        return null;
     }
 
 }

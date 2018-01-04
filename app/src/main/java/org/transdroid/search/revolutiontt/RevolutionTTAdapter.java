@@ -228,9 +228,12 @@ public class RevolutionTTAdapter implements ISearchAdapter {
 		return true;
 	}
 
-	@Override
-	public boolean usesToken() {
-		return false;
+	public AuthType getAuthType() {
+		return AuthType.USERNAME;
+	}
+
+	public String[] getRequiredCookies() {
+		return null;
 	}
 
 }

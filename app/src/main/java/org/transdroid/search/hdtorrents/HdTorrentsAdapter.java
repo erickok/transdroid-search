@@ -76,7 +76,7 @@ public class HdTorrentsAdapter implements ISearchAdapter {
     private static final String PEER_END_STRING = "</b>";
     private static final String IMDB_START_STRING = "http://www.imdb.com/";
     private static final String IMDB_END_STRING = "\"";
-    
+
     private static final String URL_PREFIX = "https://hd-torrents.org/";
     private static final int CONNECTION_TIMEOUT = 8000;
 
@@ -94,14 +94,17 @@ public class HdTorrentsAdapter implements ISearchAdapter {
         return true;
     }
 
-    @Override
-    public boolean usesToken() {
-        return false;
+    public AuthType getAuthType() {
+        return AuthType.USERNAME;
+    }
+
+    public String[] getRequiredCookies() {
+        return null;
     }
 
     @Override
     public List<SearchResult> search(SharedPreferences prefs, String query, SortOrder order, int maxResults) throws Exception {
-        
+
         DefaultHttpClient client = prepareRequest(prefs);
 
         // build search query
@@ -151,7 +154,7 @@ public class HdTorrentsAdapter implements ISearchAdapter {
             throw new InvalidParameterException(
                     "No username or password was provided, while this is required for this private site.");
         }
-        
+
         // setup our http client
         HttpParams params = new BasicHttpParams();
         HttpConnectionParams.setConnectionTimeout(params, CONNECTION_TIMEOUT);
@@ -186,14 +189,14 @@ public class HdTorrentsAdapter implements ISearchAdapter {
             if ("pass".equals(cookie.getName())) pass = true;
             if ("hashx".equals(cookie.getName())) hash = true;
         }
-        
+
         // if we don't have the correct cookies, login failed. notify user with a toast and toss an exception.
         success = uid && pass && hash;
         if (!success) {
         	Log.e(LOG_TAG, "Failed to log into HD-Torrents as '" + username + "'. Did not receive expected login cookies!");
             throw new LoginException("Failed to log into HD-Torrents as '" + username + "'. Did not receive expected login cookies!");
         }
-        
+
         Log.d(LOG_TAG, "Successfully logged in to HD-Torrents");
     }
 
@@ -278,7 +281,7 @@ public class HdTorrentsAdapter implements ISearchAdapter {
                 resultStart = nextResultStart;
             }
         }
-        
+
         return results;
     }
 }

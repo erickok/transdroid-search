@@ -47,9 +47,12 @@ public class RarbgAdapter implements ISearchAdapter {
 		return false;
 	}
 
-	@Override
-	public boolean usesToken() {
-		return false;
+	public AuthType getAuthType() {
+		return AuthType.USERNAME;
+	}
+
+	public String[] getRequiredCookies() {
+		return null;
 	}
 
 	@Override

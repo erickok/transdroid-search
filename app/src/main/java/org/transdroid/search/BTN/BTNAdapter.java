@@ -170,8 +170,12 @@ public class BTNAdapter implements ISearchAdapter {
 	}
 
 	@Override
-	public boolean usesToken() {
-		return true;
+	public AuthType getAuthType() {
+		return AuthType.TOKEN;
+	}
+
+	public String[] getRequiredCookies() {
+		return null;
 	}
 
 	class TorrentSeedsComparator implements Comparator<SearchResult> {

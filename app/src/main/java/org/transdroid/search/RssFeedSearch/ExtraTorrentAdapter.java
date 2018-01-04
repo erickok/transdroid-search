@@ -29,7 +29,7 @@ import org.transdroid.util.FileSizeConverter;
 
 /**
  * Search adapter for the ExtraTorrent torrent site (based on custom search RSS feeds)
- * 
+ *
  * @author Eric Kok
  */
 public class ExtraTorrentAdapter extends RssFeedSearchAdapter {
@@ -37,12 +37,12 @@ public class ExtraTorrentAdapter extends RssFeedSearchAdapter {
 	protected SearchResult fromRssItemToSearchResult(Item item) {
 		ExtraTorrentsItem theItem = (ExtraTorrentsItem) item;
 		return new SearchResult(
-				item.getTitle(), 
+				item.getTitle(),
 				item.getEnclosureUrl(),
 				item.getLink(),
-				theItem.getSize() == -1? "": FileSizeConverter.getSize(theItem.getSize()),  
+				theItem.getSize() == -1? "": FileSizeConverter.getSize(theItem.getSize()),
 				item.getPubdate(),
-				theItem.getSeeders(), 
+				theItem.getSeeders(),
 				theItem.getLeechers());
 	}
 
@@ -61,7 +61,7 @@ public class ExtraTorrentAdapter extends RssFeedSearchAdapter {
 	protected RssParser getRssParser(String url) {
 		return new ExtraTorrentsRssParser(url);
 	}
-	
+
 	/**
 	 * Custom Item with addition size, seeders and leechers data properties
 	 */
@@ -76,7 +76,7 @@ public class ExtraTorrentAdapter extends RssFeedSearchAdapter {
 		public int getSeeders() { return seeders; }
 		public int getLeechers() { return leechers; }
 	}
-	
+
 	/**
 	 * Custom parser to parse the additional size, seeders and leechers data properties
 	 */
@@ -85,7 +85,7 @@ public class ExtraTorrentAdapter extends RssFeedSearchAdapter {
 		public ExtraTorrentsRssParser(String url) {
 			super(url);
 		}
-		
+
 		public Item createNewItem() {
 			return new ExtraTorrentsItem();
 		}
@@ -126,9 +126,12 @@ public class ExtraTorrentAdapter extends RssFeedSearchAdapter {
 		return false;
 	}
 
-	@Override
-	public boolean usesToken() {
-		return false;
+	public AuthType getAuthType() {
+		return AuthType.USERNAME;
+	}
+
+	public String[] getRequiredCookies() {
+		return null;
 	}
 
 }
