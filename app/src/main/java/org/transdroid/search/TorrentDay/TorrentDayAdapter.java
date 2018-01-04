@@ -7,6 +7,13 @@ import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.apache.http.HttpResponse;
+import org.apache.http.client.HttpClient;
+import org.apache.http.client.methods.HttpGet;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.params.BasicHttpParams;
+import org.apache.http.params.HttpConnectionParams;
+import org.apache.http.params.HttpParams;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -16,33 +23,33 @@ import org.transdroid.search.SearchResult;
 import org.transdroid.search.SortOrder;
 import org.transdroid.search.TorrentSite;
 import org.transdroid.search.gui.SettingsHelper;
+import org.transdroid.util.HttpHelper;
 
 public class TorrentDayAdapter implements ISearchAdapter {
-  private static final String QUERY_URL = "https://www.torrentday.com/browse.php?search=%1$s";
-
-  public static void main(String[] args) throws Exception {
-    new TorrentDayAdapter().search(null, "ufc", null, 10);
-  }
+  private static final String BASE_URL = "https://www.torrentday.com/";
+  private static final String QUERY_URL = BASE_URL + "browse.php?search=%1$s";
+  private static final String COOKIE_UID = "uid";
+  private static final String COOKIE_PASS = "pass";
 
   @Override
   public List<SearchResult> search(SharedPreferences prefs, String query, SortOrder order, int maxResults) throws Exception {
     final String encodedQuery = URLEncoder.encode(query, "UTF-8");
     final String url = String.format(QUERY_URL, encodedQuery);
 
-    final String uid = SettingsHelper.getSiteCookie(prefs, TorrentSite.TorrentDay, "uid");
-    String pass = SettingsHelper.getSiteCookie(prefs, TorrentSite.TorrentDay, "pass");
+    final String uid = SettingsHelper.getSiteCookie(prefs, TorrentSite.TorrentDay, COOKIE_UID);
+    final String pass = SettingsHelper.getSiteCookie(prefs, TorrentSite.TorrentDay, COOKIE_PASS);
 
     final Document doc = Jsoup.connect(url)
-        .cookie("uid", uid)
-        .cookie("pass", pass)
+        .cookie(COOKIE_UID, uid)
+        .cookie(COOKIE_PASS, pass)
         .get();
 
     final ArrayList<SearchResult> results = new ArrayList<>();
     for (Element element : doc.select("tr.browse")) {
       final Elements torrentNameElement = element.select("a.torrentName");
       final String title = torrentNameElement.text();
-      final String torrentUrl = element.select("td.dlLinksInfo > a").attr("href");
-      final String detailsUrl = torrentNameElement.attr("href");
+      final String torrentUrl = BASE_URL + element.select("td.dlLinksInfo > a").attr("href");
+      final String detailsUrl = BASE_URL + torrentNameElement.attr("href");
       final String size = element.select("td.sizeInfo").text();
       final int seeds = Integer.valueOf(element.select("td.seedersInfo").text());
       final int leechers = Integer.valueOf(element.select("td.leechersInfo").text());
@@ -56,6 +63,7 @@ public class TorrentDayAdapter implements ISearchAdapter {
 
   @Override
   public String buildRssFeedUrlFromSearch(String query, SortOrder order) {
+    // not implemented
     return null;
   }
 
@@ -69,11 +77,19 @@ public class TorrentDayAdapter implements ISearchAdapter {
   }
 
   public String[] getRequiredCookies() {
-    return new String[]{"uid", "pass"};
+    return new String[]{COOKIE_UID, COOKIE_PASS};
   }
 
   @Override
   public InputStream getTorrentFile(SharedPreferences prefs, String url) throws Exception {
-    return null;
+    final DefaultHttpClient httpClient = new DefaultHttpClient();
+    final HttpGet request = new HttpGet(url);
+
+    final String uid = SettingsHelper.getSiteCookie(prefs, TorrentSite.TorrentDay, COOKIE_UID);
+    final String pass = SettingsHelper.getSiteCookie(prefs, TorrentSite.TorrentDay, COOKIE_PASS);
+
+    request.setHeader("Cookie", String.format("uid=%s; pass=%s", uid, pass));
+    final HttpResponse response = httpClient.execute(request);
+    return response.getEntity().getContent();
   }
 }

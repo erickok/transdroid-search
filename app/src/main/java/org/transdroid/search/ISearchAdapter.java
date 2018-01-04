@@ -63,12 +63,17 @@ public interface ISearchAdapter {
 	String getSiteName();
 
 	/**
-	 * Implementing search providers should return whether the site uses a token authentication system.
-	 * @return True is a session token is used in lieu of a username/password login combination
+	 * Implementing search provider should return what authentication system it uses.
+	 * @return Type of authentication or NONE if public site.
 	 */
 	AuthType getAuthType();
 
 
+	/**
+	 * Providers using a Cookie authentication system should return an array of the cookie names
+	 * it requires.
+	 * @return An array of cookie names or null if not a using Cookie authentication.
+	 */
 	String[] getRequiredCookies();
 
 	/**
