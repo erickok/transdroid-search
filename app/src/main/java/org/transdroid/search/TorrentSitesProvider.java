@@ -29,6 +29,8 @@ import android.util.Log;
 
 import org.transdroid.search.gui.SettingsHelper;
 
+import static org.transdroid.search.ISearchAdapter.AuthType.NONE;
+
 /**
  * Provider of a list of available torrent sites.
  * 
@@ -110,7 +112,7 @@ public class TorrentSitesProvider extends ContentProvider {
 			values[1] = site.toString();
 			values[2] = site.getAdapter().getSiteName();
 			values[3] = site.getAdapter().buildRssFeedUrlFromSearch("%s", SortOrder.BySeeders);
-			values[4] = (site.getAdapter().isPrivateSite()? 1: 0);
+			values[4] = (site.getAdapter().getAuthType() != NONE? 1: 0);
 			curs.addRow(values);
 			
 		}

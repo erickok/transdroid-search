@@ -165,11 +165,6 @@ public class BTNAdapter implements ISearchAdapter {
 	}
 
 	@Override
-	public boolean isPrivateSite() {
-		return true;
-	}
-
-	@Override
 	public AuthType getAuthType() {
 		return AuthType.TOKEN;
 	}

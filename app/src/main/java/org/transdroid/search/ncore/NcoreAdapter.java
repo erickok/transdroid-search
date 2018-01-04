@@ -216,11 +216,6 @@ public class NcoreAdapter implements ISearchAdapter {
         return "Ncore";
     }
 
-    @Override
-    public boolean isPrivateSite() {
-        return true;
-    }
-
     public AuthType getAuthType() {
         return AuthType.USERNAME;
     }

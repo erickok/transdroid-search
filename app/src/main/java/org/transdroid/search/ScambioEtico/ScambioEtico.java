@@ -239,12 +239,6 @@ public class ScambioEtico implements ISearchAdapter {
 		return "Scambio Etico";
 	}
 
-	@Override
-	public boolean isPrivateSite() {
-		// Not really private, still it requires registration.
-		return true;
-	}
-
 	public AuthType getAuthType() {
 		return AuthType.USERNAME;
 	}

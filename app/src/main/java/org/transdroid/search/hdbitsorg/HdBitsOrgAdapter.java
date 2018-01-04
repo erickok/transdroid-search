@@ -91,11 +91,6 @@ public class HdBitsOrgAdapter implements ISearchAdapter {
         return "hdbits.org";
     }
 
-    @Override
-    public boolean isPrivateSite() {
-        return true;
-    }
-
     public AuthType getAuthType() {
         return AuthType.USERNAME;
     }

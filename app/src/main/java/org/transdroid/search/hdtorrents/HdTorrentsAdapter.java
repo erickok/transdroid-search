@@ -89,11 +89,6 @@ public class HdTorrentsAdapter implements ISearchAdapter {
         return "HD-Torrents";
     }
 
-    @Override
-    public boolean isPrivateSite() {
-        return true;
-    }
-
     public AuthType getAuthType() {
         return AuthType.USERNAME;
     }

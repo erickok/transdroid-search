@@ -49,16 +49,9 @@ public class SettingsHelper {
 	 *         otherwise
 	 */
 	public static boolean isSiteEnabled(SharedPreferences prefs, TorrentSite site) {
-
-		// For public sites use the PREF_SITE_ENABLED-based preference only
-		if (!site.getAdapter().isPrivateSite())
-			return prefs.getBoolean(PREF_SITE_ENABLED + site.name(), true);
-
-		// For private sites see if a token or username and password are specified as well
-		if (!prefs.getBoolean(PREF_SITE_ENABLED + site.name(), true))
-			return false;
-
 		switch (site.getAdapter().getAuthType()) {
+			case NONE:
+				return prefs.getBoolean(PREF_SITE_ENABLED + site.name(), false);
 			case TOKEN:
 				return prefs.getString(PREF_SITE_TOKEN + site.name(), null) != null;
 			case USERNAME:

@@ -30,6 +30,7 @@ import android.content.SharedPreferences;
  */
 public interface ISearchAdapter {
 	enum AuthType {
+		NONE,
 		TOKEN,
 		USERNAME,
 		COOKIES,
@@ -60,13 +61,6 @@ public interface ISearchAdapter {
 	 * @return The name of the torrent site
 	 */
 	String getSiteName();
-
-	/**
-	 * Implementing search providers should return whether this is a private site, that is, whether this site requires
-	 * user credentials before it can be searched.
-	 * @return True if this is an adapter to a private site, false otherwise.
-	 */
-	boolean isPrivateSite();
 
 	/**
 	 * Implementing search providers should return whether the site uses a token authentication system.

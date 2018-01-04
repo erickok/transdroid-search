@@ -204,13 +204,8 @@ public class DemonoidAdapter implements ISearchAdapter {
 		return new SearchResult(name, link, details, size, date, seeders, leechers);
 	}
 
-	@Override
-	public boolean isPrivateSite() {
-		return false;
-	}
-
 	public AuthType getAuthType() {
-		return AuthType.USERNAME;
+		return AuthType.NONE;
 	}
 
 	public String[] getRequiredCookies() {

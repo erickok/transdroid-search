@@ -111,13 +111,8 @@ public class TorrentDownloadsAdapter extends RssFeedSearchAdapter {
 		return "Torrent Downloads";
 	}
 
-	@Override
-	public boolean isPrivateSite() {
-		return false;
-	}
-
 	public AuthType getAuthType() {
-		return AuthType.USERNAME;
+		return AuthType.NONE;
 	}
 
 	public String[] getRequiredCookies() {

@@ -64,11 +64,6 @@ public class TorrentDayAdapter implements ISearchAdapter {
     return "TorrentDay";
   }
 
-  @Override
-  public boolean isPrivateSite() {
-    return true;
-  }
-
   public AuthType getAuthType() {
     return AuthType.COOKIES;
   }

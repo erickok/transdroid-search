@@ -225,11 +225,6 @@ public class DanishbitsAdapter implements ISearchAdapter {
 		return "Danishbits";
 	}
 
-	@Override
-	public boolean isPrivateSite() {
-		return true;
-	}
-
 	public AuthType getAuthType() {
 		return AuthType.USERNAME;
 	}

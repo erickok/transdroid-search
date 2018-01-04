@@ -196,13 +196,8 @@ public class ThePirateBayAdapter implements ISearchAdapter {
 		return new SearchResult(name, magnetLink, details, size, date, seeders, leechers);
 	}
 
-	@Override
-	public boolean isPrivateSite() {
-		return false;
-	}
-
 	public AuthType getAuthType() {
-		return AuthType.USERNAME;
+		return AuthType.NONE;
 	}
 
 	public String[] getRequiredCookies() {
