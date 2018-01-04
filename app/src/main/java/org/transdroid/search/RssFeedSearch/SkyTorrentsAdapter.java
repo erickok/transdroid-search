@@ -164,4 +164,5 @@ public class SkyTorrentsAdapter extends RssFeedSearchAdapter {
   public AuthType getAuthType() {
     return AuthType.NONE;
   }
+
 }
