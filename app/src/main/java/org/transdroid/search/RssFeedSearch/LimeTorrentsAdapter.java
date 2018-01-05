@@ -121,9 +121,4 @@ public class LimeTorrentsAdapter extends RssFeedSearchAdapter {
 	public AuthType getAuthType() {
 		return AuthType.NONE;
 	}
-
-	public String[] getRequiredCookies() {
-		return null;
-	}
-
 }

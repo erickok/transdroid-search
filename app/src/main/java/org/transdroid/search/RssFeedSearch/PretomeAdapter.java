@@ -119,10 +119,6 @@ public class PretomeAdapter extends RssFeedSearchAdapter {
 		return AuthType.TOKEN;
 	}
 
-	public String[] getRequiredCookies() {
-		return null;
-	}
-
 	@Override
 	protected RssParser getRssParser(final String url) {
 		return new RssParser(url) {

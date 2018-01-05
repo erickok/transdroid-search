@@ -165,8 +165,4 @@ public class SkyTorrentsAdapter extends RssFeedSearchAdapter {
     return AuthType.NONE;
   }
 
-  public String[] getRequiredCookies() {
-    return null;
-  }
-
 }
