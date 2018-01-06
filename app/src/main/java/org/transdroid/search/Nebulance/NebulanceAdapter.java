@@ -46,9 +46,7 @@ public class NebulanceAdapter extends AbstractHtmlAdapter {
         } else {
             quality = "";
         }
-        return String.format(QUERY_URL,
-            URLEncoder.encode(query, "UTF-8"),
-            URLEncoder.encode(quality, "UTF-8"));
+        return String.format(QUERY_URL, URLEncoder.encode(query, "UTF-8"), quality);
     }
 
     @Override
