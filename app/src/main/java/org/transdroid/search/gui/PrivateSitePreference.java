@@ -185,7 +185,7 @@ public class PrivateSitePreference extends DialogPreference {
 			if (TextUtils.isEmpty(cookieValue)) {
 				cookieValue = null;
 			} else {
-				setCookies.add(cookieName);
+				setCookies.add(cookieValue);
 			}
 			SettingsHelper.setSiteCookie(edit, torrentSite, cookieName, cookieValue);
 		}
