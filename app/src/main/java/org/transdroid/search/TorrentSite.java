@@ -28,6 +28,7 @@ import org.transdroid.search.Demonoid.DemonoidAdapter;
 import org.transdroid.search.HoundDawgs.HoundDawgsAdapter;
 import org.transdroid.search.RssFeedSearch.ExtraTorrentAdapter;
 import org.transdroid.search.RssFeedSearch.LimeTorrentsAdapter;
+import org.transdroid.search.RssFeedSearch.NyaaTorrentsAdapter;
 import org.transdroid.search.RssFeedSearch.PretomeAdapter;
 import org.transdroid.search.RssFeedSearch.SkyTorrentsAdapter;
 import org.transdroid.search.RssFeedSearch.TorrentDownloadsAdapter;
@@ -106,6 +107,12 @@ public enum TorrentSite {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new LimeTorrentsAdapter();
+		}
+	},
+	NyaaTorrents {
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new NyaaTorrentsAdapter();
 		}
 	},
 	Ncore {
