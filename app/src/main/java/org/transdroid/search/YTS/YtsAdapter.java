@@ -129,14 +129,12 @@ public class YtsAdapter implements ISearchAdapter {
         return "YTS (proxied)";
     }
 
-    @Override
-    public boolean isPrivateSite() {
-        return false;
+    public AuthType getAuthType() {
+        return AuthType.NONE;
     }
 
-    @Override
-    public boolean usesToken() {
-        return false;
+    public String[] getRequiredCookies() {
+        return null;
     }
 
     @Override

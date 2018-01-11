@@ -30,7 +30,7 @@ import org.transdroid.util.FileSizeConverter;
 /**
  * Search adapter for the LimeTorrents torrent site (based on custom search RSS feeds)
  * This adapter does not support sorting.
- * 
+ *
  * @author Eric Kok
  */
 public class LimeTorrentsAdapter extends RssFeedSearchAdapter {
@@ -42,9 +42,9 @@ public class LimeTorrentsAdapter extends RssFeedSearchAdapter {
 				item.getTitle(),
 				item.getEnclosureUrl(),
 				item.getLink(),
-				FileSizeConverter.getSize(theItem.size), 
-				item.getPubdate(), 
-				theItem.seeders, 
+				FileSizeConverter.getSize(theItem.size),
+				item.getPubdate(),
+				theItem.seeders,
 				theItem.leechers);
 	}
 
@@ -70,7 +70,7 @@ public class LimeTorrentsAdapter extends RssFeedSearchAdapter {
 		public int seeders, leechers;
 		public long size;
 	}
-	
+
 	/**
 	 * Custom parser to parse the additional comments data property
 	 */
@@ -79,7 +79,7 @@ public class LimeTorrentsAdapter extends RssFeedSearchAdapter {
 		public LimeTorrentsParser(String url) {
 			super(url);
 		}
-		
+
 		public Item createNewItem() {
 			return new LimeTorrentsItem();
 		}
@@ -118,14 +118,7 @@ public class LimeTorrentsAdapter extends RssFeedSearchAdapter {
 		return "LimeTorrents";
 	}
 
-	@Override
-	public boolean isPrivateSite() {
-		return false;
+	public AuthType getAuthType() {
+		return AuthType.NONE;
 	}
-
-	@Override
-	public boolean usesToken() {
-		return false;
-	}
-
 }

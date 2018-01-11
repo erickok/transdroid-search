@@ -115,14 +115,8 @@ public class PretomeAdapter extends RssFeedSearchAdapter {
 		return "Pretome";
 	}
 
-	@Override
-	public boolean isPrivateSite() {
-		return true;
-	}
-
-	@Override
-	public boolean usesToken() {
-		return true;
+	public AuthType getAuthType() {
+		return AuthType.TOKEN;
 	}
 
 	@Override

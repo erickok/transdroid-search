@@ -225,14 +225,12 @@ public class TorrentLeechAdapter implements ISearchAdapter {
 		return "TorrentLeech";
 	}
 
-	@Override
-	public boolean isPrivateSite() {
-		return true;
+	public AuthType getAuthType() {
+		return AuthType.USERNAME;
 	}
 
-	@Override
-	public boolean usesToken() {
-		return false;
+	public String[] getRequiredCookies() {
+		return null;
 	}
 
 }
