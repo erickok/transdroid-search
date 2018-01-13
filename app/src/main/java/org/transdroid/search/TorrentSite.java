@@ -111,6 +111,12 @@ public enum TorrentSite {
 			return new LimeTorrentsAdapter();
 		}
 	},
+	MoreThanTv {
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new MoreThanTvAdapter();
+		}
+	},
 	Ncore {
 		@Override
 		public ISearchAdapter getAdapter() {
@@ -121,12 +127,6 @@ public enum TorrentSite {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new NebulanceAdapter();
-		}
-	},
-	MoreThanTv {
-		@Override
-		public ISearchAdapter getAdapter() {
-			return new MoreThanTvAdapter();
 		}
 	},
 	ThePirateBay {
