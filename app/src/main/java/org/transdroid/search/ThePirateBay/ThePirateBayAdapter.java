@@ -124,7 +124,7 @@ public class ThePirateBayAdapter extends AbstractHtmlAdapter {
 			}
 			return calendar.getTime();
 		} catch (RuntimeException e) {
-			throw new RuntimeException("Parsing " + dateString, e);
+			return null;
 		}
 	}
 }
