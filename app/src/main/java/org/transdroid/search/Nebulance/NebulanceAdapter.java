@@ -10,6 +10,7 @@ import org.transdroid.search.AbstractHtmlAdapter;
 import org.transdroid.search.SearchResult;
 import org.transdroid.search.SortOrder;
 import org.transdroid.search.TorrentSite;
+import org.transdroid.util.DateUtils;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -77,15 +78,8 @@ public class NebulanceAdapter extends AbstractHtmlAdapter {
     private Date getTorrentDate(Element torrentElement) {
         final String timeText = torrentElement.select("td.nobr > span.time").text();
         final String timeTooltip = torrentElement.select("td.nobr > span.time").attr("title");
-        try {
-            return DATE_FORMAT.parse(timeTooltip);
-        } catch (ParseException e) {
-            try {
-                return DATE_FORMAT.parse(timeText);
-            } catch (ParseException e1) {
-                return null;
-            }
-        }
+        final Date date = DateUtils.parseDate(DATE_FORMAT, timeTooltip);
+        return date == null ? DateUtils.parseDate(DATE_FORMAT, timeText) : date;
     }
 
     @Override
