@@ -26,6 +26,8 @@ import org.transdroid.search.BitHdtv.BitHdtvAdapter;
 import org.transdroid.search.Danishbits.DanishbitsAdapter;
 import org.transdroid.search.Demonoid.DemonoidAdapter;
 import org.transdroid.search.HoundDawgs.HoundDawgsAdapter;
+import org.transdroid.search.MoreThanTv.MoreThanTvAdapter;
+import org.transdroid.search.Nebulance.NebulanceAdapter;
 import org.transdroid.search.RssFeedSearch.ExtraTorrentAdapter;
 import org.transdroid.search.RssFeedSearch.LimeTorrentsAdapter;
 import org.transdroid.search.RssFeedSearch.PretomeAdapter;
@@ -109,10 +111,22 @@ public enum TorrentSite {
 			return new LimeTorrentsAdapter();
 		}
 	},
+	MoreThanTv {
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new MoreThanTvAdapter();
+		}
+	},
 	Ncore {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new NcoreAdapter();
+		}
+	},
+	Nebulance {
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new NebulanceAdapter();
 		}
 	},
 	ThePirateBay {
