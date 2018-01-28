@@ -20,25 +20,28 @@ package org.transdroid.search;
 
 import android.content.SharedPreferences;
 
-import org.transdroid.search.AsiaTorrents.AsiaTorrentsAdapter;
-import org.transdroid.search.BTN.BTNAdapter;
-import org.transdroid.search.BitHdtv.BitHdtvAdapter;
-import org.transdroid.search.Danishbits.DanishbitsAdapter;
-import org.transdroid.search.Demonoid.DemonoidAdapter;
-import org.transdroid.search.HoundDawgs.HoundDawgsAdapter;
-import org.transdroid.search.RssFeedSearch.ExtraTorrentAdapter;
-import org.transdroid.search.RssFeedSearch.LimeTorrentsAdapter;
-import org.transdroid.search.RssFeedSearch.PretomeAdapter;
-import org.transdroid.search.RssFeedSearch.SkyTorrentsAdapter;
-import org.transdroid.search.RssFeedSearch.TorrentDownloadsAdapter;
-import org.transdroid.search.ScambioEtico.ScambioEtico;
-import org.transdroid.search.ThePirateBay.ThePirateBayAdapter;
-import org.transdroid.search.TorrentLeech.TorrentLeechAdapter;
-import org.transdroid.search.hdbitsorg.HdBitsOrgAdapter;
-import org.transdroid.search.hdtorrents.HdTorrentsAdapter;
-import org.transdroid.search.ncore.NcoreAdapter;
-import org.transdroid.search.rarbg.RarbgAdapter;
-import org.transdroid.search.revolutiontt.RevolutionTTAdapter;
+import org.transdroid.search.adapters.privatetrackers.AsiaTorrentsAdapter;
+import org.transdroid.search.adapters.privatetrackers.BTNAdapter;
+import org.transdroid.search.adapters.privatetrackers.BitHdtvAdapter;
+import org.transdroid.search.adapters.privatetrackers.DanishbitsAdapter;
+import org.transdroid.search.adapters.publictrackers.DemonoidAdapter;
+import org.transdroid.search.adapters.privatetrackers.HoundDawgsAdapter;
+import org.transdroid.search.adapters.html.privatetrackers.MoreThanTvAdapter;
+import org.transdroid.search.adapters.html.privatetrackers.NebulanceAdapter;
+import org.transdroid.search.adapters.rss.publictrackers.ExtraTorrentAdapter;
+import org.transdroid.search.adapters.rss.publictrackers.LimeTorrentsAdapter;
+import org.transdroid.search.adapters.rss.privatetrackers.PretomeAdapter;
+import org.transdroid.search.adapters.rss.publictrackers.SkyTorrentsAdapter;
+import org.transdroid.search.adapters.rss.publictrackers.TorrentDownloadsAdapter;
+import org.transdroid.search.adapters.privatetrackers.ScambioEtico;
+import org.transdroid.search.adapters.html.publictrackers.ThePirateBayAdapter;
+import org.transdroid.search.adapters.html.privatetrackers.TorrentDayAdapter;
+import org.transdroid.search.adapters.privatetrackers.TorrentLeechAdapter;
+import org.transdroid.search.adapters.privatetrackers.HdBitsOrgAdapter;
+import org.transdroid.search.adapters.privatetrackers.HdTorrentsAdapter;
+import org.transdroid.search.adapters.privatetrackers.NcoreAdapter;
+import org.transdroid.search.adapters.publictrackers.RarbgAdapter;
+import org.transdroid.search.adapters.privatetrackers.RevolutionTTAdapter;
 
 import java.io.InputStream;
 import java.util.List;
@@ -108,10 +111,22 @@ public enum TorrentSite {
 			return new LimeTorrentsAdapter();
 		}
 	},
+	MoreThanTv {
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new MoreThanTvAdapter();
+		}
+	},
 	Ncore {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new NcoreAdapter();
+		}
+	},
+	Nebulance {
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new NebulanceAdapter();
 		}
 	},
 	ThePirateBay {
@@ -148,6 +163,12 @@ public enum TorrentSite {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new SkyTorrentsAdapter();
+		}
+	},
+	TorrentDay {
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new TorrentDayAdapter();
 		}
 	},
 	TorrentDownloads {

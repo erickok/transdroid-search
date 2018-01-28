@@ -28,6 +28,8 @@ import android.preference.PreferenceFragment;
 import org.transdroid.search.R;
 import org.transdroid.search.TorrentSite;
 
+import static org.transdroid.search.ISearchAdapter.AuthType.NONE;
+
 /**
  * The modern-device version (Android 3.0 and later) of the activity that shows all public and private torrent sites supported and which allows to
  * enter settings for each site (if appropriate) as well as to enable/disable a site.
@@ -63,7 +65,7 @@ public class SettingsActivityModern extends Activity {
 			PreferenceCategory publicGroup = (PreferenceCategory) findPreference("header_publicsites");
 			PreferenceCategory privateGroup = (PreferenceCategory) findPreference("header_privatesites");
 			for (TorrentSite torrentSite : sites) {
-				if (torrentSite.getAdapter().isPrivateSite()) {
+				if (torrentSite.getAdapter().getAuthType() != NONE) {
 					privateGroup.addPreference(new PrivateSitePreference(getActivity(), privateCounter++, torrentSite));
 				} else {
 					publicGroup.addPreference(new PublicSitePreference(getActivity(), publicCounter++, torrentSite));

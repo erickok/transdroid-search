@@ -29,6 +29,12 @@ import android.content.SharedPreferences;
  * @author Eric Kok
  */
 public interface ISearchAdapter {
+	enum AuthType {
+		NONE,
+		TOKEN,
+		USERNAME,
+		COOKIES,
+	}
 
 	/**
 	 * Implementing search providers should synchronously perform the search for torrents matching the given query
@@ -57,17 +63,18 @@ public interface ISearchAdapter {
 	String getSiteName();
 
 	/**
-	 * Implementing search providers should return whether this is a private site, that is, whether this site requires
-	 * user credentials before it can be searched.
-	 * @return True if this is an adapter to a private site, false otherwise.
+	 * Implementing search provider should return what authentication system it uses.
+	 * @return Type of authentication or NONE if public site.
 	 */
-	boolean isPrivateSite();
+	AuthType getAuthType();
+
 
 	/**
-	 * Implementing search providers should return whether the site uses a token authentication system.
-	 * @return True is a session token is used in lieu of a username/password login combination
+	 * Providers using a Cookie authentication system should return an array of the cookie names
+	 * it requires.
+	 * @return An array of cookie names or null if not a using Cookie authentication.
 	 */
-	boolean usesToken();
+	String[] getRequiredCookies();
 
 	/**
 	 * Implement search providers should set up an HTTP request for the specified torrent file uri and, possibly after

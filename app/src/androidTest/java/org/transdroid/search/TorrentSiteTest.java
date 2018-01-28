@@ -16,6 +16,7 @@ import java.util.List;
 
 import static com.google.common.truth.Truth.assertThat;
 import static com.google.common.truth.Truth.assert_;
+import static org.transdroid.search.ISearchAdapter.AuthType.NONE;
 
 @RunWith(AndroidJUnit4.class)
 public class TorrentSiteTest {
@@ -128,7 +129,7 @@ public class TorrentSiteTest {
 
 	private void searchSite(TorrentSite torrentSite) throws Exception {
 		// Set test user and password
-		if (torrentSite.getAdapter().isPrivateSite()) {
+		if (torrentSite.getAdapter().getAuthType() != NONE) {
 			String user = getResourceString(torrentSite.name() + "_user");
 			String pass = getResourceString(torrentSite.name() + "_pass");
 			String token = getResourceString(torrentSite.name() + "_token");
