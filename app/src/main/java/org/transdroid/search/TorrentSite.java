@@ -20,6 +20,7 @@ package org.transdroid.search;
 
 import android.content.SharedPreferences;
 
+import org.transdroid.search.adapters.html.privatetrackers.AudioBookTorrentsAdapter;
 import org.transdroid.search.adapters.privatetrackers.AsiaTorrentsAdapter;
 import org.transdroid.search.adapters.privatetrackers.BTNAdapter;
 import org.transdroid.search.adapters.privatetrackers.BitHdtvAdapter;
@@ -55,6 +56,12 @@ public enum TorrentSite {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new AsiaTorrentsAdapter();
+		}
+	},
+	AudioBookBay {
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new AudioBookTorrentsAdapter();
 		}
 	},
 	BitHdtv {
