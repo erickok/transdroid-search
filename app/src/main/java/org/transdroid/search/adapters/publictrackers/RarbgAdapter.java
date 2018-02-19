@@ -65,6 +65,8 @@ public class RarbgAdapter implements ISearchAdapter {
 		if (results == null) {
 			// Special case: our access token was invalid; request a new token and try again
 			accessToken = null;
+			// As Rarbg limits requests to 1 per 2 seconds, we wait to not directly fail
+			Thread.sleep(2000);
 			requestAccessToken();
 			results = performSearch(query, order);
 			if (results == null)
@@ -170,8 +172,9 @@ public class RarbgAdapter implements ISearchAdapter {
 	}
 
 	@Override
-	public InputStream getTorrentFile(SharedPreferences prefs, String url) throws Exception {
+	public InputStream getTorrentFile(SharedPreferences prefs, String url) {
 		// Only for private sites
 		return null;
 	}
+
 }
