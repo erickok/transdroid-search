@@ -57,6 +57,7 @@ Developed By
 * Steve Garon
 * Gabor Tanka
 * Eric Taix
+* Alon Albert
 * John Conrad
 * Toon Schoenmakers
 * Gabor Foldvari
@@ -64,6 +65,7 @@ Developed By
 * Mário Franco
 * Martin Piffault
 * Colby Brown
+* Thomas Riccardi
 * and others...
 
 License
