@@ -1,48 +1,49 @@
 /*
- *	This file is part of Transdroid Torrent Search 
+ *	This file is part of Transdroid Torrent Search
  *	<http://code.google.com/p/transdroid-search/>
- *	
- *	Transdroid Torrent Search is free software: you can redistribute 
- *	it and/or modify it under the terms of the GNU Lesser General 
- *	Public License as published by the Free Software Foundation, 
- *	either version 3 of the License, or (at your option) any later 
+ *
+ *	Transdroid Torrent Search is free software: you can redistribute
+ *	it and/or modify it under the terms of the GNU Lesser General
+ *	Public License as published by the Free Software Foundation,
+ *	either version 3 of the License, or (at your option) any later
  *	version.
- *	
- *	Transdroid Torrent Search is distributed in the hope that it will 
- *	be useful, but WITHOUT ANY WARRANTY; without even the implied 
- *	warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+ *
+ *	Transdroid Torrent Search is distributed in the hope that it will
+ *	be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *	warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *	See the GNU Lesser General Public License for more details.
- *	
- *	You should have received a copy of the GNU Lesser General Public 
+ *
+ *	You should have received a copy of the GNU Lesser General Public
  *	License along with Transdroid.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.transdroid.search;
 
 import android.content.SharedPreferences;
 
+import org.transdroid.search.RssFeedSearch.NyaaTorrentsAdapter;
 import org.transdroid.search.adapters.html.privatetrackers.AudioBookTorrentsAdapter;
+import org.transdroid.search.adapters.html.privatetrackers.MoreThanTvAdapter;
+import org.transdroid.search.adapters.html.privatetrackers.NebulanceAdapter;
+import org.transdroid.search.adapters.html.privatetrackers.TorrentDayAdapter;
+import org.transdroid.search.adapters.html.publictrackers.ThePirateBayAdapter;
 import org.transdroid.search.adapters.privatetrackers.AsiaTorrentsAdapter;
 import org.transdroid.search.adapters.privatetrackers.BTNAdapter;
 import org.transdroid.search.adapters.privatetrackers.BitHdtvAdapter;
 import org.transdroid.search.adapters.privatetrackers.DanishbitsAdapter;
-import org.transdroid.search.adapters.publictrackers.DemonoidAdapter;
-import org.transdroid.search.adapters.privatetrackers.HoundDawgsAdapter;
-import org.transdroid.search.adapters.html.privatetrackers.MoreThanTvAdapter;
-import org.transdroid.search.adapters.html.privatetrackers.NebulanceAdapter;
-import org.transdroid.search.adapters.rss.publictrackers.ExtraTorrentAdapter;
-import org.transdroid.search.adapters.rss.publictrackers.LimeTorrentsAdapter;
-import org.transdroid.search.adapters.rss.privatetrackers.PretomeAdapter;
-import org.transdroid.search.adapters.rss.publictrackers.SkyTorrentsAdapter;
-import org.transdroid.search.adapters.rss.publictrackers.TorrentDownloadsAdapter;
-import org.transdroid.search.adapters.privatetrackers.ScambioEtico;
-import org.transdroid.search.adapters.html.publictrackers.ThePirateBayAdapter;
-import org.transdroid.search.adapters.html.privatetrackers.TorrentDayAdapter;
-import org.transdroid.search.adapters.privatetrackers.TorrentLeechAdapter;
 import org.transdroid.search.adapters.privatetrackers.HdBitsOrgAdapter;
 import org.transdroid.search.adapters.privatetrackers.HdTorrentsAdapter;
+import org.transdroid.search.adapters.privatetrackers.HoundDawgsAdapter;
 import org.transdroid.search.adapters.privatetrackers.NcoreAdapter;
-import org.transdroid.search.adapters.publictrackers.RarbgAdapter;
 import org.transdroid.search.adapters.privatetrackers.RevolutionTTAdapter;
+import org.transdroid.search.adapters.privatetrackers.ScambioEtico;
+import org.transdroid.search.adapters.privatetrackers.TorrentLeechAdapter;
+import org.transdroid.search.adapters.publictrackers.DemonoidAdapter;
+import org.transdroid.search.adapters.publictrackers.RarbgAdapter;
+import org.transdroid.search.adapters.rss.privatetrackers.PretomeAdapter;
+import org.transdroid.search.adapters.rss.publictrackers.ExtraTorrentAdapter;
+import org.transdroid.search.adapters.rss.publictrackers.LimeTorrentsAdapter;
+import org.transdroid.search.adapters.rss.publictrackers.SkyTorrentsAdapter;
+import org.transdroid.search.adapters.rss.publictrackers.TorrentDownloadsAdapter;
 
 import java.io.InputStream;
 import java.util.List;
@@ -122,6 +123,12 @@ public enum TorrentSite {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new MoreThanTvAdapter();
+		}
+	},
+	NyaaTorrents {
+		@Override
+		public ISearchAdapter getAdapter() {
+			return new NyaaTorrentsAdapter();
 		}
 	},
 	Ncore {
@@ -209,7 +216,8 @@ public enum TorrentSite {
 	 * off-loaded to the implementing torrent site.
 	 * @param prefs The Android shared preferences to read credentials from
 	 * @param url The full url of the torrent file to download
-	 * @return An InputStream handle to the requested file so it can be further downloaded, or null if no connection is possible (like when the device
+	 * @return An InputStream handle to the requested file so it can be further downloaded, or null if no connection is possible (like when the
+	 * device
 	 * is offline or when the user is not authorized)
 	 * @throws Exception When an exception occurred during the retrieval of the request url
 	 */

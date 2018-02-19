@@ -83,6 +83,11 @@ public class TorrentSiteTest {
 	}
 
 	@Test
+	public void search_NyaaTorrents() throws Exception {
+		searchSite(TorrentSite.NyaaTorrents);
+	}
+
+	@Test
 	public void search_Ncore() throws Exception {
 		searchSite(TorrentSite.Ncore);
 	}
