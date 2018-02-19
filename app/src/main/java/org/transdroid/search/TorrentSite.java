@@ -36,7 +36,6 @@ import org.transdroid.search.adapters.privatetrackers.NcoreAdapter;
 import org.transdroid.search.adapters.privatetrackers.RevolutionTTAdapter;
 import org.transdroid.search.adapters.privatetrackers.ScambioEtico;
 import org.transdroid.search.adapters.privatetrackers.TorrentLeechAdapter;
-import org.transdroid.search.adapters.publictrackers.DemonoidAdapter;
 import org.transdroid.search.adapters.publictrackers.RarbgAdapter;
 import org.transdroid.search.adapters.rss.privatetrackers.PretomeAdapter;
 import org.transdroid.search.adapters.rss.publictrackers.ExtraTorrentAdapter;
@@ -74,12 +73,6 @@ public enum TorrentSite {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new DanishbitsAdapter();
-		}
-	},
-	Demonoid {
-		@Override
-		public ISearchAdapter getAdapter() {
-			return new DemonoidAdapter();
 		}
 	},
 	ExtraTorrent {
