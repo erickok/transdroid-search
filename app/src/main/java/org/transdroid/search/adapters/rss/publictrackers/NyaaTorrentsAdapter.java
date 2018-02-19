@@ -16,13 +16,13 @@
  *	You should have received a copy of the GNU Lesser General Public 
  *	License along with Transdroid.  If not, see <http://www.gnu.org/licenses/>.
  */
-package org.transdroid.search.RssFeedSearch;
+package org.transdroid.search.adapters.rss.publictrackers;
 
 import org.ifies.android.sax.Item;
 import org.ifies.android.sax.RssParser;
 import org.transdroid.search.SearchResult;
 import org.transdroid.search.SortOrder;
-import org.transdroid.util.FileSizeConverter;
+import org.transdroid.search.adapters.rss.RssFeedSearchAdapter;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -129,13 +129,8 @@ public class NyaaTorrentsAdapter extends RssFeedSearchAdapter {
 	}
 
 	@Override
-	public boolean isPrivateSite() {
-		return false;
-	}
-
-	@Override
-	public boolean usesToken() {
-		return false;
+	public AuthType getAuthType() {
+		return AuthType.NONE;
 	}
 
 }

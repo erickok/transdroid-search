@@ -20,7 +20,7 @@ package org.transdroid.search;
 
 import android.content.SharedPreferences;
 
-import org.transdroid.search.RssFeedSearch.NyaaTorrentsAdapter;
+import org.transdroid.search.adapters.rss.publictrackers.NyaaTorrentsAdapter;
 import org.transdroid.search.adapters.html.privatetrackers.AudioBookTorrentsAdapter;
 import org.transdroid.search.adapters.html.privatetrackers.MoreThanTvAdapter;
 import org.transdroid.search.adapters.html.privatetrackers.NebulanceAdapter;
