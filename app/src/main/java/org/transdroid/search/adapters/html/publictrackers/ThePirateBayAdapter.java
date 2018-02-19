@@ -1,19 +1,19 @@
 /*
- *	This file is part of Transdroid Torrent Search 
+ *	This file is part of Transdroid Torrent Search
  *	<http://code.google.com/p/transdroid-search/>
- *	
- *	Transdroid Torrent Search is free software: you can redistribute 
- *	it and/or modify it under the terms of the GNU Lesser General 
- *	Public License as published by the Free Software Foundation, 
- *	either version 3 of the License, or (at your option) any later 
+ *
+ *	Transdroid Torrent Search is free software: you can redistribute
+ *	it and/or modify it under the terms of the GNU Lesser General
+ *	Public License as published by the Free Software Foundation,
+ *	either version 3 of the License, or (at your option) any later
  *	version.
- *	
- *	Transdroid Torrent Search is distributed in the hope that it will 
- *	be useful, but WITHOUT ANY WARRANTY; without even the implied 
- *	warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+ *
+ *	Transdroid Torrent Search is distributed in the hope that it will
+ *	be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *	warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *	See the GNU Lesser General Public License for more details.
- *	
- *	You should have received a copy of the GNU Lesser General Public 
+ *
+ *	You should have received a copy of the GNU Lesser General Public
  *	License along with Transdroid.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.transdroid.search.adapters.html.publictrackers;
@@ -23,10 +23,10 @@ import android.content.SharedPreferences;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.transdroid.search.adapters.html.AbstractHtmlAdapter;
 import org.transdroid.search.SearchResult;
 import org.transdroid.search.SortOrder;
 import org.transdroid.search.TorrentSite;
+import org.transdroid.search.adapters.html.AbstractHtmlAdapter;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -36,9 +36,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * An adapter that provides access to The Pirate Bay torrent searches by parsing
- * the raw HTML output.
- *
+ * An adapter that provides access to The Pirate Bay torrent searches by parsing the raw HTML output.
  * @author Eric Kok
  */
 public class ThePirateBayAdapter extends AbstractHtmlAdapter {
@@ -51,7 +49,7 @@ public class ThePirateBayAdapter extends AbstractHtmlAdapter {
 
 	@Override
 	protected String getSearchUrl(SharedPreferences prefs, String query, SortOrder order, int maxResults) throws UnsupportedEncodingException {
-		return String.format(QUERYURL, URLEncoder.encode(query, "UTF-8"), (order == SortOrder.BySeeders? SORT_SEEDS: SORT_COMPOSITE));
+		return String.format(QUERYURL, URLEncoder.encode(query, "UTF-8"), (order == SortOrder.BySeeders ? SORT_SEEDS : SORT_COMPOSITE));
 	}
 
 	@Override

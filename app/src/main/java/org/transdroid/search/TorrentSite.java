@@ -20,6 +20,7 @@ package org.transdroid.search;
 
 import android.content.SharedPreferences;
 
+import org.transdroid.search.adapters.html.publictrackers.ScambioEticoAdapter;
 import org.transdroid.search.adapters.rss.publictrackers.NyaaTorrentsAdapter;
 import org.transdroid.search.adapters.html.privatetrackers.AudioBookTorrentsAdapter;
 import org.transdroid.search.adapters.html.privatetrackers.MoreThanTvAdapter;
@@ -34,7 +35,6 @@ import org.transdroid.search.adapters.privatetrackers.HdTorrentsAdapter;
 import org.transdroid.search.adapters.privatetrackers.HoundDawgsAdapter;
 import org.transdroid.search.adapters.privatetrackers.NcoreAdapter;
 import org.transdroid.search.adapters.privatetrackers.RevolutionTTAdapter;
-import org.transdroid.search.adapters.privatetrackers.ScambioEtico;
 import org.transdroid.search.adapters.privatetrackers.TorrentLeechAdapter;
 import org.transdroid.search.adapters.publictrackers.RarbgAdapter;
 import org.transdroid.search.adapters.rss.privatetrackers.PretomeAdapter;
@@ -144,7 +144,7 @@ public enum TorrentSite {
 	ScambioEtico {
 		@Override
 		public ISearchAdapter getAdapter() {
-			return new ScambioEtico();
+			return new ScambioEticoAdapter();
 		}
 	},
 	RevolutionTT {
