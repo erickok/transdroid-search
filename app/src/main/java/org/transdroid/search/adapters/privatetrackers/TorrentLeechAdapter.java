@@ -1,19 +1,19 @@
 /*
- *	This file is part of Transdroid Torrent Search 
+ *	This file is part of Transdroid Torrent Search
  *	<http://code.google.com/p/transdroid-search/>
- *	
- *	Transdroid Torrent Search is free software: you can redistribute 
- *	it and/or modify it under the terms of the GNU Lesser General 
- *	Public License as published by the Free Software Foundation, 
- *	either version 3 of the License, or (at your option) any later 
+ *
+ *	Transdroid Torrent Search is free software: you can redistribute
+ *	it and/or modify it under the terms of the GNU Lesser General
+ *	Public License as published by the Free Software Foundation,
+ *	either version 3 of the License, or (at your option) any later
  *	version.
- *	
- *	Transdroid Torrent Search is distributed in the hope that it will 
- *	be useful, but WITHOUT ANY WARRANTY; without even the implied 
- *	warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+ *
+ *	Transdroid Torrent Search is distributed in the hope that it will
+ *	be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *	warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *	See the GNU Lesser General Public License for more details.
- *	
- *	You should have received a copy of the GNU Lesser General Public 
+ *
+ *	You should have received a copy of the GNU Lesser General Public
  *	License along with Transdroid.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.transdroid.search.adapters.privatetrackers;
@@ -72,12 +72,13 @@ public class TorrentLeechAdapter implements ISearchAdapter {
 		// First log in
 		HttpPost loginPost = new HttpPost(LOGINURL);
 		loginPost.setEntity(new UrlEncodedFormEntity(Arrays.asList(
-				new BasicNameValuePair[]{new BasicNameValuePair("username", username), new BasicNameValuePair("password", password),
-						new BasicNameValuePair("remember_me", "off")})));
+				new BasicNameValuePair("username", username),
+				new BasicNameValuePair("password", password),
+				new BasicNameValuePair("remember_me", "off"))));
 		HttpResponse loginResult = httpclient.execute(loginPost);
 		String loginHtml = HttpHelper.convertStreamToString(loginResult.getEntity().getContent());
 		final String LOGIN_ERROR = "Invalid Username/password combination";
-		if (loginResult.getStatusLine().getStatusCode() != HttpStatus.SC_OK || loginHtml.indexOf(LOGIN_ERROR) >= 0) {
+		if (loginResult.getStatusLine().getStatusCode() != HttpStatus.SC_OK || loginHtml.contains(LOGIN_ERROR)) {
 			// Failed to sign in
 			throw new LoginException("Login failure for TorrentLeecht with user " + username);
 		}
@@ -116,7 +117,7 @@ public class TorrentLeechAdapter implements ISearchAdapter {
 
 	}
 
-	protected List<SearchResult> parseHtml(String html, int maxResults) throws Exception {
+	private List<SearchResult> parseHtml(String html, int maxResults) {
 
 		// Texts to find subsequently
 		final String RESULTS = "<table id=\"torrenttable\"";
@@ -124,7 +125,7 @@ public class TorrentLeechAdapter implements ISearchAdapter {
 		final String TORRENT = "<td class=\"category\">";
 
 		// Parse the search results from HTML by looking for the identifying texts
-		List<SearchResult> results = new ArrayList<SearchResult>();
+		List<SearchResult> results = new ArrayList<>();
 		int resultsStart = html.indexOf(RESULTS) + RESULTS.length();
 		if (html.contains(NOTORRENTS)) {
 			return results; // Success, but no results for this query
