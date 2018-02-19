@@ -118,7 +118,7 @@ public class AudioBookTorrentsAdapter extends AbstractHtmlAdapter {
   }
 
   @Override
-  public String buildRssFeedUrlFromSearch(String query, SortOrder order) {
+  public String buildRssFeedUrlFromSearch(SharedPreferences prefs, String query, SortOrder order) {
     // not implemented
     return null;
   }

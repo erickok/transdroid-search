@@ -118,7 +118,7 @@ public class HdTorrentsAdapter implements ISearchAdapter {
     }
 
     @Override
-    public String buildRssFeedUrlFromSearch(String query, SortOrder order) {
+    public String buildRssFeedUrlFromSearch(SharedPreferences prefs, String query, SortOrder order) {
         // no rss based search for HD-Torrents.org. there is a live RSS feed for all
         // torrents on the site but it does not provide search capability
         return null;

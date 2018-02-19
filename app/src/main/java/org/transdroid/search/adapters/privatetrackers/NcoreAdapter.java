@@ -205,7 +205,7 @@ public class NcoreAdapter implements ISearchAdapter {
     }
 
     @Override
-    public String buildRssFeedUrlFromSearch(String query, SortOrder order) {
+    public String buildRssFeedUrlFromSearch(SharedPreferences prefs, String query, SortOrder order) {
         // Only provide a generic open RSS feed, otherwise an ID for searched serie/movie/etc has
         // to be obtained on http://finderss.it.cx/ and my not exist.
         return null;

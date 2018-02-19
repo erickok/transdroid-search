@@ -66,6 +66,12 @@ public class PretomeAdapter extends RssFeedSearchAdapter {
 	}
 
 	@Override
+	public String buildRssFeedUrlFromSearch(SharedPreferences prefs, String query, SortOrder order) {
+		this.prefs = prefs;
+		return super.buildRssFeedUrlFromSearch(prefs, query, order);
+	}
+
+	@Override
 	protected String getUrl(String query, SortOrder order) {
 		String token = SettingsHelper.getSiteToken(prefs, TorrentSite.Pretome);
 		if (token == null) {

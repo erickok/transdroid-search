@@ -111,7 +111,7 @@ public class TorrentSitesProvider extends ContentProvider {
 			values[0] = id++;
 			values[1] = site.toString();
 			values[2] = site.getAdapter().getSiteName();
-			values[3] = site.getAdapter().buildRssFeedUrlFromSearch("%s", SortOrder.BySeeders);
+			values[3] = site.getAdapter().buildRssFeedUrlFromSearch(prefs, "%s", SortOrder.BySeeders);
 			values[4] = (site.getAdapter().getAuthType() != NONE? 1: 0);
 			curs.addRow(values);
 			

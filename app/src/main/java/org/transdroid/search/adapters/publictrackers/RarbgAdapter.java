@@ -164,7 +164,7 @@ public class RarbgAdapter implements ISearchAdapter {
 	}
 
 	@Override
-	public String buildRssFeedUrlFromSearch(String query, SortOrder order) {
+	public String buildRssFeedUrlFromSearch(SharedPreferences prefs, String query, SortOrder order) {
 		// Not supported by RARABG
 		return null;
 	}

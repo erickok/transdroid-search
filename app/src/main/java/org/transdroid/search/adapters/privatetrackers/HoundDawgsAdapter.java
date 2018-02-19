@@ -213,7 +213,7 @@ public class HoundDawgsAdapter implements ISearchAdapter {
 	}
 
 	@Override
-	public String buildRssFeedUrlFromSearch(String query, SortOrder order) {
+	public String buildRssFeedUrlFromSearch(SharedPreferences prefs, String query, SortOrder order) {
 		// HoundDawgs doesn't support RSS feed-based searches
 		return null;
 	}

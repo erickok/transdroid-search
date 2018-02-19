@@ -229,7 +229,7 @@ public class ScambioEtico implements ISearchAdapter {
 	}
 
 	@Override
-	public String buildRssFeedUrlFromSearch(String query, SortOrder order) {
+	public String buildRssFeedUrlFromSearch(SharedPreferences prefs, String query, SortOrder order) {
 		// Scambio Etico doesn't support RSS feed-based searches
 		return null;
 	}

@@ -215,7 +215,7 @@ public class DanishbitsAdapter implements ISearchAdapter {
 	}
 
 	@Override
-	public String buildRssFeedUrlFromSearch(String query, SortOrder order) {
+	public String buildRssFeedUrlFromSearch(SharedPreferences prefs, String query, SortOrder order) {
 		// Danishbits doesn't support RSS feed-based searches
 		return null;
 	}

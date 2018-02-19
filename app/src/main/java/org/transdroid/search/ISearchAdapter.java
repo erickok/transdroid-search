@@ -50,11 +50,13 @@ public interface ISearchAdapter {
 
 	/**
 	 * Implementing search providers should provide the URL of an RSS feed matching the search a specific query.
+	 *
+	 * @param prefs The Android shared preferences to read credentials
 	 * @param query The raw (non-urlencoded) query for which the RSS feed should provide torrents
 	 * @param order The preferred order in which the RSS items are sorted
 	 * @return The RSS feed URL, or null if this is not supported by the site
 	 */
-	String buildRssFeedUrlFromSearch(String query, SortOrder order);
+	String buildRssFeedUrlFromSearch(SharedPreferences prefs, String query, SortOrder order);
 
 	/**
 	 * Implementing search providers should return the real name of the site they work on.

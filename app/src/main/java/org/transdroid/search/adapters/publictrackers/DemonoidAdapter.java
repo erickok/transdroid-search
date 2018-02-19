@@ -142,7 +142,7 @@ public class DemonoidAdapter implements ISearchAdapter {
 	}
 
 	@Override
-	public String buildRssFeedUrlFromSearch(String query, SortOrder order) {
+	public String buildRssFeedUrlFromSearch(SharedPreferences prefs, String query, SortOrder order) {
 		// The Pirate Bay doesn't support RSS feeds
 		return null;
 	}

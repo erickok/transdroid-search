@@ -120,7 +120,7 @@ public class HdBitsOrgAdapter implements ISearchAdapter {
     }
 
     @Override
-    public String buildRssFeedUrlFromSearch(String query, SortOrder order) {
+    public String buildRssFeedUrlFromSearch(SharedPreferences prefs, String query, SortOrder order) {
         // no rss based search for hdbits. there is a live RSS feed for all
         // torrents on the site but it does not provide search capability
         return null;
