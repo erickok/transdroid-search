@@ -28,7 +28,6 @@ import org.transdroid.search.adapters.html.privatetrackers.TorrentDayAdapter;
 import org.transdroid.search.adapters.html.publictrackers.ThePirateBayAdapter;
 import org.transdroid.search.adapters.privatetrackers.AsiaTorrentsAdapter;
 import org.transdroid.search.adapters.privatetrackers.BTNAdapter;
-import org.transdroid.search.adapters.privatetrackers.BitHdtvAdapter;
 import org.transdroid.search.adapters.privatetrackers.DanishbitsAdapter;
 import org.transdroid.search.adapters.privatetrackers.HdBitsOrgAdapter;
 import org.transdroid.search.adapters.privatetrackers.HdTorrentsAdapter;
@@ -63,12 +62,6 @@ public enum TorrentSite {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new AudioBookTorrentsAdapter();
-		}
-	},
-	BitHdtv {
-		@Override
-		public ISearchAdapter getAdapter() {
-			return new BitHdtvAdapter();
 		}
 	},
 	BTN {
