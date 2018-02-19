@@ -43,11 +43,6 @@ public class TorrentSiteTest {
 	}
 
 	@Test
-	public void search_BitHdtv() throws Exception {
-		searchSite(TorrentSite.BitHdtv);
-	}
-
-	@Test
 	public void search_BTN() throws Exception {
 		searchSite(TorrentSite.BTN);
 	}
@@ -55,11 +50,6 @@ public class TorrentSiteTest {
 	@Test
 	public void search_Danishbits() throws Exception {
 		searchSite(TorrentSite.Danishbits);
-	}
-
-	@Test
-	public void search_ExtraTorrent() throws Exception {
-		searchSite(TorrentSite.ExtraTorrent);
 	}
 
 	@Test
