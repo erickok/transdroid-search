@@ -153,7 +153,7 @@ public class DanishbitsAdapter implements ISearchAdapter {
 		final String DETAILS_END = "\" ";
 		final String NAME = "title=\"";
 		final String NAME_END = "\">";
-		final String SIZE = "</div><td>";
+		final String SIZE = "<td>";
 		final String SIZE_END = "<br />";
 		final String DATE = "class=\"time\" title=\"";
 		final String DATE_END = "\">";
