@@ -8,8 +8,8 @@ android {
         applicationId "org.transdroid.search"
         minSdkVersion 8
         targetSdkVersion 25
-        versionCode 32
-        versionName "3.9"
+        versionCode 33
+        versionName "3.10"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
     buildTypes {

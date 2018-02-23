@@ -122,6 +122,11 @@ public class TorrentSiteTest {
 		searchSite(TorrentSite.TorrentLeech);
 	}
 
+	@Test
+	public void search_Yts() throws Exception {
+		searchSite(TorrentSite.Yts);
+	}
+
 	private void searchSite(TorrentSite torrentSite) throws Exception {
 		// Set test user and password
 		if (torrentSite.getAdapter().getAuthType() != NONE) {

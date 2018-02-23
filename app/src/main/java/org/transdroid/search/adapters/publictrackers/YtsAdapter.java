@@ -34,7 +34,7 @@ import java.util.Locale;
  */
 public class YtsAdapter implements ISearchAdapter {
 
-    private static final String BASE_URL = "https://yts.immunicity.world/api/v2/list_movies.json";
+    private static final String BASE_URL = "https://yts.am/api/v2/list_movies.json";
     private static final int CONNECTION_TIMEOUT = 10000;
 
     /**
@@ -126,7 +126,7 @@ public class YtsAdapter implements ISearchAdapter {
 
     @Override
     public String getSiteName() {
-        return "YTS (proxied)";
+        return "YTS";
     }
 
     public AuthType getAuthType() {
