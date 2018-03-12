@@ -52,7 +52,7 @@ import javax.security.auth.login.LoginException;
  */
 public class BTNAdapter implements ISearchAdapter {
 
-	private static final String API_URL = "http://api.btnapps.net";
+	private static final String API_URL = "http://api.broadcasthe.net";
 	private static final String THETVDB_BASE_URL = "http://thetvdb.com/?tab=series&id=";
 	private static final String API_SEARCH = "getTorrents";
 
