@@ -6,7 +6,7 @@ Transdroid Torrent Search is an Android application that provides torrent search
 The latest .apk is available via [transdroid.org/latest-search](http://transdroid.org/latest-search) and code is available under the Lesser GPL v3 license.
 
 <a href="https://transdroid.org/lastest" target="_blank">
-<img src="https://transdroid.org/images/getontransdroid.png" alt="Get it on transdroid.org" height="90"/></a>
+<img src="https://transdroid.org/images/getontransdroid.png" alt="Get it on transdroid.org" height="80"/></a>
 <a href="https://f-droid.org/packages/org.transdroid.search/">
 <img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="80"></a>
 
