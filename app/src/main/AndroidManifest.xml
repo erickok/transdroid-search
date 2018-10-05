@@ -32,6 +32,10 @@
 		android:description="@string/app_description"
 		android:theme="@style/Theme.Transdroid.Search">
 
+		<uses-library
+			android:name="org.apache.http.legacy"
+			android:required="false" />
+
 		<provider
 			android:name="org.transdroid.search.TorrentSitesProvider"
 			android:authorities="org.transdroid.search.torrentsitesprovider"

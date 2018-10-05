@@ -1,13 +1,13 @@
 apply plugin: 'com.android.application'
 android {
-    compileSdkVersion 25
-    buildToolsVersion "25.0.3"
+    compileSdkVersion 28
+    buildToolsVersion "28.0.3"
     useLibrary 'org.apache.http.legacy'
 
     defaultConfig {
         applicationId "org.transdroid.search"
-        minSdkVersion 8
-        targetSdkVersion 25
+        minSdkVersion 9
+        targetSdkVersion 28
         versionCode 33
         versionName "3.10"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -22,6 +22,6 @@ dependencies {
     compile files('libs/android-json-rpc-0.3.4.jar')
     compile 'org.jsoup:jsoup:1.11.2'
 
-    androidTestCompile 'com.android.support.test:runner:0.5'
-    androidTestCompile "com.google.truth:truth:0.39"
+    androidTestCompile 'com.android.support.test:runner:1.0.2'
+    androidTestCompile "com.google.truth:truth:0.42"
 }
