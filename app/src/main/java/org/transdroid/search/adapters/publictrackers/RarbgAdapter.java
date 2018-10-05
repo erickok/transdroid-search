@@ -31,7 +31,7 @@ import java.util.Locale;
  */
 public class RarbgAdapter implements ISearchAdapter {
 
-	private static final String BASE_URL = "https://torrentapi.org/pubapi_v2.php";
+	private static final String BASE_URL = "https://torrentapi.org/pubapi_v2.php?app_id=Transdroid&";
 
 	// Access is provided using a token, requested via get_token and valid for up to 15 minutes
 	private static String accessToken;
@@ -79,7 +79,7 @@ public class RarbgAdapter implements ISearchAdapter {
 	private void requestAccessToken() throws Exception {
 
 		// Ask for a new token
-		HttpResponse response = httpclient.execute(new HttpGet(BASE_URL + "?get_token=get_token"));
+		HttpResponse response = httpclient.execute(new HttpGet(BASE_URL + "get_token=get_token"));
 		if (response.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
 			InputStream instream = response.getEntity().getContent();
 			String error = HttpHelper.convertStreamToString(instream);
@@ -96,6 +96,8 @@ public class RarbgAdapter implements ISearchAdapter {
 
 		if (structure.has("token")) {
 			accessToken = structure.getString("token");
+			// As Rarbg limits requests to 1 per 2 seconds, we wait to not directly fail
+			Thread.sleep(2000);
 			return;
 		}
 
@@ -106,7 +108,7 @@ public class RarbgAdapter implements ISearchAdapter {
 	private List<SearchResult> performSearch(String query, SortOrder order) throws Exception {
 
 		// Ask for extended search results
-		String q = String.format(Locale.US, "?mode=search&search_string=%1$s&ranked=0&sort=%2$s&format=json_extended&token=%3$s",
+		String q = String.format(Locale.US, "mode=search&search_string=%1$s&ranked=0&sort=%2$s&format=json_extended&token=%3$s",
 				URLEncoder.encode(query, "UTF-8"), (order == SortOrder.BySeeders ? "seeders" : "last"), accessToken);
 		HttpResponse response = httpclient.execute(new HttpGet(BASE_URL + q));
 
