@@ -30,7 +30,6 @@ import org.transdroid.search.adapters.privatetrackers.BTNAdapter;
 import org.transdroid.search.adapters.privatetrackers.DanishbitsAdapter;
 import org.transdroid.search.adapters.privatetrackers.HdBitsOrgAdapter;
 import org.transdroid.search.adapters.privatetrackers.HdTorrentsAdapter;
-import org.transdroid.search.adapters.privatetrackers.HoundDawgsAdapter;
 import org.transdroid.search.adapters.privatetrackers.NcoreAdapter;
 import org.transdroid.search.adapters.privatetrackers.RevolutionTTAdapter;
 import org.transdroid.search.adapters.privatetrackers.TorrentLeechAdapter;
@@ -81,12 +80,6 @@ public enum TorrentSite {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new HdTorrentsAdapter();
-		}
-	},
-	HoundDawgs {
-		@Override
-		public ISearchAdapter getAdapter() {
-			return new HoundDawgsAdapter();
 		}
 	},
 	LimeTorrents {

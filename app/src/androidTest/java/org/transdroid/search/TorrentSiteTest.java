@@ -63,11 +63,6 @@ public class TorrentSiteTest {
 	}
 
 	@Test
-	public void search_HoundDawgs() throws Exception {
-		searchSite(TorrentSite.HoundDawgs);
-	}
-
-	@Test
 	public void search_LimeTorrents() throws Exception {
 		searchSite(TorrentSite.LimeTorrents);
 	}

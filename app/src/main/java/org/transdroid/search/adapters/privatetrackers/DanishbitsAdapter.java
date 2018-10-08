@@ -78,7 +78,7 @@ public class DanishbitsAdapter implements ISearchAdapter {
 		final String LOGIN_ERROR = "<form id=\"loginform\" method=\"post\" action=\"login.php\">";
 		if (loginResult.getStatusLine().getStatusCode() != HttpStatus.SC_OK || loginHtml.indexOf(LOGIN_ERROR) >= 0) {
 			// Failed to sign in
-			throw new LoginException("Login failure for HoundDawgs with user " + username);
+			throw new LoginException("Login failure for DanishBits with user " + username);
 		}
 
 		return httpclient;
