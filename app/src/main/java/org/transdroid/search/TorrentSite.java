@@ -40,7 +40,6 @@ import org.transdroid.search.adapters.privatetrackers.TorrentLeechAdapter;
 import org.transdroid.search.adapters.publictrackers.RarbgAdapter;
 import org.transdroid.search.adapters.rss.privatetrackers.PretomeAdapter;
 import org.transdroid.search.adapters.rss.publictrackers.LimeTorrentsAdapter;
-import org.transdroid.search.adapters.rss.publictrackers.SkyTorrentsAdapter;
 import org.transdroid.search.adapters.rss.publictrackers.TorrentDownloadsAdapter;
 
 import java.io.InputStream;
@@ -151,12 +150,6 @@ public enum TorrentSite {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new RarbgAdapter();
-		}
-	},
-	SkyTorrents {
-		@Override
-		public ISearchAdapter getAdapter() {
-			return new SkyTorrentsAdapter();
 		}
 	},
 	TorrentDay {

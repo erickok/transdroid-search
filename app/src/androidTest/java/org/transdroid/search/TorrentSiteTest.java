@@ -108,11 +108,6 @@ public class TorrentSiteTest {
 	}
 
 	@Test
-	public void search_SkyTorrents() throws Exception {
-		searchSite(TorrentSite.SkyTorrents);
-	}
-
-	@Test
 	public void search_TorrentDownloads() throws Exception {
 		searchSite(TorrentSite.TorrentDownloads);
 	}
