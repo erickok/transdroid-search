@@ -32,7 +32,7 @@ public class AudioBookTorrentsAdapter extends AbstractHtmlAdapter {
   private static final String BASE_URL = "https://audiobookbay.nl";
   private static final String SEARCH_URL = BASE_URL + "/?s=%s";
   private static final String LOGIN_URL = BASE_URL + "/member/login.php";
-  private static final Pattern CONTENT_PATTERN = Pattern.compile("Posted: (.*) Piece Size: .* File Size: (.*)");
+  private static final Pattern CONTENT_PATTERN = Pattern.compile("Posted: (.*) Format: .* File Size: (.*)");
   @SuppressLint("SimpleDateFormat")
   private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("dd MMM yyyy");
 

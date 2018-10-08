@@ -43,6 +43,11 @@ public class TorrentSiteTest {
 	}
 
 	@Test
+	public void search_AudioBookBay() throws Exception {
+		searchSite(TorrentSite.AudioBookBay);
+	}
+
+	@Test
 	public void search_BTN() throws Exception {
 		searchSite(TorrentSite.BTN);
 	}
