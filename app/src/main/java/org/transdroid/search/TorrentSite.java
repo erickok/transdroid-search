@@ -24,7 +24,6 @@ import org.transdroid.search.adapters.rss.publictrackers.NyaaTorrentsAdapter;
 import org.transdroid.search.adapters.html.privatetrackers.AudioBookTorrentsAdapter;
 import org.transdroid.search.adapters.html.privatetrackers.MoreThanTvAdapter;
 import org.transdroid.search.adapters.html.privatetrackers.NebulanceAdapter;
-import org.transdroid.search.adapters.html.privatetrackers.TorrentDayAdapter;
 import org.transdroid.search.adapters.html.publictrackers.ThePirateBayAdapter;
 import org.transdroid.search.adapters.privatetrackers.AsiaTorrentsAdapter;
 import org.transdroid.search.adapters.privatetrackers.BTNAdapter;
@@ -142,12 +141,6 @@ public enum TorrentSite {
 		@Override
 		public ISearchAdapter getAdapter() {
 			return new RarbgAdapter();
-		}
-	},
-	TorrentDay {
-		@Override
-		public ISearchAdapter getAdapter() {
-			return new TorrentDayAdapter();
 		}
 	},
 	TorrentDownloads {
