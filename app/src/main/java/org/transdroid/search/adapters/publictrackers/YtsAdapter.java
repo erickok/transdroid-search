@@ -34,7 +34,7 @@ import java.util.Locale;
  */
 public class YtsAdapter implements ISearchAdapter {
 
-    private static final String BASE_URL = "https://yts.am/api/v2/list_movies.json";
+    private static final String BASE_URL = "https://yts.gs/api/v2/list_movies.json";
     private static final int CONNECTION_TIMEOUT = 10000;
 
     /**
