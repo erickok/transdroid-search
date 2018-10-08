@@ -8,12 +8,21 @@ android {
         applicationId "org.transdroid.search"
         minSdkVersion 9
         targetSdkVersion 28
-        versionCode 33
-        versionName "3.10"
+        versionCode 34
+        versionName "3.11"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    signingConfigs {
+        releaseConfig {
+            keyAlias 'erickok'
+            keyPassword ''
+            storeFile file('../../erickok.keystore')
+            storePassword ''
+        }
     }
     buildTypes {
         release {
+            signingConfig signingConfigs.releaseConfig
             minifyEnabled true
         }
     }
