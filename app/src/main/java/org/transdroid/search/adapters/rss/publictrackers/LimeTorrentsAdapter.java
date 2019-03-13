@@ -52,7 +52,7 @@ public class LimeTorrentsAdapter extends RssFeedSearchAdapter {
 	@Override
 	protected String getUrl(String query, SortOrder order) {
 		try {
-			return "http://www.limetorrents.co/searchrss/" + URLEncoder.encode(query, "UTF-8") + "/";
+			return "https://www.limetorrents.co/searchrss/" + URLEncoder.encode(query, "UTF-8") + "/";
 		} catch (UnsupportedEncodingException e) {
 			e.printStackTrace();
 			return null;

@@ -12,6 +12,9 @@ android {
         versionName "3.11"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+    sourceSets {
+        main.java.srcDirs += 'src/external/java'
+    }
     signingConfigs {
         releaseConfig {
             keyAlias 'erickok'
@@ -28,9 +31,8 @@ android {
     }
 }
 dependencies {
-    compile files('libs/android-json-rpc-0.3.4.jar')
-    compile 'org.jsoup:jsoup:1.11.2'
+    implementation 'org.jsoup:jsoup:1.11.2'
 
-    androidTestCompile 'com.android.support.test:runner:1.0.2'
-    androidTestCompile "com.google.truth:truth:0.42"
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation "com.google.truth:truth:0.42"
 }
