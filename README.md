@@ -77,7 +77,7 @@ License
 =======
 
 
-    Copyright 2010-2016 Eric Kok et al.
+    Copyright 2010-2019 Eric Kok et al.
     
     Transdroid Torrent Search is free software: you can redistribute 
     it and/or modify it under the terms of the GNU Lesser General 
@@ -96,3 +96,5 @@ License
 Some code/libraries are used in the project:
 
 * [RssParser](http://github.com/digitalspaghetti/learning-android) (learning-android) by Tane Piper (Public Domain)
+* [android-json-rpc](https://code.google.com/archive/p/android-json-rpc/) by alexd (MIT License)
+* [Volley](https://github.com/google/volley) by Google (Apache License 2.0)
