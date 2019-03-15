@@ -11,6 +11,7 @@ import android.support.test.runner.AndroidJUnit4;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.transdroid.search.adapters.custom.CustomSiteAdapter;
 
 import java.util.List;
 
@@ -35,6 +36,12 @@ public class TorrentSiteTest {
 		context = InstrumentationRegistry.getContext();
 		prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		packageName = context.getPackageName();
+	}
+
+	@Test
+	public void search_CustomSite() throws Exception {
+		String customSiteTestUrl = getResourceString("CustomSiteAdapter_url");
+		checkSearch(new CustomSiteAdapter("CustomSiteAdapter", customSiteTestUrl));
 	}
 
 	@Test
@@ -133,7 +140,11 @@ public class TorrentSiteTest {
 					.commit();
 		}
 
-		List<SearchResult> results = torrentSite.search(prefs, QUERY, ORDER, RESULTS);
+		checkSearch(torrentSite.getAdapter());
+	}
+
+	private void checkSearch(ISearchAdapter adapter) throws Exception {
+		List<SearchResult> results = adapter.search(prefs, QUERY, ORDER, RESULTS);
 
 		assertThat(results).isNotEmpty();
 		for (SearchResult result : results) {

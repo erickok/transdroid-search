@@ -124,7 +124,8 @@ public abstract class AbstractHtmlAdapter implements ISearchAdapter {
                 final BasicCookieStore cookieStore = new BasicCookieStore();
                 final String domain = new URL(getLoginUrl()).getHost();
                 for (String cookieName : getRequiredCookies()) {
-                    final BasicClientCookie cookie = new BasicClientCookie(cookieName, SettingsHelper.getSiteCookie(prefs, getTorrentSite(), cookieName));
+                    final BasicClientCookie cookie = new BasicClientCookie(cookieName,
+                            SettingsHelper.getSiteCookie(prefs, getTorrentSite().name(), cookieName));
                     cookie.setDomain(domain);
                     cookieStore.addCookie(cookie);
                 }

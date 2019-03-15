@@ -178,7 +178,8 @@ public class RssParser extends DefaultHandler {
 			this.channel.addCategory(this.text.toString().trim());
 		}
 
-		addAdditionalData(localName, this.item, this.text.toString());
+		if (this.item != null)
+			addAdditionalData(localName, this.item, this.text.toString());
 
 		this.text.setLength(0);
 	}

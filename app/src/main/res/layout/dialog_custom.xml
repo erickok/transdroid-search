@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="match_parent"
+	android:layout_height="match_parent"
+	android:orientation="vertical"
+	android:padding="20dp" >
+
+	<ImageButton
+		android:id="@+id/delete"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:src="@android:drawable/ic_delete"
+		android:layout_gravity="right" />
+
+	<EditText
+		android:id="@+id/name"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:hint="@string/pref_hint_name"
+		android:inputType="textShortMessage" />
+
+	<TextView
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginTop="16dp"
+		android:text="@string/pref_hint_url_explanation" />
+
+	<EditText
+		android:id="@+id/url"
+		android:layout_width="match_parent"
+		android:layout_height="wrap_content"
+		android:layout_marginTop="20dp"
+		android:hint="@string/pref_hint_url"
+		android:inputType="textUri" />
+
+</LinearLayout>

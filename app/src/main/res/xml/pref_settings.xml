@@ -12,5 +12,11 @@
         android:order="200"
         android:title="@string/pref_privatesites" >
     </PreferenceCategory>
-    
+
+    <PreferenceCategory
+        android:key="header_customsites"
+        android:order="300"
+        android:title="@string/pref_customsites" >
+    </PreferenceCategory>
+
 </PreferenceScreen>

@@ -18,10 +18,16 @@
  */
 package org.transdroid.search.gui;
 
-import org.transdroid.search.TorrentSite;
-
 import android.content.SharedPreferences;
 import android.content.SharedPreferences.Editor;
+import android.net.Uri;
+import android.util.Pair;
+import org.transdroid.search.ISearchAdapter;
+import org.transdroid.search.TorrentSite;
+import org.transdroid.search.adapters.custom.CustomSiteAdapter;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A helper class to access user settings form the {@link SharedPreferences} and gives access to the used preferences
@@ -38,28 +44,55 @@ public class SettingsHelper {
 	static final String PREF_SITE_PASS = "pref_key_pass_";
 	static final String PREF_SITE_TOKEN = "pref_key_token_";
 	static final String PREF_SITE_COOKIE = "pref_key_cookie_";
+	static final String PREF_SITE_CUSTOM_NAME = "pref_key_custom_name_";
+	static final String PREF_SITE_CUSTOM_URL = "pref_key_custom_url_";
+	private static final String CODE_PREFIX_CUSTOM = "custom_";
+
+	public static ISearchAdapter getSiteByCode(SharedPreferences prefs, String code) {
+		if (code.startsWith(CODE_PREFIX_CUSTOM)) {
+			final int index = Integer.parseInt(code.substring(code.length() - 1));
+			final Pair<String, ISearchAdapter> customSite = getCustomSite(prefs, index);
+			return customSite == null ? null : customSite.second;
+		}
+		return TorrentSite.fromCode(code).getAdapter();
+	}
+
+	public static List<Pair<String, ISearchAdapter>> getAllSites(SharedPreferences prefs) {
+		List<Pair<String, ISearchAdapter>> all = new ArrayList<>();
+		for (final TorrentSite site : TorrentSite.values()) {
+			all.add(Pair.create(site.name(), site.getAdapter()));
+		}
+		int i = 0;
+		while (prefs.contains(PREF_SITE_CUSTOM_URL + i)) {
+			all.add(getCustomSite(prefs, i++));
+		}
+		return all;
+	}
 
 	/**
 	 * Determines if a torrent site is currently enabled by the user, based on the user settings. Public sites are
 	 * simply enabled/disabled with a check box but private sites are only enabled when proper user credentials have
 	 * been supplied.
 	 * @param prefs The shared preferences to read from
-	 * @param site The site for which to determine if it is enabled
+	 * @param siteCode The site code for which to determine if it is enabled
+	 * @param adapter The search adapter for this site
 	 * @return True if the site is enabled and should be available in the search and torrent site providers; false
 	 *         otherwise
 	 */
-	public static boolean isSiteEnabled(SharedPreferences prefs, TorrentSite site) {
-		switch (site.getAdapter().getAuthType()) {
+	public static boolean isSiteEnabled(SharedPreferences prefs, String siteCode, ISearchAdapter adapter) {
+		switch (adapter.getAuthType()) {
+			case CUSTOM:
+				return true;
 			case NONE:
-				return prefs.getBoolean(PREF_SITE_ENABLED + site.name(), false);
+				return prefs.getBoolean(PREF_SITE_ENABLED + siteCode, false);
 			case TOKEN:
-				return prefs.getString(PREF_SITE_TOKEN + site.name(), null) != null;
+				return prefs.getString(PREF_SITE_TOKEN + siteCode, null) != null;
 			case USERNAME:
-				return prefs.getString(PREF_SITE_USER + site.name(), null) != null
-						&& prefs.getString(PREF_SITE_PASS + site.name(), null) != null;
+				return prefs.getString(PREF_SITE_USER + siteCode, null) != null
+						&& prefs.getString(PREF_SITE_PASS + siteCode, null) != null;
 			case COOKIES:
-				for (String cookie : site.getAdapter().getRequiredCookies()) {
-					final String cookieValue = getSiteCookie(prefs, site, cookie);
+				for (String cookie : adapter.getRequiredCookies()) {
+					final String cookieValue = getSiteCookie(prefs, siteCode, cookie);
 					if (cookieValue == null) {
 						return false;
 					}
@@ -90,7 +123,7 @@ public class SettingsHelper {
 	public static String getSitePass(SharedPreferences prefs, TorrentSite site) {
 		return prefs.getString(PREF_SITE_PASS + site.name(), null);
 	}
-	
+
 	/**
 	 * Returns the API token that the user specified in the settings as site-specific credentials.
 	 * @param prefs The shared preferences to read from
@@ -102,11 +135,46 @@ public class SettingsHelper {
 		return prefs.getString(PREF_SITE_TOKEN + site.name(), null);
 	}
 
-	public static void setSiteCookie(Editor editor, TorrentSite site, String name, String value) {
-		editor.putString(PREF_SITE_COOKIE + site.name() + "_" + name, value);
+	public static void setSiteCookie(Editor editor, String siteCode, String name, String value) {
+		editor.putString(PREF_SITE_COOKIE + siteCode + "_" + name, value);
 	}
 
-	public static String getSiteCookie(SharedPreferences prefs, TorrentSite site, String name) {
-		return prefs.getString(PREF_SITE_COOKIE + site.name() + "_" + name, null);
+	public static String getSiteCookie(SharedPreferences prefs, String siteCode, String name) {
+		return prefs.getString(PREF_SITE_COOKIE + siteCode + "_" + name, null);
 	}
+
+	static Pair<String, ISearchAdapter> getCustomSite(SharedPreferences prefs, int index) {
+		if (!prefs.contains(PREF_SITE_CUSTOM_URL + index))
+			return null;
+		String siteUrl = prefs.getString(PREF_SITE_CUSTOM_URL + index, "");
+		String siteDomain = Uri.parse(siteUrl).getHost();
+		String siteName = prefs.getString(PREF_SITE_CUSTOM_NAME + index, siteDomain);
+		if (siteName == null) siteName = siteUrl;
+		ISearchAdapter adapter = new CustomSiteAdapter(siteName, siteUrl);
+		return Pair.create(CODE_PREFIX_CUSTOM + index, adapter);
+	}
+
+	static String getCustomSiteName(SharedPreferences prefs, int index) {
+		return prefs.getString(PREF_SITE_CUSTOM_NAME + index, null);
+	}
+
+	static String getCustomSiteUrl(SharedPreferences prefs, int index) {
+		return prefs.getString(PREF_SITE_CUSTOM_URL + index, null);
+	}
+
+	static void removeCustomSite(SharedPreferences prefs, int sortOrder) {
+		final Editor editor = prefs.edit();
+		// Move all sites later in the list 'up' one place
+		int i = sortOrder;
+		while (prefs.contains(PREF_SITE_CUSTOM_URL + (i + 1))) {
+			editor.putString(PREF_SITE_CUSTOM_NAME + i, prefs.getString(PREF_SITE_CUSTOM_NAME + (i + 1), null))
+					.putString(PREF_SITE_CUSTOM_URL + i, prefs.getString(PREF_SITE_CUSTOM_URL + (i + 1), null));
+			i++;
+		}
+		editor
+				.remove(PREF_SITE_CUSTOM_NAME + i)
+				.remove(PREF_SITE_CUSTOM_URL + i)
+				.apply();
+	}
+
 }
