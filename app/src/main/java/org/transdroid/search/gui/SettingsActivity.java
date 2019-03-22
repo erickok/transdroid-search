@@ -19,18 +19,22 @@
 package org.transdroid.search.gui;
 
 import android.app.Activity;
-import android.content.Intent;
-import android.os.Build;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceCategory;
 import android.preference.PreferenceFragment;
-
+import android.preference.PreferenceManager;
+import android.util.Pair;
+import org.transdroid.search.ISearchAdapter;
 import org.transdroid.search.R;
-import org.transdroid.search.TorrentSite;
+
+import java.util.List;
+
+import static org.transdroid.search.ISearchAdapter.AuthType.CUSTOM;
+import static org.transdroid.search.ISearchAdapter.AuthType.NONE;
 
 /**
- * Dummy activity to decide which interaface to use, compat or modern, based on the Android version. This allows using an PreferenceActivity for
- * Android devices/versions that do not yet support PreferenceFragment without having to include support libraries, etc.
+ * Activity that shows all public and private torrent sites, enable/disable them or enter settings, and to add custom RSS search feeds.
  * @author Eric Kok
  */
 public class SettingsActivity extends Activity {
@@ -38,12 +42,49 @@ public class SettingsActivity extends Activity {
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.HONEYCOMB) {
-			startActivity(new Intent(this, SettingsActivityModern.class));
-		} else {
-			startActivity(new Intent(this, SettingsActivityCompat.class));
+		if (savedInstanceState == null) {
+			getFragmentManager().beginTransaction().replace(android.R.id.content, new SettingsActivity.SettingsFragment()).commit();
 		}
-		finish();
+	}
+
+	public static class SettingsFragment extends PreferenceFragment implements CustomSitePreference.OnCustomSiteChanged {
+
+		@Override
+		public void onCreate(Bundle savedInstanceState) {
+			super.onCreate(savedInstanceState);
+
+			onCustomSiteChanged();
+		}
+
+		@Override
+		public void onCustomSiteChanged() {
+			// Load the preferences screen
+			if (getPreferenceScreen() != null) {
+				getPreferenceScreen().removeAll();
+			}
+			addPreferencesFromResource(R.xml.pref_settings);
+
+			// Retrieve all torrent sites and build a preference object for them
+			SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getActivity());
+			int publicCounter = 101;
+			int privateCounter = 201;
+			int customIndex = 0;
+			int customCounter = 301;
+			List<Pair<String, ISearchAdapter>> sites = SettingsHelper.getAllSites(prefs);
+			PreferenceCategory publicGroup = (PreferenceCategory) findPreference("header_publicsites");
+			PreferenceCategory privateGroup = (PreferenceCategory) findPreference("header_privatesites");
+			PreferenceCategory customGroup = (PreferenceCategory) findPreference("header_customsites");
+			for (Pair<String, ISearchAdapter> torrentSite : sites) {
+				if (torrentSite.second.getAuthType() == CUSTOM) {
+					customGroup.addPreference(new CustomSitePreference(getActivity(), customIndex++, customCounter++, this));
+				} else if (torrentSite.second.getAuthType() != NONE) {
+					privateGroup.addPreference(new PrivateSitePreference(getActivity(), privateCounter++, torrentSite));
+				} else {
+					publicGroup.addPreference(new PublicSitePreference(getActivity(), publicCounter++, torrentSite));
+				}
+			}
+			customGroup.addPreference(new CustomSitePreference(getActivity(), customIndex, customCounter, this));
+		}
 	}
 
 }

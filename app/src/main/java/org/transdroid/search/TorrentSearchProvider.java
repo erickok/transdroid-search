@@ -33,6 +33,7 @@ import android.os.ParcelFileDescriptor;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
+import org.transdroid.search.gui.SettingsHelper;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -144,7 +145,7 @@ public class TorrentSearchProvider extends ContentProvider {
 		String term = "";
 		SortOrder order = SortOrder.BySeeders; // Use BySeeders as default
 		final int maxResults = 30;
-		TorrentSite site = TorrentSite.Rarbg;
+		ISearchAdapter site = TorrentSite.Rarbg.getAdapter();
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
 
 		// Retrieve the search term, site and order
@@ -153,8 +154,7 @@ public class TorrentSearchProvider extends ContentProvider {
 		}
 		if (selectionP != null && selectionP.equals(SELECTION_SITE) && selectionArgsP != null
 				&& selectionArgsP.length > 0) {
-			// TODO: Support searching multiple sites at once
-			site = TorrentSite.fromCode(selectionArgsP[0]);
+			site = SettingsHelper.getSiteByCode(prefs, selectionArgsP[0]);
 			if (site == null) {
 				throw new RuntimeException(selectionArgsP[0] + " is not a valid torrent site. "
 						+ "To get the available sites, use " + TorrentSitesProvider.PROVIDER_NAME);

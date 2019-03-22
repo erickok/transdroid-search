@@ -6,6 +6,7 @@ import android.database.Cursor;
 import android.support.test.InstrumentationRegistry;
 import android.support.test.runner.AndroidJUnit4;
 
+import com.google.common.collect.Range;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -26,6 +27,7 @@ public class TorrentSitesProviderTest {
 	@Test
 	public void query_hasSitesWithCodeAndName() throws Exception {
 		Cursor cursor = provider.query(TorrentSitesProvider.CONTENT_URI, null, null, null, null);
+		int authTypeCount = ISearchAdapter.AuthType.values().length;
 		assertThat(cursor).isNotNull();
 		assertThat(cursor.getCount()).isGreaterThan(0);
 		assertThat(cursor.getColumnCount()).isEqualTo(5);
@@ -35,7 +37,7 @@ public class TorrentSitesProviderTest {
 			assertThat(cursor.getInt(0)).isEqualTo(id); // Incremental id
 			assertThat(cursor.getString(1)).isNotEmpty(); // Site code
 			assertThat(cursor.getString(2)).isNotEmpty(); // Site name
-			assertThat(cursor.getInt(4)).isAnyOf(0, 1); // Public or private site
+			assertThat(cursor.getInt(4)).isIn(Range.closed(0, authTypeCount)); // Auth type
 			id++;
 		} while (cursor.moveToNext());
 	}

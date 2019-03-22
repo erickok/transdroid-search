@@ -20,7 +20,8 @@ package org.transdroid.search.gui;
 
 import java.util.Locale;
 
-import org.transdroid.search.TorrentSite;
+import android.util.Pair;
+import org.transdroid.search.ISearchAdapter;
 
 import android.content.Context;
 import android.preference.CheckBoxPreference;
@@ -32,11 +33,11 @@ import android.preference.Preference;
  */
 public class PublicSitePreference extends CheckBoxPreference {
 
-	public PublicSitePreference(Context context, int sortOrder, TorrentSite torrentSite) {
+	PublicSitePreference(Context context, int sortOrder, Pair<String, ISearchAdapter> torrentSite) {
 		super(context);
 		setOrder(sortOrder);
-		setTitle(torrentSite.getAdapter().getSiteName());
-		setKey(SettingsHelper.PREF_SITE_ENABLED + torrentSite.name());
+		setTitle(torrentSite.second.getSiteName());
+		setKey(SettingsHelper.PREF_SITE_ENABLED + torrentSite.first);
 		setDefaultValue(true);
 	}
 

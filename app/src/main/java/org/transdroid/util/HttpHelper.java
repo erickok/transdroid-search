@@ -57,8 +57,8 @@ public class HttpHelper {
 		registry.register(new Scheme("https", ignoreSslIssues ? new IgnoreTlsSniSocketFactory() : new TlsSniSocketFactory(), 443));
 
 		HttpParams httpparams = new BasicHttpParams();
-		HttpConnectionParams.setConnectionTimeout(httpparams, 8000);
-		HttpConnectionParams.setSoTimeout(httpparams, 8000);
+		HttpConnectionParams.setConnectionTimeout(httpparams, 30000);
+		HttpConnectionParams.setSoTimeout(httpparams, 30000);
 		DefaultHttpClient httpclient = new DefaultHttpClient(new ThreadSafeClientConnManager(httpparams, registry), httpparams);
 
 		httpclient.addRequestInterceptor(HttpHelper.gzipRequestInterceptor);

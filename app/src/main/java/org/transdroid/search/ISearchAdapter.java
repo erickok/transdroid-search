@@ -34,6 +34,7 @@ public interface ISearchAdapter {
 		TOKEN,
 		USERNAME,
 		COOKIES,
+		CUSTOM
 	}
 
 	/**

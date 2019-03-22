@@ -27,9 +27,10 @@ import android.net.Uri;
 import android.preference.PreferenceManager;
 import android.util.Log;
 
+import android.util.Pair;
 import org.transdroid.search.gui.SettingsHelper;
 
-import static org.transdroid.search.ISearchAdapter.AuthType.NONE;
+import java.util.List;
 
 /**
  * Provider of a list of available torrent sites.
@@ -96,23 +97,23 @@ public class TorrentSitesProvider extends ContentProvider {
 		String[] columnNames = new String[] { "_ID", "CODE", "NAME", "RSSURL", "ISPRIVATE" };
 		MatrixCursor curs = new MatrixCursor(columnNames);
 
-		TorrentSite[] sites = TorrentSite.values();
-		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
-		
+        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
+		List<Pair<String, ISearchAdapter>> sites = SettingsHelper.getAllSites(prefs);
+
 		// Return the enabled results as MatrixCursor
 		int id = 0;
-		for (TorrentSite site : sites) {
+		for (Pair<String, ISearchAdapter> site : sites) {
 			
 			// Don't include this site if the user disabled it (or it is private and no credentials are specified)
-			if (!SettingsHelper.isSiteEnabled(prefs, site))
+			if (!SettingsHelper.isSiteEnabled(prefs, site.first, site.second))
 				continue;
 			
 			Object[] values = new Object[5];
 			values[0] = id++;
-			values[1] = site.toString();
-			values[2] = site.getAdapter().getSiteName();
-			values[3] = site.getAdapter().buildRssFeedUrlFromSearch(prefs, "%s", SortOrder.BySeeders);
-			values[4] = (site.getAdapter().getAuthType() != NONE? 1: 0);
+			values[1] = site.first;
+			values[2] = site.second.getSiteName();
+			values[3] = site.second.buildRssFeedUrlFromSearch(prefs, "%s", SortOrder.BySeeders);
+			values[4] = site.second.getAuthType().ordinal();
 			curs.addRow(values);
 			
 		}

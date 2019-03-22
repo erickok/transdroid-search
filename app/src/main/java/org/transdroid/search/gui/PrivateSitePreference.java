@@ -25,9 +25,10 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import android.util.Pair;
+import org.transdroid.search.ISearchAdapter;
 import org.transdroid.search.ISearchAdapter.AuthType;
 import org.transdroid.search.R;
-import org.transdroid.search.TorrentSite;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -47,19 +48,19 @@ import android.widget.LinearLayout;
  */
 public class PrivateSitePreference extends DialogPreference {
 
-	private final TorrentSite torrentSite;
+	private final Pair<String, ISearchAdapter> torrentSite;
 	private final AuthType authType;
 	private EditText userEdit, passEdit, tokenEdit;
 	private Map<String, EditText> cookieEdits;
 
-	public PrivateSitePreference(Context context, int sortOrder, TorrentSite torrentSite) {
+	PrivateSitePreference(Context context, int sortOrder, Pair<String, ISearchAdapter> torrentSite) {
 		super(context, null);
 		this.torrentSite = torrentSite;
-		this.authType = torrentSite.getAdapter().getAuthType();
+		this.authType = torrentSite.second.getAuthType();
 
 		// Set up the credentials dialog and the preference appearance
 		setOrder(sortOrder);
-		setTitle(torrentSite.getAdapter().getSiteName());
+		setTitle(torrentSite.second.getSiteName());
 		switch (authType) {
 			case TOKEN:
 				setDialogLayoutResource(R.layout.dialog_token);
@@ -69,18 +70,18 @@ public class PrivateSitePreference extends DialogPreference {
 				setDialogLayoutResource(R.layout.dialog_credentials);
 				setDialogTitle(R.string.pref_credentials);
 				String currentUser = PreferenceManager.getDefaultSharedPreferences(getContext())
-						.getString(SettingsHelper.PREF_SITE_USER + torrentSite.name(), null);
+						.getString(SettingsHelper.PREF_SITE_USER + torrentSite.first, null);
 				if (currentUser != null)
 					setSummary(currentUser);
 				break;
 			case COOKIES:
 				setDialogLayoutResource(R.layout.dialog_cookies);
 				setDialogTitle(R.string.pref_cookies);
-				final String[] requiredCookies = this.torrentSite.getAdapter().getRequiredCookies();
+				final String[] requiredCookies = this.torrentSite.second.getRequiredCookies();
 				final List<String> setCookies = new ArrayList<>();
 				final SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(context);
 				for (String cookieName : requiredCookies) {
-                    final String value = SettingsHelper.getSiteCookie(prefs, this.torrentSite, cookieName);
+                    final String value = SettingsHelper.getSiteCookie(prefs, this.torrentSite.first, cookieName);
                     if (value != null) {
                         setCookies.add(cookieName);
                     }
@@ -106,22 +107,22 @@ public class PrivateSitePreference extends DialogPreference {
 		SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(getContext());
 		switch (authType) {
 			case TOKEN:
-				tokenEdit = (EditText) dialog.findViewById(R.id.token);
+				tokenEdit = dialog.findViewById(R.id.token);
 				// Show token for easy modification
-				tokenEdit.setText(prefs.getString(SettingsHelper.PREF_SITE_TOKEN + torrentSite.name(), ""));
+				tokenEdit.setText(prefs.getString(SettingsHelper.PREF_SITE_TOKEN + torrentSite.first, ""));
 				break;
 			case USERNAME:
-				userEdit = (EditText) dialog.findViewById(R.id.username);
-				passEdit = (EditText) dialog.findViewById(R.id.password);
+				userEdit = dialog.findViewById(R.id.username);
+				passEdit = dialog.findViewById(R.id.password);
 				// Show username for easy modification
-				userEdit.setText(prefs.getString(SettingsHelper.PREF_SITE_USER + torrentSite.name(), ""));
+				userEdit.setText(prefs.getString(SettingsHelper.PREF_SITE_USER + torrentSite.first, ""));
 				break;
 			case COOKIES:
 				cookieEdits = new HashMap<>();
-				final LinearLayout layout = (LinearLayout) dialog.findViewById(R.id.dialog_cookies_layout);
-				for (String cookieName : torrentSite.getAdapter().getRequiredCookies()) {
+				final LinearLayout layout = dialog.findViewById(R.id.dialog_cookies_layout);
+				for (String cookieName : torrentSite.second.getRequiredCookies()) {
 					final EditText cookieEdit = new EditText(dialog.getContext());
-					cookieEdit.setText(SettingsHelper.getSiteCookie(prefs, torrentSite, cookieName));
+					cookieEdit.setText(SettingsHelper.getSiteCookie(prefs, torrentSite.first, cookieName));
 					cookieEdit.setHint(cookieName);
 					cookieEdits.put(cookieName, cookieEdit);
 					layout.addView(cookieEdit);
@@ -154,8 +155,8 @@ public class PrivateSitePreference extends DialogPreference {
 		if (TextUtils.isEmpty(token))
 			token = null;
 		Editor edit = PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
-		edit.putString(SettingsHelper.PREF_SITE_TOKEN + torrentSite.name(), token);
-		edit.commit();
+		edit.putString(SettingsHelper.PREF_SITE_TOKEN + torrentSite.first, token);
+		edit.apply();
 	}
 
 	private void persistUserAndPass() {
@@ -168,9 +169,9 @@ public class PrivateSitePreference extends DialogPreference {
 		if (TextUtils.isEmpty(password))
 			password = null;
 		Editor edit = PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
-		edit.putString(SettingsHelper.PREF_SITE_USER + torrentSite.name(), username);
-		edit.putString(SettingsHelper.PREF_SITE_PASS + torrentSite.name(), password);
-		edit.commit();
+		edit.putString(SettingsHelper.PREF_SITE_USER + torrentSite.first, username);
+		edit.putString(SettingsHelper.PREF_SITE_PASS + torrentSite.first, password);
+		edit.apply();
 		// Show the username in the preference activity
 		setSummary(username);
 	}
@@ -187,12 +188,12 @@ public class PrivateSitePreference extends DialogPreference {
 			} else {
 				setCookies.add(cookieValue);
 			}
-			SettingsHelper.setSiteCookie(edit, torrentSite, cookieName, cookieValue);
+			SettingsHelper.setSiteCookie(edit, torrentSite.first, cookieName, cookieValue);
 		}
 		if (setCookies.size() > 0) {
 			setSummary(context.getString(R.string.pref_cookies_set,
 				TextUtils.join(context.getString(R.string.list_delimiter), setCookies)));
 		}
-		edit.commit();
+		edit.apply();
 	}
 }
