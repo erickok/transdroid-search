@@ -41,7 +41,7 @@ import java.util.regex.Pattern;
  */
 public class ThePirateBayAdapter extends AbstractHtmlAdapter {
 
-	private static final String DOMAIN = "https://proxtpb.art/";
+	private static final String DOMAIN = "https://proxtpb.art";
 	private static final String QUERYURL = DOMAIN + "/search/%1$s/0/%2$s/0";
 	private static final String SORT_COMPOSITE = "3";
 	private static final String SORT_SEEDS = "7";
