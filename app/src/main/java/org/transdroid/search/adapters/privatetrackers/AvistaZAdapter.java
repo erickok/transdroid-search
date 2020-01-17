@@ -46,21 +46,21 @@ import org.transdroid.util.HttpHelper;
 import android.content.SharedPreferences;
 
 /**
- * An adapter that provides access to AsiaTorrents searches by parsing the raw HTML output.
+ * An adapter that provides access to AvistaZ searches by parsing the raw HTML output.
  */
-public class AsiaTorrentsAdapter implements ISearchAdapter {
+public class AvistaZAdapter implements ISearchAdapter {
 
 	private static final String LOGIN_USER = "uid";
 	private static final String LOGIN_PASS = "pwd";
-	private static final String LOGINURL = "http://www.asiatorrents.me/index.php?page=login";
-	private static final String QUERYURL = "http://www.asiatorrents.me/index.php?page=torrents&search=%1$s";
+	private static final String LOGINURL = "https://avistaz.to/index.php?page=login";
+	private static final String QUERYURL = "https://avistaz.to/index.php?page=torrents&search=%1$s";
 	private static final int CONNECTION_TIMEOUT = 8000;
 	private final SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
 
 	private DefaultHttpClient prepareRequest(SharedPreferences prefs) throws Exception {
 
-		String username = SettingsHelper.getSiteUser(prefs, TorrentSite.AsiaTorrents);
-		String password = SettingsHelper.getSitePass(prefs, TorrentSite.AsiaTorrents);
+		String username = SettingsHelper.getSiteUser(prefs, TorrentSite.AvistaZ);
+		String password = SettingsHelper.getSitePass(prefs, TorrentSite.AvistaZ);
 		if (username == null || password == null) {
 			throw new InvalidParameterException("No username or password was provided, while this is required for this private site.");
 		}
@@ -234,13 +234,13 @@ public class AsiaTorrentsAdapter implements ISearchAdapter {
 
 	@Override
 	public String buildRssFeedUrlFromSearch(SharedPreferences prefs, String query, SortOrder order) {
-		// AsiaTorrents doesn't support RSS feed-based searches
+		// AvistaZ doesn't support RSS feed-based searches
 		return null;
 	}
 
 	@Override
 	public String getSiteName() {
-		return "AsiaTorrents";
+		return "AvistaZ";
 	}
 
 	public AuthType getAuthType() {
