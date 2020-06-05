@@ -17,7 +17,7 @@
     <string name="pref_hint_token">API/session token</string>
     <string name="pref_hint_name">(Optional) name</string>
     <string name="pref_hint_url_explanation">Link to the RSS feed, including any access token, where \u0025s will be replaced by the search string, e.g.\nhttps://site.com/torrents?q=\u0025</string>
-    <string name="pref_hint_url">Url</string>
+    <string name="pref_hint_url">URL</string>
 
     <string name="login_failure">Invalid user name or password for private tracker.</string>
     <string name="list_delimiter">,&#160;</string>

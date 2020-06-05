@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_description">Aplikacja pomocnicza dla wyszukiwania torrentów</string>
+    
+    <string name="pref_settingslabel">Ustawienia wyszukiwania torrentów</string>
+    <string name="pref_publicsites">Publiczne strony</string>
+    <string name="pref_privatesites">Prywatne strony</string>
+    <string name="pref_customsites">Niestandardowe strony</string>
+    <string name="pref_customsites_add">Dodaj niestandardową stronę (feed RSS)</string>
+    <string name="pref_credentials">Dane logowania do strony</string>
+    <string name="pref_cookies">Ciasteczka (cookies) strony</string>
+    <string name="pref_cookies_set">Ciasteczka (cookies): %s</string>
+    <string name="pref_token">Token autoryzacyjny strony</string>
+    <string name="pref_hint_username">Nazwa użytkownika</string>
+    <string name="pref_hint_password">Hasło</string>
+    <string name="pref_hint_token">Token API/Sesji</string>
+    <string name="pref_hint_name">(Opcjonalna) nazwa</string>
+    <string name="pref_hint_url_explanation">Link do feedu RSS, wraz z tokenem autoryzacyjnym, gdzie \u0025s zostanie zastąpione przez wyszukiwany tekst, np. \nhttps://site.com/torrents?q=\u0025</string>
+    <string name="pref_hint_url">URL</string>
+
+    <string name="login_failure">Nieprawidłowa nazwa użytkownika bądź hasło dla prywatnego trackera.</string>
+    <string name="list_delimiter">,&#160;</string>
+
+</resources>
