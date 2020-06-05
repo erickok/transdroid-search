@@ -43,7 +43,7 @@ public class TorrentDownloadsAdapter extends RssFeedSearchAdapter {
 		TorrentDownloadsItem theItem = (TorrentDownloadsItem) item;
 		return new SearchResult(
 				item.getTitle(),
-				DOMAIN + item.getLink().replace("/torrent/", "/download/"),
+				"magnet:?xt=urn:btih:" + item.getInfoHash().toLowerCase() + "&dn=" + URLEncoder.encode(item.getTitle(), "UTF-8"),
 				DOMAIN + item.getLink(),
 				FileSizeConverter.getSize(theItem.getSize()),
 				item.getPubdate(),
@@ -74,12 +74,15 @@ public class TorrentDownloadsAdapter extends RssFeedSearchAdapter {
 		private long size;
 		private int seeders;
 		private int leechers;
+		private String infoHash;
 		public void setSize(long size) { this.size = size; }
 		public void setSeeders(int seeders) { this.seeders = seeders; }
 		public void setLeechers(int leechers) { this.leechers = leechers; }
+		public void setInfoHash(String infoHash) { this.infoHash = infoHash; }
 		public long getSize() { return size; }
 		public int getSeeders() { return seeders; }
 		public int getLeechers() { return leechers; }
+		public String getInfoHash() { return infoHash; }
 	}
 
 	/**
@@ -105,6 +108,9 @@ public class TorrentDownloadsAdapter extends RssFeedSearchAdapter {
 	    	}
 	    	if (localName.equalsIgnoreCase("leechers")) {
 	    		theItem.setLeechers(Integer.parseInt(text.trim()));
+	    	}
+	    	if (localName.equalsIgnoreCase("info_hash")) {
+	    		theItem.setInfoHash(text.trim);
 	    	}
 	    }
 	}
