@@ -4,9 +4,9 @@ package org.transdroid.search;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
-import android.support.annotation.NonNull;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.annotation.NonNull;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import org.junit.Before;
 import org.junit.Test;
@@ -16,7 +16,7 @@ import org.transdroid.search.adapters.custom.CustomSiteAdapter;
 import java.util.List;
 
 import static com.google.common.truth.Truth.assertThat;
-import static com.google.common.truth.Truth.assert_;
+import static com.google.common.truth.Truth.assertWithMessage;
 import static org.transdroid.search.ISearchAdapter.AuthType.NONE;
 
 @RunWith(AndroidJUnit4.class)
@@ -33,7 +33,7 @@ public class TorrentSiteTest {
 
 	@Before
 	public void createProvider() {
-		context = InstrumentationRegistry.getContext();
+		context = InstrumentationRegistry.getInstrumentation().getContext();
 		prefs = PreferenceManager.getDefaultSharedPreferences(context);
 		packageName = context.getPackageName();
 	}
@@ -132,7 +132,7 @@ public class TorrentSiteTest {
 			String pass = getResourceString(torrentSite.name() + "_pass");
 			String token = getResourceString(torrentSite.name() + "_token");
 			if (!(has(user, pass) || has(token)))
-				assert_().fail(torrentSite.name() + " is private but no credentials found: untestable");
+				assertWithMessage(torrentSite.name() + " is private but no credentials found: untestable").fail();
 			prefs.edit()
 					.putString("pref_key_user_" + torrentSite.name(), user)
 					.putString("pref_key_pass_" + torrentSite.name(), pass)

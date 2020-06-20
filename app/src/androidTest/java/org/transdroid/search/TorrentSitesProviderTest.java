@@ -3,8 +3,8 @@ package org.transdroid.search;
 import android.content.ContentProviderClient;
 import android.content.Context;
 import android.database.Cursor;
-import android.support.test.InstrumentationRegistry;
-import android.support.test.runner.AndroidJUnit4;
+import androidx.test.platform.app.InstrumentationRegistry;
+import androidx.test.ext.junit.runners.AndroidJUnit4;
 
 import com.google.common.collect.Range;
 import org.junit.Before;
@@ -20,7 +20,7 @@ public class TorrentSitesProviderTest {
 
 	@Before
 	public void createProvider() {
-		Context context = InstrumentationRegistry.getContext();
+		Context context = InstrumentationRegistry.getInstrumentation().getContext();
 		provider = context.getContentResolver().acquireContentProviderClient(TorrentSitesProvider.CONTENT_URI);
 	}
 
