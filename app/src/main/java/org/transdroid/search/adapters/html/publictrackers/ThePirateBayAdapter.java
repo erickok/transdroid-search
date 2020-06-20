@@ -79,8 +79,8 @@ public class ThePirateBayAdapter extends AbstractHtmlAdapter {
 		final Elements children = torrentElement.children();
 		final int numChildren = children.size();
 
-		final int seeds = Integer.valueOf(children.get(numChildren - 2).text());
-		final int leechers = Integer.valueOf(children.get(numChildren - 1).text());
+		final int seeds = Integer.parseInt(children.get(numChildren - 2).text());
+		final int leechers = Integer.parseInt(children.get(numChildren - 1).text());
 		return new SearchResult(title, torrentUrl, detailsUrl, size, added, seeds, leechers);
 	}
 
@@ -107,18 +107,18 @@ public class ThePirateBayAdapter extends AbstractHtmlAdapter {
 			final String[] split1 = split[0].split("-");
 			final String[] split2 = split[1].split(":");
 			if (split2.length == 2) {
-				calendar.set(Calendar.HOUR_OF_DAY, Integer.valueOf(split2[0]));
-				calendar.set(Calendar.MINUTE, Integer.valueOf(split2[1]));
+				calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(split2[0]));
+				calendar.set(Calendar.MINUTE, Integer.parseInt(split2[1]));
 				if (split[0].equals("Y-day")) {
 					calendar.add(Calendar.DAY_OF_MONTH, -1);
 				} else if (!split[0].equals("Today")) {
-					calendar.set(Calendar.MONTH, Integer.valueOf(split1[0]) - 1);
-					calendar.set(Calendar.DAY_OF_MONTH, Integer.valueOf(split1[1]));
+					calendar.set(Calendar.MONTH, Integer.parseInt(split1[0]) - 1);
+					calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(split1[1]));
 				}
 			} else {
-				calendar.set(Calendar.YEAR, Integer.valueOf(split[1]));
-				calendar.set(Calendar.MONTH, Integer.valueOf(split1[0]) - 1);
-				calendar.set(Calendar.DAY_OF_MONTH, Integer.valueOf(split1[1]));
+				calendar.set(Calendar.YEAR, Integer.parseInt(split[1]));
+				calendar.set(Calendar.MONTH, Integer.parseInt(split1[0]) - 1);
+				calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(split1[1]));
 			}
 			return calendar.getTime();
 		} catch (RuntimeException e) {

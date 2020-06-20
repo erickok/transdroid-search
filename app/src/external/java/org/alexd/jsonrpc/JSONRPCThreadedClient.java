@@ -15,11 +15,11 @@ public abstract class JSONRPCThreadedClient {
 	protected enum Description{
 		NORMAL_RESPONSE,
 		ERROR
-	};
-	
+	}
+
 	protected static final String JSON_RESULT = "result"; 
 
-	protected class MessageObject{
+	protected static class MessageObject{
 		public Description description;
 		public Object content;
 		
@@ -29,7 +29,7 @@ public abstract class JSONRPCThreadedClient {
 		}
 	}
 	
-	public static interface OnObjectResultListener{
+	public interface OnObjectResultListener{
 		void manageResult(Object result);
 
 		void sendErrorMessageNull();
@@ -114,12 +114,11 @@ public abstract class JSONRPCThreadedClient {
 	{
 		//Copy method arguments in a json array
 		JSONArray jsonParams = new JSONArray();
-		for (int i=0; i<params.length; i++)
-		{
-			if(params[i].getClass().isArray()){
-				jsonParams.put(getJSONArray((Object[])params[i]));
+		for (Object param : params) {
+			if (param.getClass().isArray()) {
+				jsonParams.put(getJSONArray((Object[]) param));
 			}
-			jsonParams.put(params[i]);
+			jsonParams.put(param);
 		}
 		
 		//Create the json request object
@@ -207,15 +206,15 @@ public abstract class JSONRPCThreadedClient {
 						listener.manageResult(object.content);
 					}
 				}
-			};
+			}
 		};
 		
 		Thread thread = new Thread(){
 			@Override
 			public void run() {
-				MessageObject mo = null;
+				MessageObject mo;
 				try {
-					mo = new MessageObject(Description.NORMAL_RESPONSE, 
+					mo = new MessageObject(Description.NORMAL_RESPONSE,
 							doRequest(method, params).get(JSON_RESULT));
 				} catch (JSONException e) {
 					mo = new MessageObject(Description.ERROR, e);
@@ -247,15 +246,15 @@ public abstract class JSONRPCThreadedClient {
 						onResultListener.manageResult(object.content);
 					}
 				}
-			};
+			}
 		};
 		
 		Thread thread = new Thread(){
 			@Override
 			public void run() {
-				MessageObject mo = null;
+				MessageObject mo;
 				try {
-					mo = new MessageObject(Description.NORMAL_RESPONSE, 
+					mo = new MessageObject(Description.NORMAL_RESPONSE,
 							doRequest(method, params).get(JSON_RESULT));
 				} catch (JSONException e) {
 					mo = new MessageObject(Description.ERROR, e);
@@ -288,15 +287,15 @@ public abstract class JSONRPCThreadedClient {
 						listener.manageResult((String)object.content);
 					}
 				}
-			};
+			}
 		};
 		
 		Thread thread = new Thread(){
 			@Override
 			public void run() {
-				MessageObject mo = null;
+				MessageObject mo;
 				try {
-					mo = new MessageObject(Description.NORMAL_RESPONSE, 
+					mo = new MessageObject(Description.NORMAL_RESPONSE,
 							doRequest(method, params).getString(JSON_RESULT));
 				} catch (JSONException e) {
 					mo = new MessageObject(Description.ERROR, e);
@@ -329,16 +328,16 @@ public abstract class JSONRPCThreadedClient {
 						listener.manageResult((String)object.content);
 					}
 				}
-			};
+			}
 		};
 		
 		Thread thread = new Thread(){
 			@Override
 			public void run() {
-				MessageObject mo = null;
+				MessageObject mo;
 				try {
-					mo = new MessageObject(Description.NORMAL_RESPONSE, 
-						doRequest(method, params).getString(JSON_RESULT));
+					mo = new MessageObject(Description.NORMAL_RESPONSE,
+							doRequest(method, params).getString(JSON_RESULT));
 				} catch (JSONException e) {
 					mo = new MessageObject(Description.ERROR, e);
 				} catch (JSONRPCException e) {
@@ -370,26 +369,26 @@ public abstract class JSONRPCThreadedClient {
 						listener.manageResult(((Integer)object.content).intValue());
 					}
 				}
-			};
+			}
 		};
 		
 		Thread thread = new Thread(){
 			@Override
 			public void run() {
 				JSONObject response = null;
-				MessageObject mo = null;
+				MessageObject mo;
 				try {
 					response = doRequest(method, params);
 					if(response == null){
-						mo = new MessageObject(Description.ERROR, 
+						mo = new MessageObject(Description.ERROR,
 								new JSONRPCException("Cannot call method: " + method));
 					}
-					mo = new MessageObject(Description.NORMAL_RESPONSE, 
-							new Integer(response.getInt(JSON_RESULT)));
+					mo = new MessageObject(Description.NORMAL_RESPONSE,
+							response.getInt(JSON_RESULT));
 				} catch (JSONException e) {
 					try{
-						mo = new MessageObject(Description.NORMAL_RESPONSE, 
-								new Integer(response.getString(JSON_RESULT)));
+						mo = new MessageObject(Description.NORMAL_RESPONSE,
+								Integer.valueOf(response.getString(JSON_RESULT)));
 					} catch(NumberFormatException e1){
 						mo = new MessageObject(Description.ERROR, e);
 					} catch (JSONException e1){ 
@@ -441,14 +440,14 @@ public abstract class JSONRPCThreadedClient {
 						mo = new MessageObject(Description.ERROR, new JSONRPCException("Cannot call method: " + method));
 					}
 					else{
-						mo = new MessageObject(Description.NORMAL_RESPONSE, 
-								new Integer(response.getInt(JSON_RESULT)));
+						mo = new MessageObject(Description.NORMAL_RESPONSE,
+								response.getInt(JSON_RESULT));
 					}
 				}
 				catch (JSONException e) {
 					try {
-						mo = new MessageObject(Description.NORMAL_RESPONSE, 
-								new Integer(response.getString(JSON_RESULT)));
+						mo = new MessageObject(Description.NORMAL_RESPONSE,
+								Integer.valueOf(response.getString(JSON_RESULT)));
 					} catch (NumberFormatException e1) {
 						mo = new MessageObject(Description.ERROR, e1);
 					} catch (JSONException e1) {
@@ -486,23 +485,23 @@ public abstract class JSONRPCThreadedClient {
 						listener.manageResult(((Long)mo.content).longValue());
 					}
 				}
-			};
+			}
 		};
 		
 		Thread thread = new Thread(){
 			@Override
 			public void run() {
 				JSONObject response = null;
-				MessageObject mo = null;
+				MessageObject mo;
 				try{
 					response = doRequest(method, params);
 					if(response == null){
-						mo = new MessageObject(Description.ERROR, 
+						mo = new MessageObject(Description.ERROR,
 								new JSONRPCException("Cannot call method: " + method));
 					}
 					else{
-						mo = new MessageObject(Description.NORMAL_RESPONSE, 
-								new Long(response.getLong(JSON_RESULT)));
+						mo = new MessageObject(Description.NORMAL_RESPONSE,
+								response.getLong(JSON_RESULT));
 					}
 				} catch (JSONException e) {
 					try{
@@ -552,17 +551,17 @@ public abstract class JSONRPCThreadedClient {
 		Thread thread = new Thread(){
 			public void run() {
 				JSONObject response = null;
-				MessageObject mo = null;
+				MessageObject mo;
 				try {
 					response = doRequest(method, params);
 					mo = new MessageObject(Description.NORMAL_RESPONSE,
-							new Long(response.getLong(JSON_RESULT)));
+							response.getLong(JSON_RESULT));
 				} catch (JSONRPCException e) {
 					mo = new MessageObject(Description.ERROR, e);
 				} catch (JSONException e) {
 					try {
-						mo = new MessageObject(Description.NORMAL_RESPONSE, 
-								new Long(response.getString(JSON_RESULT)));
+						mo = new MessageObject(Description.NORMAL_RESPONSE,
+								Long.valueOf(response.getString(JSON_RESULT)));
 					} catch (NumberFormatException e1) {
 						mo = new MessageObject(Description.ERROR, e1);
 					} catch (JSONException e1) {
@@ -571,7 +570,7 @@ public abstract class JSONRPCThreadedClient {
 					mo = new MessageObject(Description.ERROR, e);
 				}
 				handler.sendMessage(handler.obtainMessage(NORM_PRIORITY, mo));
-			};
+			}
 		};
 		thread.start();
 	}	
@@ -600,30 +599,30 @@ public abstract class JSONRPCThreadedClient {
 						listener.manageResult(((Boolean)mo.content).booleanValue());
 					}
 				}
-			};
+			}
 		};
 		
 		Thread thread = new Thread(){
 			@Override
 			public void run() {
 				JSONObject response = null;
-				MessageObject mo = null;
+				MessageObject mo;
 				try{
 					response = doRequest(method, params);
-					mo = new MessageObject(Description.NORMAL_RESPONSE, 
-							new Boolean(response.getBoolean(JSON_RESULT)));
+					mo = new MessageObject(Description.NORMAL_RESPONSE,
+							response.getBoolean(JSON_RESULT));
 				} catch (JSONRPCException e){
 					mo = new MessageObject(Description.ERROR, e);
 				} catch (JSONException e) {
 					try {
-						mo = new MessageObject(Description.NORMAL_RESPONSE, 
-								new Boolean(response.getString(JSON_RESULT)));
+						mo = new MessageObject(Description.NORMAL_RESPONSE,
+								Boolean.valueOf(response.getString(JSON_RESULT)));
 					} catch (JSONException e1) {
 						mo = new MessageObject(Description.ERROR, e1);
 					}
 				}
 				handler.sendMessage(handler.obtainMessage(NORM_PRIORITY, mo));
-			};
+			}
 		};
 		thread.start();
 	}
@@ -657,18 +656,18 @@ public abstract class JSONRPCThreadedClient {
 		Thread thread = new Thread(){
 			@Override
 			public void run() {
-				MessageObject mo = null;
+				MessageObject mo;
 				JSONObject response = null;
 				try{
 					response = doRequest(method, params);
-					mo = new MessageObject(Description.NORMAL_RESPONSE, 
-							new Boolean(response.getBoolean(JSON_RESULT)));
+					mo = new MessageObject(Description.NORMAL_RESPONSE,
+							response.getBoolean(JSON_RESULT));
 				} catch (JSONRPCException e) {
 					mo = new MessageObject(Description.ERROR, e);
 				} catch (JSONException e) {
 					try {
-						mo = new MessageObject(Description.NORMAL_RESPONSE, 
-								new Boolean(response.getString(JSON_RESULT)));
+						mo = new MessageObject(Description.NORMAL_RESPONSE,
+								Boolean.valueOf(response.getString(JSON_RESULT)));
 					} catch (JSONException e1) {
 						mo = new MessageObject(Description.ERROR, e1);
 					}
@@ -708,18 +707,18 @@ public abstract class JSONRPCThreadedClient {
 		
 		Thread thread = new Thread(){
 			public void run() {
-				MessageObject mo = null;
+				MessageObject mo;
 				JSONObject response = null;
 				try {
 					response = doRequest(method, params);
-					mo = new MessageObject(Description.NORMAL_RESPONSE, 
-							new Double(response.getDouble(JSON_RESULT)));
+					mo = new MessageObject(Description.NORMAL_RESPONSE,
+							response.getDouble(JSON_RESULT));
 				} catch (JSONRPCException e) {
 					mo = new MessageObject(Description.ERROR, e);
 				} catch (JSONException e) {
 					try {
-						mo = new MessageObject(Description.NORMAL_RESPONSE, 
-								new Double(response.getString(JSON_RESULT)));
+						mo = new MessageObject(Description.NORMAL_RESPONSE,
+								Double.valueOf(response.getString(JSON_RESULT)));
 					} catch (NumberFormatException e1) {
 						mo = new MessageObject(Description.ERROR, e1);
 					} catch (JSONException e1) {
@@ -727,7 +726,7 @@ public abstract class JSONRPCThreadedClient {
 					} 
 				}
 				handler.sendMessage(handler.obtainMessage(NORM_PRIORITY, mo));
-			};
+			}
 		};
 		thread.start();
 	}
@@ -755,24 +754,24 @@ public abstract class JSONRPCThreadedClient {
 						listener.manageResult(((Double)mo.content).doubleValue());
 					}
 				}
-			};
+			}
 		};
 		
 		Thread thread = new Thread(){
 			@Override
 			public void run() {
-				MessageObject mo = null;
+				MessageObject mo;
 				JSONObject response = null;
 				try {
 					response = doRequest(method, params);
-					mo = new MessageObject(Description.NORMAL_RESPONSE, 
-							new Double(response.getDouble(JSON_RESULT)));
+					mo = new MessageObject(Description.NORMAL_RESPONSE,
+							response.getDouble(JSON_RESULT));
 				} catch (JSONRPCException e) {
 					mo = new MessageObject(Description.ERROR, e);
 				} catch (JSONException e) {
 					try {
-						mo = new MessageObject(Description.NORMAL_RESPONSE, 
-								new Double(response.getString(JSON_RESULT)));
+						mo = new MessageObject(Description.NORMAL_RESPONSE,
+								Double.valueOf(response.getString(JSON_RESULT)));
 					} catch (NumberFormatException e1) {
 						mo = new MessageObject(Description.ERROR, e1);
 					} catch (JSONException e1) {
@@ -814,11 +813,11 @@ public abstract class JSONRPCThreadedClient {
 		Thread thread = new Thread(){
 			@Override
 			public void run() {
-				MessageObject mo = null;
-				JSONObject response = null;
+				MessageObject mo;
+				JSONObject response;
 				try {
 					response = doRequest(method, params);
-					mo = new MessageObject(Description.NORMAL_RESPONSE, 
+					mo = new MessageObject(Description.NORMAL_RESPONSE,
 							response.getJSONObject(JSON_RESULT));
 				} catch (JSONRPCException e) {
 					mo = new MessageObject(Description.ERROR, e);
@@ -861,11 +860,11 @@ public abstract class JSONRPCThreadedClient {
 		Thread thread = new Thread(){
 			@Override
 			public void run() {
-				JSONObject response = null;
-				MessageObject mo = null;
+				JSONObject response;
+				MessageObject mo;
 				try {
 					response = doRequest(method, params);
-					mo = new MessageObject(Description.NORMAL_RESPONSE, 
+					mo = new MessageObject(Description.NORMAL_RESPONSE,
 							response.getJSONObject(JSON_RESULT));
 				} catch (JSONRPCException e) {
 					mo = new MessageObject(Description.ERROR, e);
@@ -908,11 +907,11 @@ public abstract class JSONRPCThreadedClient {
 		Thread thread = new Thread(){
 			@Override
 			public void run() {
-				MessageObject mo = null;
-				JSONObject response = null;
+				MessageObject mo;
+				JSONObject response;
 				try {
 					response = doRequest(method, params);
-					mo = new MessageObject(Description.NORMAL_RESPONSE, 
+					mo = new MessageObject(Description.NORMAL_RESPONSE,
 							response.getJSONArray(JSON_RESULT));
 				} catch (JSONRPCException e) {
 					mo = new MessageObject(Description.ERROR, e);
@@ -955,11 +954,11 @@ public abstract class JSONRPCThreadedClient {
 		Thread thread = new Thread(){
 			@Override
 			public void run() {
-				MessageObject mo = null;
-				JSONObject response =  null;
+				MessageObject mo;
+				JSONObject response;
 				try {
 					response = doRequest(method, params);
-					mo = new MessageObject(Description.NORMAL_RESPONSE, 
+					mo = new MessageObject(Description.NORMAL_RESPONSE,
 							response.getJSONArray(JSON_RESULT));
 				} catch (JSONRPCException e) {
 					mo = new MessageObject(Description.ERROR, e);

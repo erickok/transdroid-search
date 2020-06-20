@@ -138,7 +138,7 @@ public class YtsAdapter implements ISearchAdapter {
     }
 
     @Override
-    public InputStream getTorrentFile(SharedPreferences prefs, String url) throws Exception {
+    public InputStream getTorrentFile(SharedPreferences prefs, String url) {
         return null;
     }
 

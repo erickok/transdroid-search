@@ -108,7 +108,7 @@ public class NcoreAdapter implements ISearchAdapter {
 
     }
 
-    protected List<SearchResult> parseHtml(String html, int maxResults) throws Exception {
+    protected List<SearchResult> parseHtml(String html, int maxResults) {
 
         // Texts to find subsequently
         final String NOMATCH = "lista_mini_error";
@@ -159,13 +159,13 @@ public class NcoreAdapter implements ISearchAdapter {
 
 
 
-        int idStart = htmlItem.indexOf(ID_TORRENT, 0) + ID_TORRENT.length();
+        int idStart = htmlItem.indexOf(ID_TORRENT) + ID_TORRENT.length();
         String id = htmlItem.substring(idStart, htmlItem.indexOf(ID_END, idStart));
 
         String details = PREF_SITE + PREF_DETAILS + id;
         String link    = PREF_SITE + PREF_DOWNLOAD+ id;
 
-        int nameStart = htmlItem.indexOf(NAME, 0) + NAME.length();
+        int nameStart = htmlItem.indexOf(NAME) + NAME.length();
         String name = htmlItem.substring(nameStart, htmlItem.indexOf(NAME_END, nameStart));
 
         int dateStart = htmlItem.indexOf(DATE, nameStart) + DATE.length();

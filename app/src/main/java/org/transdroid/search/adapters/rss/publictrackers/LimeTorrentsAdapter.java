@@ -67,7 +67,7 @@ public class LimeTorrentsAdapter extends RssFeedSearchAdapter {
 	/**
 	 * Custom item with the torrent size and seeders and leechters numbers
 	 */
-	public class LimeTorrentsItem extends Item {
+	public static class LimeTorrentsItem extends Item {
 		public int seeders, leechers;
 		public long size;
 	}
@@ -75,7 +75,7 @@ public class LimeTorrentsAdapter extends RssFeedSearchAdapter {
 	/**
 	 * Custom parser to parse the additional comments data property
 	 */
-	public class LimeTorrentsParser extends RssParser {
+	public static class LimeTorrentsParser extends RssParser {
 
 		public LimeTorrentsParser(String url) {
 			super(url);
@@ -102,13 +102,13 @@ public class LimeTorrentsAdapter extends RssFeedSearchAdapter {
 	    			if (leechersStart >= 0) {
 	    				theItem.leechers = Integer.parseInt(description.substring(leechersStart + leechersText.length()));
 	    			}
-	    		} catch (NumberFormatException e) {
+	    		} catch (NumberFormatException ignored) {
 	    		}
 	    	}
 	    	if (localName.equalsIgnoreCase("size")) {
 	    		try {
 	    			theItem.size = Long.parseLong(text.trim());
-	    		} catch (NumberFormatException e) {
+	    		} catch (NumberFormatException ignored) {
 	    		}
 	    	}
 	    }

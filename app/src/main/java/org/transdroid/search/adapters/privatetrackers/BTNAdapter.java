@@ -141,9 +141,9 @@ public class BTNAdapter implements ISearchAdapter {
 			}
 		} catch (JSONException e) {
 			e.printStackTrace();
-		} finally {
-			return results;
 		}
+		return results;
+
 	}
 
 	@Override
@@ -173,7 +173,7 @@ public class BTNAdapter implements ISearchAdapter {
 		return null;
 	}
 
-	class TorrentSeedsComparator implements Comparator<SearchResult> {
+	static class TorrentSeedsComparator implements Comparator<SearchResult> {
 		public int compare(SearchResult tor1, SearchResult tor2) {
 			return tor2.getSeeds() - tor1.getSeeds();
 		}

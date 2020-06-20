@@ -171,14 +171,13 @@ public class HdTorrentsAdapter implements ISearchAdapter {
 
         HttpPost request = new HttpPost(LOGIN_URL);
         request.setEntity(new UrlEncodedFormEntity(Arrays
-                .asList(new BasicNameValuePair[] {
-                        new BasicNameValuePair(LOGIN_POST_USERNAME, username),
-                        new BasicNameValuePair(LOGIN_POST_PASSWORD, password) })));
+                .asList(new BasicNameValuePair(LOGIN_POST_USERNAME, username),
+                        new BasicNameValuePair(LOGIN_POST_PASSWORD, password))));
 
         client.execute(request);
 
         // verify we have the cookies needed to log in
-        boolean success = false, uid = false, pass = false, hash = false;
+        boolean success, uid = false, pass = false, hash = false;
         for (Cookie cookie : client.getCookieStore().getCookies()) {
             if ("uid".equals(cookie.getName())) uid = true;
             if ("pass".equals(cookie.getName())) pass = true;
@@ -199,10 +198,10 @@ public class HdTorrentsAdapter implements ISearchAdapter {
     // SEARCH LOGIC
     // =========================================================
 
-    protected List<SearchResult> parseHtml(String html, int maxResults) throws Exception {
+    protected List<SearchResult> parseHtml(String html, int maxResults) {
         Log.d(LOG_TAG, "Parsing search results");
 
-        List<SearchResult> results = new ArrayList<SearchResult>();
+        List<SearchResult> results = new ArrayList<>();
 
         final DateFormat parseDateFormat = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z");
 
@@ -221,14 +220,14 @@ public class HdTorrentsAdapter implements ISearchAdapter {
             String title = null;
             try {
                 title = itemString.substring(0, itemString.indexOf("</A>"));
-            } catch (Exception e) {}
+            } catch (Exception ignored) {}
 
             String downloadUrl = null;
             try {
                 int downloadStart = itemString.indexOf("=download") + 1;
                 int downloadEnd = itemString.indexOf(TORRENT_STRING) + TORRENT_STRING.length();
                 downloadUrl = URL_PREFIX + itemString.substring(downloadStart, downloadEnd);
-            } catch (Exception e) {}
+            } catch (Exception ignored) {}
 
             Date date = null;
             int seeders = -1;
@@ -236,7 +235,7 @@ public class HdTorrentsAdapter implements ISearchAdapter {
             String size = null;
             try {
                 int dateSearchStart = itemString.indexOf(DATE_START_SEARCH_STRING) + DATE_START_SEARCH_STRING.length();
-                String dateSearchString = itemString.substring(dateSearchStart, itemString.length());
+                String dateSearchString = itemString.substring(dateSearchStart);
                 int dateEnd =  dateSearchString.indexOf(DATE_END_STRING);
                 String dateString = dateSearchString.substring(dateSearchString.indexOf(DATE_START_STRING) + DATE_START_STRING.length(), dateEnd);
                 date = parseDateFormat.parse(dateString);
@@ -253,7 +252,7 @@ public class HdTorrentsAdapter implements ISearchAdapter {
                 String seedersString = itemString.substring(seedStart, seedEnd);
                 seeders = Integer.parseInt(seedersString);
                 leechers = Integer.parseInt(leechersString);
-            } catch (Exception e) {}
+            } catch (Exception ignored) {}
 
             String imdbString = null;
             try {
@@ -261,7 +260,7 @@ public class HdTorrentsAdapter implements ISearchAdapter {
                 if (imbdStart >= 10) {
                     imdbString = itemString.substring(imbdStart, itemString.indexOf(IMDB_END_STRING, imbdStart));
                 }
-            } catch (Exception e) {}
+            } catch (Exception ignored) {}
 
             if (title != null && downloadUrl != null) {
                 SearchResult result = new SearchResult(title, downloadUrl, imdbString, size, date, seeders, leechers);

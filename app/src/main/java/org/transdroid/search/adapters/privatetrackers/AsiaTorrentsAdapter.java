@@ -19,7 +19,6 @@
 package org.transdroid.search.adapters.privatetrackers;
 
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.security.InvalidParameterException;
 import java.text.*;
@@ -73,7 +72,9 @@ public class AsiaTorrentsAdapter implements ISearchAdapter {
 
 		// First log in
 		HttpPost loginPost = new HttpPost(LOGINURL);
-		loginPost.setEntity(new UrlEncodedFormEntity(Arrays.asList(new BasicNameValuePair[]{new BasicNameValuePair(LOGIN_USER, username), new BasicNameValuePair(LOGIN_PASS, password)})));
+		loginPost.setEntity(new UrlEncodedFormEntity(Arrays.asList(
+				new BasicNameValuePair(LOGIN_USER, username),
+				new BasicNameValuePair(LOGIN_PASS, password))));
 		HttpResponse loginResult = httpclient.execute(loginPost);
 		if (loginResult.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
 			// Failed to sign in
@@ -90,12 +91,8 @@ public class AsiaTorrentsAdapter implements ISearchAdapter {
 		DefaultHttpClient httpclient = prepareRequest(prefs);
 
 		// Build a search request parameters
-		String encodedQuery = "";
-		try {
-			encodedQuery = URLEncoder.encode(query, "UTF-8");
-		} catch (UnsupportedEncodingException e) {
-			throw e;
-		}
+		String encodedQuery;
+		encodedQuery = URLEncoder.encode(query, "UTF-8");
 
 		final String url = String.format(QUERYURL, encodedQuery/*, (order == SortOrder.BySeeders ? SORT_SEEDS : SORT_COMPOSITE)*/);
 
@@ -132,7 +129,7 @@ public class AsiaTorrentsAdapter implements ISearchAdapter {
 			final String TORRENT = "<td class=\"lista\" valign=\"middle\" onMouseOver=";
 
 			// Parse the search results from HTML by looking for the identifying texts
-			List<SearchResult> results = new ArrayList<SearchResult>();
+			List<SearchResult> results = new ArrayList<>();
 			//if (html.indexOf(NOMATCH) >= 0)
 				//return results; // Success, but no result for this query
 			int resultsStart = html.indexOf(RESULTS) + RESULTS.length();

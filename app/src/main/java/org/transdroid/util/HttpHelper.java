@@ -21,10 +21,7 @@ package org.transdroid.util;
 import org.apache.http.Header;
 import org.apache.http.HeaderElement;
 import org.apache.http.HttpEntity;
-import org.apache.http.HttpException;
-import org.apache.http.HttpRequest;
 import org.apache.http.HttpRequestInterceptor;
-import org.apache.http.HttpResponse;
 import org.apache.http.HttpResponseInterceptor;
 import org.apache.http.conn.scheme.PlainSocketFactory;
 import org.apache.http.conn.scheme.Scheme;
@@ -35,7 +32,6 @@ import org.apache.http.impl.conn.tsccm.ThreadSafeClientConnManager;
 import org.apache.http.params.BasicHttpParams;
 import org.apache.http.params.HttpConnectionParams;
 import org.apache.http.params.HttpParams;
-import org.apache.http.protocol.HttpContext;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -71,33 +67,28 @@ public class HttpHelper {
 	/**
 	 * HTTP request interceptor to allow for GZip-encoded data transfer
 	 */
-	public static HttpRequestInterceptor gzipRequestInterceptor = new HttpRequestInterceptor() {
-		public void process(final HttpRequest request, final HttpContext context) throws HttpException, IOException {
-			if (!request.containsHeader("Accept-Encoding")) {
-				request.addHeader("Accept-Encoding", "gzip");
-			}
+	public static HttpRequestInterceptor gzipRequestInterceptor = (request, context) -> {
+		if (!request.containsHeader("Accept-Encoding")) {
+			request.addHeader("Accept-Encoding", "gzip");
 		}
 	};
 
 	/**
 	 * HTTP response interceptor that decodes GZipped data
 	 */
-	public static HttpResponseInterceptor gzipResponseInterceptor = new HttpResponseInterceptor() {
-		public void process(final HttpResponse response, final HttpContext context) throws HttpException, IOException {
-			HttpEntity entity = response.getEntity();
-			Header ceheader = entity.getContentEncoding();
-			if (ceheader != null) {
-				HeaderElement[] codecs = ceheader.getElements();
-				for (HeaderElement codec : codecs) {
+	public static HttpResponseInterceptor gzipResponseInterceptor = (response, context) -> {
+		HttpEntity entity = response.getEntity();
+		Header ceheader = entity.getContentEncoding();
+		if (ceheader != null) {
+			HeaderElement[] codecs = ceheader.getElements();
+			for (HeaderElement codec : codecs) {
 
-					if (codec.getName().equalsIgnoreCase("gzip")) {
-						response.setEntity(new GzipDecompressingEntity(response.getEntity()));
-						return;
-					}
+				if (codec.getName().equalsIgnoreCase("gzip")) {
+					response.setEntity(new GzipDecompressingEntity(response.getEntity()));
+					return;
 				}
 			}
 		}
-
 	};
 
 	/**

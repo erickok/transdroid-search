@@ -73,13 +73,10 @@ public class CustomSitePreference extends DialogPreference {
         urlEdit.setText(SettingsHelper.getCustomSiteUrl(prefs, index));
         // Show delete button
         ImageButton deleteButton = dialog.findViewById(R.id.delete);
-        deleteButton.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                SettingsHelper.removeCustomSite(prefs, index);
-                getDialog().dismiss();
-                onCustomSiteChanged.onCustomSiteChanged();
-            }
+        deleteButton.setOnClickListener(v -> {
+            SettingsHelper.removeCustomSite(prefs, index);
+            getDialog().dismiss();
+            onCustomSiteChanged.onCustomSiteChanged();
         });
         return dialog;
     }

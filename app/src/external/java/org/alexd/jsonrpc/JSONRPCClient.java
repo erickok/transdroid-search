@@ -6,7 +6,6 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import org.alexd.jsonrpc.JSONRPCException;
 import org.alexd.jsonrpc.JSONRPCParams.Versions;
 import org.apache.http.protocol.HTTP;
 
@@ -71,12 +70,11 @@ public abstract class JSONRPCClient {
 	{
 		//Copy method arguments in a json array
 		JSONArray jsonParams = new JSONArray();
-		for (int i=0; i<params.length; i++)
-		{
-			if(params[i].getClass().isArray()){
-				jsonParams.put(getJSONArray((Object[])params[i]));
+		for (Object param : params) {
+			if (param.getClass().isArray()) {
+				jsonParams.put(getJSONArray((Object[]) param));
 			}
-			jsonParams.put(params[i]);
+			jsonParams.put(param);
 		}
 		
 		//Create the json request object

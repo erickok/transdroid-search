@@ -54,12 +54,12 @@ public class TlsSniSocketFactory implements LayeredSocketFactory {
 	// Plain TCP/IP (layer below TLS)
 
 	@Override
-	public Socket connectSocket(Socket s, String host, int port, InetAddress localAddress, int localPort, HttpParams params) throws IOException {
+	public Socket connectSocket(Socket s, String host, int port, InetAddress localAddress, int localPort, HttpParams params) {
 		return null;
 	}
 
 	@Override
-	public Socket createSocket() throws IOException {
+	public Socket createSocket() {
 		return null;
 	}
 

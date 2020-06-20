@@ -11,15 +11,13 @@ import android.util.Log;
 
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
-import com.android.volley.Response;
-import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 
 public class JsonRpcService {
 	
 	public interface Listener<E>{
-		public void onResult(E response);
+		void onResult(E response);
 	}
 	
 	private static final String TAG = JsonRpcService.class.toString();
@@ -69,19 +67,8 @@ public class JsonRpcService {
 		try{
 			JsonObjectRequest request = new JsonObjectRequest(METHODE_TYPE, serviceUrl,
 					getJsonRequest(method, parameters),
-					new Response.Listener<JSONObject>() {
-
-						@Override
-						public void onResponse(JSONObject response) {
-							Log.d(TAG, response.toString());
-						}
-					},
-					new Response.ErrorListener() {
-						@Override
-						public void onErrorResponse(VolleyError error) {
-							Log.e(TAG, error.toString());
-						}
-					});
+					response -> Log.d(TAG, response.toString()),
+					error -> Log.e(TAG, error.toString()));
 			queue.add(request);
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -92,19 +79,8 @@ public class JsonRpcService {
 		try{
 			JsonObjectRequest request = new JsonObjectRequest(METHODE_TYPE, serviceUrl,
 					getJsonRequest(method, parameters),
-					new Response.Listener<JSONObject>() {
-
-						@Override
-						public void onResponse(JSONObject response) {
-							Log.d(TAG, response.toString());
-						}
-					},
-					new Response.ErrorListener() {
-						@Override
-						public void onErrorResponse(VolleyError error) {
-							Log.e(TAG, error.toString());
-						}
-					});
+					response -> Log.d(TAG, response.toString()),
+					error -> Log.e(TAG, error.toString()));
 			queue.add(request);
 		} catch (JSONException e) {
 			e.printStackTrace();
@@ -112,142 +88,72 @@ public class JsonRpcService {
 	}
 	
 	public void callString(final Listener<String> listener, String method, JSONObject parameters){
-		Listener<Object> intListener = new Listener<Object>() {
-			@Override
-			public void onResult(Object response) {
-				listener.onResult((String)response);
-			}
-		};
+		Listener<Object> intListener = response -> listener.onResult((String)response);
 		call(intListener, method, parameters);
 	}
 	
 	public void callString(final Listener<String> listener, String method, Object ... parameters){
-		Listener<Object> intListener = new Listener<Object>() {
-			@Override
-			public void onResult(Object response) {
-				listener.onResult((String)response);
-			}
-		};
+		Listener<Object> intListener = response -> listener.onResult((String)response);
 		call(intListener, method, parameters);
 	}
 	
 	public void callInt(final Listener<Integer> listener, String method, JSONObject parameters){
-		Listener<Object> intListener = new Listener<Object>() {
-			@Override
-			public void onResult(Object response) {
-				listener.onResult((Integer)response);
-			}
-		};
+		Listener<Object> intListener = response -> listener.onResult((Integer)response);
 		call(intListener, method, parameters);
 	}
 
 	public void callInt(final Listener<Integer> listener, String method, Object ... parameters){
-		Listener<Object> intListener = new Listener<Object>() {
-			@Override
-			public void onResult(Object response) {
-				listener.onResult((Integer)response);
-			}
-		};
+		Listener<Object> intListener = response -> listener.onResult((Integer)response);
 		call(intListener, method, parameters);
 	}
 	
 	public void callLong(final Listener<Long> listener, String method, JSONObject parameters){
-		Listener<Object> intListener = new Listener<Object>() {
-			@Override
-			public void onResult(Object response) {
-				listener.onResult((Long)response);
-			}
-		};
+		Listener<Object> intListener = response -> listener.onResult((Long)response);
 		call(intListener, method, parameters);
 	}
 	
 	public void callLong(final Listener<Long> listener, String method, Object ... parameters){
-		Listener<Object> intListener = new Listener<Object>() {
-			@Override
-			public void onResult(Object response) {
-				listener.onResult((Long)response);
-			}
-		};
+		Listener<Object> intListener = response -> listener.onResult((Long)response);
 		call(intListener, method, parameters);
 	}
 	
 	public void callBoolean(final Listener<Boolean> listener, String method, JSONObject parameters){
-		Listener<Object> intListener = new Listener<Object>() {
-			@Override
-			public void onResult(Object response) {
-				listener.onResult((Boolean)response);
-			}
-		};
+		Listener<Object> intListener = response -> listener.onResult((Boolean)response);
 		call(intListener, method, parameters);
 	}
 	
 	public void callBoolean(final Listener<Boolean> listener, String method, Object ... parameters){
-		Listener<Object> intListener = new Listener<Object>() {
-			@Override
-			public void onResult(Object response) {
-				listener.onResult((Boolean)response);
-			}
-		};
+		Listener<Object> intListener = response -> listener.onResult((Boolean)response);
 		call(intListener, method, parameters);
 	}
 	
 	public void callDouble(final Listener<Double> listener, String method, JSONObject parameters){
-		Listener<Object> intListener = new Listener<Object>() {
-			@Override
-			public void onResult(Object response) {
-				listener.onResult((Double)response);
-			}
-		};
+		Listener<Object> intListener = response -> listener.onResult((Double)response);
 		call(intListener, method, parameters);
 	}
 	
 	public void callDouble(final Listener<Double> listener, String method, Object ... parameters){
-		Listener<Object> intListener = new Listener<Object>() {
-			@Override
-			public void onResult(Object response) {
-				listener.onResult((Double)response);
-			}
-		};
+		Listener<Object> intListener = response -> listener.onResult((Double)response);
 		call(intListener, method, parameters);
 	}
 	
 	public void callJsonObject(final Listener<JSONObject> listener, String method, JSONObject parameters){
-		Listener<Object> intListener = new Listener<Object>() {
-			@Override
-			public void onResult(Object response) {
-				listener.onResult((JSONObject)response);
-			}
-		};
+		Listener<Object> intListener = response -> listener.onResult((JSONObject)response);
 		call(intListener, method, parameters);
 	}
 	
 	public void callJsonObject(final Listener<JSONObject> listener, String method, Object ... parameters){
-		Listener<Object> intListener = new Listener<Object>() {
-			@Override
-			public void onResult(Object response) {
-				listener.onResult((JSONObject)response);
-			}
-		};
+		Listener<Object> intListener = response -> listener.onResult((JSONObject)response);
 		call(intListener, method, parameters);
 	}
 	
 	public void callJsonArray(final Listener<JSONArray> listener, String method, JSONObject parameters){
-		Listener<Object> intListener = new Listener<Object>() {
-			@Override
-			public void onResult(Object response) {
-				listener.onResult((JSONArray)response);
-			}
-		};
+		Listener<Object> intListener = response -> listener.onResult((JSONArray)response);
 		call(intListener, method, parameters);
 	}
 	
 	public void callJsonArray(final Listener<JSONArray> listener, String method, Object ... parameters){
-		Listener<Object> intListener = new Listener<Object>() {
-			@Override
-			public void onResult(Object response) {
-				listener.onResult((JSONArray)response);
-			}
-		};
+		Listener<Object> intListener = response -> listener.onResult((JSONArray)response);
 		call(intListener, method, parameters);
 	}
 	

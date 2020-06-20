@@ -64,7 +64,7 @@ public class NyaaTorrentsAdapter extends RssFeedSearchAdapter {
 	/**
 	 * Custom Item with addition torrentLink. size, seeders and leechers data properties
 	 */
-	public class NyaaTorrentsItem extends Item {
+	public static class NyaaTorrentsItem extends Item {
 		private String torrentLink;
 		private String size;
 		private int seeders;
@@ -86,7 +86,7 @@ public class NyaaTorrentsAdapter extends RssFeedSearchAdapter {
 	/**
 	 * Custom parser to parse the additional torrentLink. size, seeders and leechers data properties
 	 */
-	public class NyaaTorrentsRssParser extends RssParser {
+	public static class NyaaTorrentsRssParser extends RssParser {
 
 		public NyaaTorrentsRssParser(String url) {
 			super(url);

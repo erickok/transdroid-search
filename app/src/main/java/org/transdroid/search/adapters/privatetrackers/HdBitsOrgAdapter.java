@@ -198,16 +198,15 @@ public class HdBitsOrgAdapter implements ISearchAdapter {
 
         HttpPost request = new HttpPost(LOGIN_URL);
         request.setEntity(new UrlEncodedFormEntity(Arrays
-                .asList(new BasicNameValuePair[] {
-                        new BasicNameValuePair(LOGIN_POST_USERNAME, username),
+                .asList(new BasicNameValuePair(LOGIN_POST_USERNAME, username),
                         new BasicNameValuePair(LOGIN_POST_PASSWORD, password),
                         new BasicNameValuePair(LOGIN_POST_TOKEN, token),
-                        new BasicNameValuePair("returnto", "%2F") })));
+                        new BasicNameValuePair("returnto", "%2F"))));
 
         client.execute(request);
 
         // verify we have the cookies needed to log in
-        boolean success = false, uid = false, pass = false, hash = false;
+        boolean success, uid = false, pass = false, hash = false;
         for (Cookie cookie : client.getCookieStore().getCookies()) {
             if ("uid".equals(cookie.getName())) uid = true;
             if ("pass".equals(cookie.getName())) pass = true;
@@ -228,10 +227,10 @@ public class HdBitsOrgAdapter implements ISearchAdapter {
     // SEARCH LOGIC
     // =========================================================
 
-    protected List<SearchResult> parseHtml(String html, int maxResults) throws Exception {
+    protected List<SearchResult> parseHtml(String html, int maxResults) {
         Log.d(LOG_TAG, "Parsing search results.");
 
-        List<SearchResult> results = new ArrayList<SearchResult>();
+        List<SearchResult> results = new ArrayList<>();
         int matchCount = 0;
         int errorCount = 0;
 

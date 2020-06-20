@@ -58,8 +58,8 @@ public class MoreThanTvAdapter extends AbstractHtmlAdapter {
         }
         final Elements numberColumns = torrentElement.select("td[class^='number_column']");
         final String size = numberColumns.get(0).text();
-        final int seeds = Integer.valueOf(numberColumns.get(2).text());
-        final int leechers = Integer.valueOf(numberColumns.get(3).text());
+        final int seeds = Integer.parseInt(numberColumns.get(2).text());
+        final int leechers = Integer.parseInt(numberColumns.get(3).text());
 
         return new SearchResult(title, torrentUrl, detailsUrl, size, added, seeds, leechers);
     }

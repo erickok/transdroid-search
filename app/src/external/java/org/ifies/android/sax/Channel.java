@@ -12,8 +12,8 @@ import java.util.List;
 public class Channel {
        
         public Channel() {
-                setCategories(new ArrayList<String>());
-                setItems(new ArrayList<Item>());
+                setCategories(new ArrayList<>());
+                setItems(new ArrayList<>());
         }
        
         public void setId(int id) {

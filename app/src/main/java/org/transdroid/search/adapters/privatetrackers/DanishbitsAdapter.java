@@ -76,7 +76,7 @@ public class DanishbitsAdapter implements ISearchAdapter {
 		HttpResponse loginResult = httpclient.execute(loginPost);
 		String loginHtml = HttpHelper.convertStreamToString(loginResult.getEntity().getContent());
 		final String LOGIN_ERROR = "<form id=\"loginform\" method=\"post\" action=\"login.php\">";
-		if (loginResult.getStatusLine().getStatusCode() != HttpStatus.SC_OK || loginHtml.indexOf(LOGIN_ERROR) >= 0) {
+		if (loginResult.getStatusLine().getStatusCode() != HttpStatus.SC_OK || loginHtml.contains(LOGIN_ERROR)) {
 			// Failed to sign in
 			throw new LoginException("Login failure for DanishBits with user " + username);
 		}
@@ -115,7 +115,7 @@ public class DanishbitsAdapter implements ISearchAdapter {
 
 	}
 
-	protected List<SearchResult> parseHtml(String html, int maxResults) throws Exception {
+	protected List<SearchResult> parseHtml(String html, int maxResults) {
 
 		// Texts to find subsequently
 		final String NOTORRENTS = "</a></td></tr></table>";

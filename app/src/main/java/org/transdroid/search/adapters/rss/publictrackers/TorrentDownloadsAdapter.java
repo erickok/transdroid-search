@@ -37,13 +37,15 @@ public class TorrentDownloadsAdapter extends RssFeedSearchAdapter {
 
 	private static final String DOMAIN = "https://torrentdownloads.unblocker.cc";
 
-	protected SearchResult fromRssItemToSearchResult(Item item) {
+	protected SearchResult fromRssItemToSearchResult(Item item) throws UnsupportedEncodingException {
 		// Direct .torrent file download in style http://www.torrentdownloads.me/torrent/<id>/<title>
 		// Web links (as appearing in the RSS item) in style http://www.torrentdownloads.me/download/<id>/<title>
 		TorrentDownloadsItem theItem = (TorrentDownloadsItem) item;
 		return new SearchResult(
 				item.getTitle(),
-				"magnet:?xt=urn:btih:" + item.getInfoHash().toLowerCase() + "&dn=" + URLEncoder.encode(item.getTitle(), "UTF-8"),
+				"magnet:?xt=urn:btih:" + ((TorrentDownloadsItem) item)
+						.getInfoHash().toLowerCase() + "&dn=" +
+						URLEncoder.encode(item.getTitle(), "UTF-8"),
 				DOMAIN + item.getLink(),
 				FileSizeConverter.getSize(theItem.getSize()),
 				item.getPubdate(),
@@ -70,7 +72,7 @@ public class TorrentDownloadsAdapter extends RssFeedSearchAdapter {
 	/**
 	 * Custom Item with addition size, seeders and leechers data properties
 	 */
-	public class TorrentDownloadsItem extends Item {
+	public static class TorrentDownloadsItem extends Item {
 		private long size;
 		private int seeders;
 		private int leechers;
@@ -88,7 +90,7 @@ public class TorrentDownloadsAdapter extends RssFeedSearchAdapter {
 	/**
 	 * Custom parser to parse the additional size, seeders and leechers data properties
 	 */
-	public class TorrentDownloadsRssParser extends RssParser {
+	public static class TorrentDownloadsRssParser extends RssParser {
 
 		public TorrentDownloadsRssParser(String url) {
 			super(url);
@@ -110,7 +112,7 @@ public class TorrentDownloadsAdapter extends RssFeedSearchAdapter {
 	    		theItem.setLeechers(Integer.parseInt(text.trim()));
 	    	}
 	    	if (localName.equalsIgnoreCase("info_hash")) {
-	    		theItem.setInfoHash(text.trim);
+	    		theItem.setInfoHash(text.trim());
 	    	}
 	    }
 	}

@@ -19,6 +19,7 @@
 package org.transdroid.search.adapters.rss;
 
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -48,7 +49,7 @@ public abstract class RssFeedSearchAdapter implements ISearchAdapter {
 	 * @param item The RSS item element, containing title, URL, description, etc.
 	 * @return A result object that is properly filled with data
 	 */
-	protected abstract SearchResult fromRssItemToSearchResult(Item item);
+	protected abstract SearchResult fromRssItemToSearchResult(Item item) throws UnsupportedEncodingException;
 
 	/**
 	 * Returns the RSS feed URL for a search query. Typically, you return URL-encode

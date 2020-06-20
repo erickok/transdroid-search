@@ -31,8 +31,7 @@
 		android:icon="@drawable/ic_launcher"
 		android:label="Torrent Search (by Transdroid)"
 		android:description="@string/app_description"
-		android:theme="@style/Theme.Transdroid.Search"
-		tools:ignore="GoogleAppIndexingWarning">
+		android:theme="@style/Theme.Transdroid.Search">
 
 		<uses-library
 			android:name="org.apache.http.legacy"
@@ -60,13 +59,13 @@
 			</intent-filter>
 		</activity>
 
-		<activity
+		<!--activity
 			android:name=".gui.SettingsActivityCompat"
 			android:label="@string/pref_settingslabel" />
 
 		<activity
 			android:name=".gui.SettingsActivityModern"
-			android:label="@string/pref_settingslabel" />
+			android:label="@string/pref_settingslabel" /-->
 
 	</application>
 

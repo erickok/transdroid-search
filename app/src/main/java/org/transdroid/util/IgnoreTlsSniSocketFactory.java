@@ -51,12 +51,12 @@ import javax.net.ssl.TrustManager;
 public class IgnoreTlsSniSocketFactory implements LayeredSocketFactory {
 
 	@Override
-	public Socket connectSocket(Socket s, String host, int port, InetAddress localAddress, int localPort, HttpParams params) throws IOException {
+	public Socket connectSocket(Socket s, String host, int port, InetAddress localAddress, int localPort, HttpParams params) {
 		return null;
 	}
 
 	@Override
-	public Socket createSocket() throws IOException {
+	public Socket createSocket() {
 		return null;
 	}
 

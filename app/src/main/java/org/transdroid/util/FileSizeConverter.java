@@ -71,7 +71,7 @@ public class FileSizeConverter {
 	// Returns a file size in bytes in a nice readable formatted string
 	public static String getSize(long from, boolean withUnit) {
 		if (from < INC_SIZE) {
-			return String.valueOf(from) + (withUnit? SizeUnit.B.toString(): "");
+			return from + (withUnit? SizeUnit.B.toString(): "");
 		} else if (from < (INC_SIZE * INC_SIZE)) { 
 			return String.format(DECIMAL_FORMATTER, ((double)from) / INC_SIZE) + (withUnit? SizeUnit.KB.toString(): "");
 		} else if (from < (INC_SIZE * INC_SIZE * INC_SIZE)) {

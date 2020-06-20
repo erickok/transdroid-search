@@ -102,17 +102,14 @@ public class JSONRPCThreadedHttpClient extends JSONRPCThreadedClient
 			responseString = responseString.trim();
 			JSONObject jsonResponse = new JSONObject(responseString);
 			// Check for remote errors
+			// JSON-RPC 2.0
 			if (jsonResponse.has("error"))
 			{
 				Object jsonError = jsonResponse.get("error");
 				if (!jsonError.equals(null))
 					throw new JSONRPCException(jsonResponse.get("error"));
-				return jsonResponse; // JSON-RPC 1.0
 			}
-			else
-			{
-				return jsonResponse; // JSON-RPC 2.0
-			}
+			return jsonResponse; // JSON-RPC 1.0
 		}
 		// Underlying errors are wrapped into a JSONRPCException instance
 		catch (ClientProtocolException e)

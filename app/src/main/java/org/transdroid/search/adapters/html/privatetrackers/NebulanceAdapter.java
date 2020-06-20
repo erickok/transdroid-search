@@ -68,8 +68,8 @@ public class NebulanceAdapter extends AbstractHtmlAdapter {
         final Elements children = torrentElement.children();
         final int numChildren = children.size();
 
-        final int seeds = Integer.valueOf(children.get(numChildren - 2).text());
-        final int leechers = Integer.valueOf(children.get(numChildren - 1).text());
+        final int seeds = Integer.parseInt(children.get(numChildren - 2).text());
+        final int leechers = Integer.parseInt(children.get(numChildren - 1).text());
 
         return new SearchResult(title, torrentUrl, detailsUrl, size, date, seeds, leechers);
     }

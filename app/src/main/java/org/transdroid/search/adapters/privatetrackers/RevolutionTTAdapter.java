@@ -72,11 +72,11 @@ public class RevolutionTTAdapter implements ISearchAdapter {
 		// First log in
 		HttpPost loginPost = new HttpPost(LOGINURL);
 		loginPost.setEntity(new UrlEncodedFormEntity(
-				Arrays.asList(new BasicNameValuePair[]{new BasicNameValuePair("username", username), new BasicNameValuePair("password", password)})));
+				Arrays.asList(new BasicNameValuePair("username", username), new BasicNameValuePair("password", password))));
 		HttpResponse loginResult = httpclient.execute(loginPost);
 		String loginHtml = HttpHelper.convertStreamToString(loginResult.getEntity().getContent());
 		final String LOGIN_ERROR = "Login failed!";
-		if (loginResult.getStatusLine().getStatusCode() != HttpStatus.SC_OK || loginHtml.indexOf(LOGIN_ERROR) >= 0) {
+		if (loginResult.getStatusLine().getStatusCode() != HttpStatus.SC_OK || loginHtml.contains(LOGIN_ERROR)) {
 			// Failed to sign in
 			throw new LoginException("Login failure for RevolutionTT with user " + username);
 		}
@@ -115,7 +115,7 @@ public class RevolutionTTAdapter implements ISearchAdapter {
 
 	}
 
-	protected List<SearchResult> parseHtml(String html, int maxResults) throws Exception {
+	protected List<SearchResult> parseHtml(String html, int maxResults) {
 
 		// Texts to find subsequently
 		final String NOTORRENTS = "Nothing found!";

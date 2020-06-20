@@ -238,15 +238,12 @@ public class TorrentSearchProvider extends ContentProvider {
 
 				// Write a temporary file with the torrent contents
 				tempFile = File.createTempFile("transdroidsearch_", ".torrent", getContext().getCacheDir());
-				FileOutputStream output = new FileOutputStream(tempFile);
-				try {
+				try (FileOutputStream output = new FileOutputStream(tempFile)) {
 					final byte[] buffer = new byte[1024];
 					int read;
 					while ((read = input.read(buffer)) != -1)
 						output.write(buffer, 0, read);
 					output.flush();
-				} finally {
-					output.close();
 				}
 			} catch (IOException e) {
 				Log.e(TorrentSearchProvider.class.getSimpleName(), "Can't write input stream for " + url + " to "
@@ -286,11 +283,7 @@ public class TorrentSearchProvider extends ContentProvider {
             	
             	Looper.prepare();
                 Handler handler = new Handler();
-                handler.post(new Runnable() {
-                    @Override public void run() {
-                        Toast.makeText(context, context.getString(resourceId), Toast.LENGTH_LONG).show();
-                    }
-                });                
+                handler.post(() -> Toast.makeText(context, context.getString(resourceId), Toast.LENGTH_LONG).show());
                 Looper.loop();
                 Looper.myLooper().quit();
             }
