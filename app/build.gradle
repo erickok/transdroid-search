@@ -1,8 +1,8 @@
 apply plugin: 'com.android.application'
+
 android {
     compileSdkVersion 28
-    buildToolsVersion "28.0.3"
-    useLibrary 'org.apache.http.legacy'
+    buildToolsVersion "29.0.3"
 
     defaultConfig {
         applicationId "org.transdroid.search"
@@ -12,9 +12,11 @@ android {
         versionName "4.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     }
+
     sourceSets {
         main.java.srcDirs += 'src/external/java'
     }
+
     signingConfigs {
         releaseConfig {
             keyAlias 'erickok'
@@ -23,16 +25,27 @@ android {
             storePassword ''
         }
     }
+
     buildTypes {
         release {
             signingConfig signingConfigs.releaseConfig
             minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
     }
+
+    compileOptions {
+        encoding = 'UTF-8'
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+
+    useLibrary 'org.apache.http.legacy'
 }
+
 dependencies {
     implementation 'org.jsoup:jsoup:1.11.2'
 
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
-    androidTestImplementation "com.google.truth:truth:0.42"
+    androidTestImplementation 'com.google.truth:truth:0.42'
 }
