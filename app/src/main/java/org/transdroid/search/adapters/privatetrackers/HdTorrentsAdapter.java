@@ -1,34 +1,25 @@
 /*
- *    This file is part of Transdroid Torrent Search 
+ *    This file is part of Transdroid Torrent Search
  *    <http://code.google.com/p/transdroid-search/>
- *    
- *    Transdroid Torrent Search is free software: you can redistribute 
- *    it and/or modify it under the terms of the GNU Lesser General 
- *    Public License as published by the Free Software Foundation, 
- *    either version 3 of the License, or (at your option) any later 
+ *
+ *    Transdroid Torrent Search is free software: you can redistribute
+ *    it and/or modify it under the terms of the GNU Lesser General
+ *    Public License as published by the Free Software Foundation,
+ *    either version 3 of the License, or (at your option) any later
  *    version.
- *    
- *    Transdroid Torrent Search is distributed in the hope that it will 
- *    be useful, but WITHOUT ANY WARRANTY; without even the implied 
- *    warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+ *
+ *    Transdroid Torrent Search is distributed in the hope that it will
+ *    be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *    warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *    See the GNU Lesser General Public License for more details.
- *    
- *    You should have received a copy of the GNU Lesser General Public 
+ *
+ *    You should have received a copy of the GNU Lesser General Public
  *    License along with Transdroid.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.transdroid.search.adapters.privatetrackers;
 
-import java.io.InputStream;
-import java.net.URLEncoder;
-import java.security.InvalidParameterException;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-
-import javax.security.auth.login.LoginException;
+import android.content.SharedPreferences;
+import android.util.Log;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
@@ -47,8 +38,17 @@ import org.transdroid.search.TorrentSite;
 import org.transdroid.search.gui.SettingsHelper;
 import org.transdroid.util.HttpHelper;
 
-import android.content.SharedPreferences;
-import android.util.Log;
+import java.io.InputStream;
+import java.net.URLEncoder;
+import java.security.InvalidParameterException;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+
+import javax.security.auth.login.LoginException;
 
 /**
  * An adapter that provides access to HD-Torrents.org searches by parsing the raw HTML output.
@@ -187,7 +187,7 @@ public class HdTorrentsAdapter implements ISearchAdapter {
         // if we don't have the correct cookies, login failed. notify user with a toast and toss an exception.
         success = uid && pass && hash;
         if (!success) {
-        	Log.e(LOG_TAG, "Failed to log into HD-Torrents as '" + username + "'. Did not receive expected login cookies!");
+            Log.e(LOG_TAG, "Failed to log into HD-Torrents as '" + username + "'. Did not receive expected login cookies!");
             throw new LoginException("Failed to log into HD-Torrents as '" + username + "'. Did not receive expected login cookies!");
         }
 
@@ -220,14 +220,16 @@ public class HdTorrentsAdapter implements ISearchAdapter {
             String title = null;
             try {
                 title = itemString.substring(0, itemString.indexOf("</A>"));
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
 
             String downloadUrl = null;
             try {
                 int downloadStart = itemString.indexOf("=download") + 1;
                 int downloadEnd = itemString.indexOf(TORRENT_STRING) + TORRENT_STRING.length();
                 downloadUrl = URL_PREFIX + itemString.substring(downloadStart, downloadEnd);
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
 
             Date date = null;
             int seeders = -1;
@@ -236,7 +238,7 @@ public class HdTorrentsAdapter implements ISearchAdapter {
             try {
                 int dateSearchStart = itemString.indexOf(DATE_START_SEARCH_STRING) + DATE_START_SEARCH_STRING.length();
                 String dateSearchString = itemString.substring(dateSearchStart);
-                int dateEnd =  dateSearchString.indexOf(DATE_END_STRING);
+                int dateEnd = dateSearchString.indexOf(DATE_END_STRING);
                 String dateString = dateSearchString.substring(dateSearchString.indexOf(DATE_START_STRING) + DATE_START_STRING.length(), dateEnd);
                 date = parseDateFormat.parse(dateString);
 
@@ -252,7 +254,8 @@ public class HdTorrentsAdapter implements ISearchAdapter {
                 String seedersString = itemString.substring(seedStart, seedEnd);
                 seeders = Integer.parseInt(seedersString);
                 leechers = Integer.parseInt(leechersString);
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
 
             String imdbString = null;
             try {
@@ -260,7 +263,8 @@ public class HdTorrentsAdapter implements ISearchAdapter {
                 if (imbdStart >= 10) {
                     imdbString = itemString.substring(imbdStart, itemString.indexOf(IMDB_END_STRING, imbdStart));
                 }
-            } catch (Exception ignored) {}
+            } catch (Exception ignored) {
+            }
 
             if (title != null && downloadUrl != null) {
                 SearchResult result = new SearchResult(title, downloadUrl, imdbString, size, date, seeders, leechers);
@@ -270,8 +274,7 @@ public class HdTorrentsAdapter implements ISearchAdapter {
             int nextResultStart = html.indexOf(START_STRING, resultEnd) + START_STRING.length();
             if (nextResultStart < resultStart) {
                 resultStart = -1;
-            }
-            else {
+            } else {
                 resultStart = nextResultStart;
             }
         }

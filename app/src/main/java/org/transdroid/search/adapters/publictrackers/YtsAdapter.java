@@ -65,7 +65,7 @@ public class YtsAdapter implements ISearchAdapter {
 
     private List<SearchResult> performSearch(String query, SortOrder order) throws IOException, JSONException {
         // Ask for search results
-        String orderKey = order == SortOrder.BySeeders? "seeds": "date_added";
+        String orderKey = order == SortOrder.BySeeders ? "seeds" : "date_added";
         String q = String.format(Locale.US, "?query_term=%1$s&sort_by=%2$s", URLEncoder.encode(query, "UTF-8"), orderKey);
         HttpParams httpparams = new BasicHttpParams();
         HttpConnectionParams.setConnectionTimeout(httpparams, CONNECTION_TIMEOUT);

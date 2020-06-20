@@ -73,7 +73,6 @@ public abstract class AbstractHtmlAdapter implements ISearchAdapter {
     }
 
     /**
-     *
      * @return true is this site generated authenticated link. false if the links require manual
      * authentication.
      */
@@ -84,6 +83,7 @@ public abstract class AbstractHtmlAdapter implements ISearchAdapter {
 
     /**
      * Build a SearchResult object from an HTML Element.
+     *
      * @param torrentElement An HTML element representing a search result.
      */
     @SuppressWarnings("WeakerAccess")
@@ -91,6 +91,7 @@ public abstract class AbstractHtmlAdapter implements ISearchAdapter {
 
     /**
      * Find the HTML elements containing the results of the search
+     *
      * @param document A Jsoup document to select from.
      */
     @SuppressWarnings("WeakerAccess")
@@ -99,8 +100,9 @@ public abstract class AbstractHtmlAdapter implements ISearchAdapter {
     /**
      * Authenticates an HttpClient. Derived Adapters can override this method to perform more
      * complicated authentication procedures.
+     *
      * @param client an HttpClient to authenticate.
-     * @param prefs The apps shared preferences object.
+     * @param prefs  The apps shared preferences object.
      */
     @SuppressWarnings("WeakerAccess")
     protected void authenticateHttpClient(DefaultHttpClient client, SharedPreferences prefs) throws Exception {
@@ -115,9 +117,9 @@ public abstract class AbstractHtmlAdapter implements ISearchAdapter {
                 final String loginUrl = getLoginUrl();
                 final HttpPost post = new HttpPost(loginUrl);
                 post.setEntity(new UrlEncodedFormEntity(Arrays
-                    .asList(
-                        new BasicNameValuePair(getUsernameFieldName(), SettingsHelper.getSiteUser(prefs, getTorrentSite())),
-                        new BasicNameValuePair(getPasswordFieldName(), SettingsHelper.getSitePass(prefs, getTorrentSite())))));
+                        .asList(
+                                new BasicNameValuePair(getUsernameFieldName(), SettingsHelper.getSiteUser(prefs, getTorrentSite())),
+                                new BasicNameValuePair(getPasswordFieldName(), SettingsHelper.getSitePass(prefs, getTorrentSite())))));
                 client.execute(post).getEntity().consumeContent();
                 break;
             case COOKIES:

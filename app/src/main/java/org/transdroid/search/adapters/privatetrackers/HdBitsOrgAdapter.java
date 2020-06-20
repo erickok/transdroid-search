@@ -1,34 +1,25 @@
 /*
- *    This file is part of Transdroid Torrent Search 
+ *    This file is part of Transdroid Torrent Search
  *    <http://code.google.com/p/transdroid-search/>
- *    
- *    Transdroid Torrent Search is free software: you can redistribute 
- *    it and/or modify it under the terms of the GNU Lesser General 
- *    Public License as published by the Free Software Foundation, 
- *    either version 3 of the License, or (at your option) any later 
+ *
+ *    Transdroid Torrent Search is free software: you can redistribute
+ *    it and/or modify it under the terms of the GNU Lesser General
+ *    Public License as published by the Free Software Foundation,
+ *    either version 3 of the License, or (at your option) any later
  *    version.
- *    
- *    Transdroid Torrent Search is distributed in the hope that it will 
- *    be useful, but WITHOUT ANY WARRANTY; without even the implied 
- *    warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+ *
+ *    Transdroid Torrent Search is distributed in the hope that it will
+ *    be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *    warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *    See the GNU Lesser General Public License for more details.
- *    
- *    You should have received a copy of the GNU Lesser General Public 
+ *
+ *    You should have received a copy of the GNU Lesser General Public
  *    License along with Transdroid.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.transdroid.search.adapters.privatetrackers;
 
-import java.io.InputStream;
-import java.net.URLEncoder;
-import java.security.InvalidParameterException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-import javax.security.auth.login.LoginException;
+import android.content.SharedPreferences;
+import android.util.Log;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.HttpStatus;
@@ -48,8 +39,17 @@ import org.transdroid.search.TorrentSite;
 import org.transdroid.search.gui.SettingsHelper;
 import org.transdroid.util.HttpHelper;
 
-import android.content.SharedPreferences;
-import android.util.Log;
+import java.io.InputStream;
+import java.net.URLEncoder;
+import java.security.InvalidParameterException;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.security.auth.login.LoginException;
 
 /**
  * An adapter that provides access to hdbits.org searches by parsing the raw HTML output.
@@ -70,13 +70,11 @@ public class HdBitsOrgAdapter implements ISearchAdapter {
     private static final String LOGIN_POST_TOKEN = "lol";
 
 
-
     private static final String SEARCH_URL = "http://hdbits.org/browse.php?search=%1$s";
     private static final String SEARCH_SORT_BY_SEEDERS_SUFFIX = "&sort=seeders&d=DESC";
 
     private static final String SEARCH_REGEX = "<tr id='t[^']+'[^>]*>.*?href=\"/(details.php?[^\"]+)\"[^>]*?>([^<]*?)<.*?href=\"(download.php/[^\"]*?)\".*?<td[^>]*>(\\d*)\\W(day|month).*?<br />(\\d*)\\W*(day|hour).*?>([^<]*)<br>(GB|MB).*?toseeders=1\"><[^>]*>([^<]*).*?<td[^>]+.*?>(\\d+)";
     // without escapes:                         <tr id='t[^']+'[^>]*>.*?href="/(details.php?[^"]+)"[^>]*?>([^<]*?)<.*?href="(download.php/[^"]*?)".*?<td[^>]*>(\d*)\W(day|month).*?<br />(\d*)\W*(day|hour).*?>([^<]*)<br>(GB|MB).*?toseeders=1"><[^>]*>([^<]*).*?<td[^>]+.*?>(\d+)
-
 
 
     private static final String URL_PREFIX = "https://hdbits.org/";
@@ -182,7 +180,8 @@ public class HdBitsOrgAdapter implements ISearchAdapter {
         Pattern tokenRegexParser = Pattern.compile(LOGIN_TOKEN_REGEX);
         Matcher match = tokenRegexParser.matcher(html);
         boolean success = match.find();
-        if (!success) throw new Exception("Unable to find hdbits.org login token. Has website HTML changed?");
+        if (!success)
+            throw new Exception("Unable to find hdbits.org login token. Has website HTML changed?");
 
         // success!
         return match.group(1);
@@ -216,7 +215,7 @@ public class HdBitsOrgAdapter implements ISearchAdapter {
         // if we don't have the correct cookies, login failed. notify user with a toast and toss an exception.
         success = uid && pass && hash;
         if (!success) {
-        	Log.e(LOG_TAG, "Failed to log into hdbits.org as '" + username + "'. Did not receive expected login cookies!");
+            Log.e(LOG_TAG, "Failed to log into hdbits.org as '" + username + "'. Did not receive expected login cookies!");
             throw new LoginException("Failed to log into hdbits.org as '" + username + "'. Did not receive expected login cookies!");
         }
 
@@ -244,25 +243,25 @@ public class HdBitsOrgAdapter implements ISearchAdapter {
             }
 
             String detailsUrl = URL_PREFIX + match.group(1);
-            String title      = match.group(2);
+            String title = match.group(2);
             String torrentUrl = URL_PREFIX + match.group(3);
-            String size       = match.group(8) + match.group(9); // size + unit
-            int seeders       = Integer.parseInt(match.group(10));
-            int leechers      = Integer.parseInt(match.group(11));
+            String size = match.group(8) + match.group(9); // size + unit
+            int seeders = Integer.parseInt(match.group(10));
+            int leechers = Integer.parseInt(match.group(11));
 
-            int time1         = Integer.parseInt(match.group(4));
-            String timeUnit1  = match.group(5);
-            int time2         = Integer.parseInt(match.group(6));
-            String timeUnit2  = match.group(7);
+            int time1 = Integer.parseInt(match.group(4));
+            String timeUnit1 = match.group(5);
+            int time2 = Integer.parseInt(match.group(6));
+            String timeUnit2 = match.group(7);
 
             // hdbits.org lists "added date" in a relative format (i.e. 8 months 7 days ago)
             // we roughly calculate the number of MS elapsed then subtract that from "now"
             // could be a day or two off depending on month lengths, it's just imprecise data
             long elapsedTime = 0;
             if (timeUnit1.startsWith("month")) elapsedTime += time1 * 1000L * 60L * 60L * 24L * 30L;
-            if (timeUnit1.startsWith("day"))   elapsedTime += time1 * 1000L * 60L * 60L * 24L;
-            if (timeUnit2.startsWith("day"))   elapsedTime += time2 * 1000L * 60L * 60L * 24L;
-            if (timeUnit2.startsWith("hour"))  elapsedTime += time2 * 1000L * 60L * 60L;
+            if (timeUnit1.startsWith("day")) elapsedTime += time1 * 1000L * 60L * 60L * 24L;
+            if (timeUnit2.startsWith("day")) elapsedTime += time2 * 1000L * 60L * 60L * 24L;
+            if (timeUnit2.startsWith("hour")) elapsedTime += time2 * 1000L * 60L * 60L;
 
             Date addedDate = new Date();
             addedDate.setTime(addedDate.getTime() - elapsedTime);

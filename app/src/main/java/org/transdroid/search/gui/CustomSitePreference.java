@@ -28,6 +28,7 @@ import android.util.Pair;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageButton;
+
 import org.transdroid.search.ISearchAdapter;
 import org.transdroid.search.R;
 

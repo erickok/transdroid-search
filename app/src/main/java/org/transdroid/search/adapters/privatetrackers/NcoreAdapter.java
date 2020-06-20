@@ -155,15 +155,14 @@ public class NcoreAdapter implements ISearchAdapter {
         final String LEECHERS_END = "</a>";
         final String PREF_SITE = "https://ncore.cc/torrents.php?action=";
         final String PREF_DOWNLOAD = "download&id=";
-        final String PREF_DETAILS= "details&id=";
-
+        final String PREF_DETAILS = "details&id=";
 
 
         int idStart = htmlItem.indexOf(ID_TORRENT) + ID_TORRENT.length();
         String id = htmlItem.substring(idStart, htmlItem.indexOf(ID_END, idStart));
 
         String details = PREF_SITE + PREF_DETAILS + id;
-        String link    = PREF_SITE + PREF_DOWNLOAD+ id;
+        String link = PREF_SITE + PREF_DOWNLOAD + id;
 
         int nameStart = htmlItem.indexOf(NAME) + NAME.length();
         String name = htmlItem.substring(nameStart, htmlItem.indexOf(NAME_END, nameStart));
@@ -180,7 +179,6 @@ public class NcoreAdapter implements ISearchAdapter {
         } catch (ParseException e) {
             // Not parsable; just leave it at null
         }
-
 
 
         int sizeStart = htmlItem.indexOf(SIZE, dateStart) + SIZE.length();

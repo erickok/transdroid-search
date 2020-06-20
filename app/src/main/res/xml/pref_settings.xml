@@ -1,22 +1,19 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android" >
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
 
     <PreferenceCategory
         android:key="header_publicsites"
         android:order="100"
-        android:title="@string/pref_publicsites" >
-    </PreferenceCategory>
-    
+        android:title="@string/pref_publicsites" />
+
     <PreferenceCategory
         android:key="header_privatesites"
         android:order="200"
-        android:title="@string/pref_privatesites" >
-    </PreferenceCategory>
+        android:title="@string/pref_privatesites" />
 
     <PreferenceCategory
         android:key="header_customsites"
         android:order="300"
-        android:title="@string/pref_customsites" >
-    </PreferenceCategory>
+        android:title="@string/pref_customsites" />
 
 </PreferenceScreen>

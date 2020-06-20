@@ -2,7 +2,7 @@
 <resources>
 
     <string name="app_description">Aplikacja pomocnicza dla wyszukiwania torrentów</string>
-    
+
     <string name="pref_settingslabel">Ustawienia wyszukiwania torrentów</string>
     <string name="pref_publicsites">Publiczne strony</string>
     <string name="pref_privatesites">Prywatne strony</string>

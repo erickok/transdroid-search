@@ -52,186 +52,186 @@ import javax.security.auth.login.LoginException;
  */
 public class TorrentLeechAdapter implements ISearchAdapter {
 
-	private static final String LOGINURL = "https://www.torrentleech.org/user/account/login/";
-	private static final String QUERYURL = "https://classic.torrentleech.org/torrents/browse/index/query/%1$s%2$s";
-	private static final String SORT_COMPOSITE = "";
-	private static final String SORT_SEEDS = "/orderby/seeders/order/desc";
-	private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
+    private static final String LOGINURL = "https://www.torrentleech.org/user/account/login/";
+    private static final String QUERYURL = "https://classic.torrentleech.org/torrents/browse/index/query/%1$s%2$s";
+    private static final String SORT_COMPOSITE = "";
+    private static final String SORT_SEEDS = "/orderby/seeders/order/desc";
+    private static final SimpleDateFormat DATE_FORMAT = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.US);
 
-	private HttpClient prepareRequest(SharedPreferences prefs) throws Exception {
+    private HttpClient prepareRequest(SharedPreferences prefs) throws Exception {
 
-		String username = SettingsHelper.getSiteUser(prefs, TorrentSite.TorrentLeech);
-		String password = SettingsHelper.getSitePass(prefs, TorrentSite.TorrentLeech);
-		if (username == null || password == null) {
-			throw new InvalidParameterException("No username or password was provided, while this is required for this private site.");
-		}
+        String username = SettingsHelper.getSiteUser(prefs, TorrentSite.TorrentLeech);
+        String password = SettingsHelper.getSitePass(prefs, TorrentSite.TorrentLeech);
+        if (username == null || password == null) {
+            throw new InvalidParameterException("No username or password was provided, while this is required for this private site.");
+        }
 
-		// Setup http client
-		HttpClient httpclient = HttpHelper.buildDefaultSearchHttpClient(false);
+        // Setup http client
+        HttpClient httpclient = HttpHelper.buildDefaultSearchHttpClient(false);
 
-		// First log in
-		HttpPost loginPost = new HttpPost(LOGINURL);
-		loginPost.setEntity(new UrlEncodedFormEntity(Arrays.asList(
-				new BasicNameValuePair("username", username),
-				new BasicNameValuePair("password", password),
-				new BasicNameValuePair("remember_me", "off"))));
-		HttpResponse loginResult = httpclient.execute(loginPost);
-		String loginHtml = HttpHelper.convertStreamToString(loginResult.getEntity().getContent());
-		final String LOGIN_ERROR = "Invalid Username/password combination";
-		if (loginResult.getStatusLine().getStatusCode() != HttpStatus.SC_OK || loginHtml.contains(LOGIN_ERROR)) {
-			// Failed to sign in
-			throw new LoginException("Login failure for TorrentLeecht with user " + username);
-		}
+        // First log in
+        HttpPost loginPost = new HttpPost(LOGINURL);
+        loginPost.setEntity(new UrlEncodedFormEntity(Arrays.asList(
+                new BasicNameValuePair("username", username),
+                new BasicNameValuePair("password", password),
+                new BasicNameValuePair("remember_me", "off"))));
+        HttpResponse loginResult = httpclient.execute(loginPost);
+        String loginHtml = HttpHelper.convertStreamToString(loginResult.getEntity().getContent());
+        final String LOGIN_ERROR = "Invalid Username/password combination";
+        if (loginResult.getStatusLine().getStatusCode() != HttpStatus.SC_OK || loginHtml.contains(LOGIN_ERROR)) {
+            // Failed to sign in
+            throw new LoginException("Login failure for TorrentLeecht with user " + username);
+        }
 
-		return httpclient;
+        return httpclient;
 
-	}
+    }
 
-	@Override
-	public List<SearchResult> search(SharedPreferences prefs, String query, SortOrder order, int maxResults) throws Exception {
+    @Override
+    public List<SearchResult> search(SharedPreferences prefs, String query, SortOrder order, int maxResults) throws Exception {
 
-		HttpClient httpclient = prepareRequest(prefs);
+        HttpClient httpclient = prepareRequest(prefs);
 
-		// Build a search request parameters
-		final String url = String.format(QUERYURL, URLEncoder.encode(query, "UTF-8"), (order == SortOrder.BySeeders ? SORT_SEEDS : SORT_COMPOSITE));
+        // Build a search request parameters
+        final String url = String.format(QUERYURL, URLEncoder.encode(query, "UTF-8"), (order == SortOrder.BySeeders ? SORT_SEEDS : SORT_COMPOSITE));
 
-		// Start synchronous search
-		HttpGet httpget = new HttpGet(url);
-		HttpResponse response = httpclient.execute(httpget);
+        // Start synchronous search
+        HttpGet httpget = new HttpGet(url);
+        HttpResponse response = httpclient.execute(httpget);
 
-		// Read HTML response
-		InputStream instream = response.getEntity().getContent();
-		String html = HttpHelper.convertStreamToString(instream);
-		instream.close();
-		return parseHtml(html, maxResults);
+        // Read HTML response
+        InputStream instream = response.getEntity().getContent();
+        String html = HttpHelper.convertStreamToString(instream);
+        instream.close();
+        return parseHtml(html, maxResults);
 
-	}
+    }
 
-	@Override
-	public InputStream getTorrentFile(SharedPreferences prefs, String url) throws Exception {
+    @Override
+    public InputStream getTorrentFile(SharedPreferences prefs, String url) throws Exception {
 
-		// Provide an authenticated file handle to the requested url
-		HttpClient httpclient = prepareRequest(prefs);
-		HttpResponse response = httpclient.execute(new HttpGet(url));
-		return response.getEntity().getContent();
+        // Provide an authenticated file handle to the requested url
+        HttpClient httpclient = prepareRequest(prefs);
+        HttpResponse response = httpclient.execute(new HttpGet(url));
+        return response.getEntity().getContent();
 
-	}
+    }
 
-	private List<SearchResult> parseHtml(String html, int maxResults) {
+    private List<SearchResult> parseHtml(String html, int maxResults) {
 
-		// Texts to find subsequently
-		final String RESULTS = "<table id=\"torrenttable\"";
-		final String NOTORRENTS = "There are no results found";
-		final String TORRENT = "<td class=\"category\">";
+        // Texts to find subsequently
+        final String RESULTS = "<table id=\"torrenttable\"";
+        final String NOTORRENTS = "There are no results found";
+        final String TORRENT = "<td class=\"category\">";
 
-		// Parse the search results from HTML by looking for the identifying texts
-		List<SearchResult> results = new ArrayList<>();
-		int resultsStart = html.indexOf(RESULTS) + RESULTS.length();
-		if (html.contains(NOTORRENTS)) {
-			return results; // Success, but no results for this query
-		}
+        // Parse the search results from HTML by looking for the identifying texts
+        List<SearchResult> results = new ArrayList<>();
+        int resultsStart = html.indexOf(RESULTS) + RESULTS.length();
+        if (html.contains(NOTORRENTS)) {
+            return results; // Success, but no results for this query
+        }
 
-		int torStart = html.indexOf(TORRENT, resultsStart);
-		while (torStart >= 0 && results.size() < maxResults) {
-			int nextTorrentIndex = html.indexOf(TORRENT, torStart + TORRENT.length());
-			if (nextTorrentIndex >= 0) {
-				results.add(parseHtmlItem(html.substring(torStart + TORRENT.length(), nextTorrentIndex)));
-			} else {
-				results.add(parseHtmlItem(html.substring(torStart + TORRENT.length())));
-			}
-			torStart = nextTorrentIndex;
-		}
-		return results;
+        int torStart = html.indexOf(TORRENT, resultsStart);
+        while (torStart >= 0 && results.size() < maxResults) {
+            int nextTorrentIndex = html.indexOf(TORRENT, torStart + TORRENT.length());
+            if (nextTorrentIndex >= 0) {
+                results.add(parseHtmlItem(html.substring(torStart + TORRENT.length(), nextTorrentIndex)));
+            } else {
+                results.add(parseHtmlItem(html.substring(torStart + TORRENT.length())));
+            }
+            torStart = nextTorrentIndex;
+        }
+        return results;
 
-	}
+    }
 
-	private SearchResult parseHtmlItem(String htmlItem) {
+    private SearchResult parseHtmlItem(String htmlItem) {
 
-		// Texts to find subsequently
-		final String DETAILS = "title\"><a href=\"";
-		final String DETAILS_END = "\">";
-		final String NAME_END = "<";
-		final String DATE = "</b> on";
-		final String DATE_END = "</td>";
-		final String LINK = "<td class=\"quickdownload\">\n                									<a href=\"";
-		final String LINK_END = "\">";
-		final String COMMENTS = "#comments\">";
-		final String SIZE = "<td>";
-		final String SIZE_END = "</td>";
-		final String SEEDERS = "<td class=\"seeders\">";
-		final String SEEDERS_END = "</td>";
-		final String LEECHERS = "<td class=\"leechers\">";
-		final String LEECHERS_END = "</td>";
-		String prefix = "http://classic.torrentleech.org";
+        // Texts to find subsequently
+        final String DETAILS = "title\"><a href=\"";
+        final String DETAILS_END = "\">";
+        final String NAME_END = "<";
+        final String DATE = "</b> on";
+        final String DATE_END = "</td>";
+        final String LINK = "<td class=\"quickdownload\">\n                									<a href=\"";
+        final String LINK_END = "\">";
+        final String COMMENTS = "#comments\">";
+        final String SIZE = "<td>";
+        final String SIZE_END = "</td>";
+        final String SEEDERS = "<td class=\"seeders\">";
+        final String SEEDERS_END = "</td>";
+        final String LEECHERS = "<td class=\"leechers\">";
+        final String LEECHERS_END = "</td>";
+        String prefix = "http://classic.torrentleech.org";
 
-		int detailsStart = htmlItem.indexOf(DETAILS) + DETAILS.length();
-		String details = htmlItem.substring(detailsStart, htmlItem.indexOf(DETAILS_END, detailsStart));
-		details = prefix + details;
+        int detailsStart = htmlItem.indexOf(DETAILS) + DETAILS.length();
+        String details = htmlItem.substring(detailsStart, htmlItem.indexOf(DETAILS_END, detailsStart));
+        details = prefix + details;
 
-		// Name starts right after the link of an item
-		int nameStart = htmlItem.indexOf(DETAILS_END, detailsStart) + DETAILS_END.length();
-		String name = htmlItem.substring(nameStart, htmlItem.indexOf(NAME_END, nameStart));
+        // Name starts right after the link of an item
+        int nameStart = htmlItem.indexOf(DETAILS_END, detailsStart) + DETAILS_END.length();
+        String name = htmlItem.substring(nameStart, htmlItem.indexOf(NAME_END, nameStart));
 
-		int dateStart = htmlItem.indexOf(DATE, nameStart) + DATE.length();
-		String dateText = htmlItem.substring(dateStart, htmlItem.indexOf(DATE_END, dateStart));
-		Date date = new Date();
-		try {
-			date = DATE_FORMAT.parse(dateText.trim());
-		} catch (ParseException e1) {
-			// Not parsable at all; just leave it at null
-		}
+        int dateStart = htmlItem.indexOf(DATE, nameStart) + DATE.length();
+        String dateText = htmlItem.substring(dateStart, htmlItem.indexOf(DATE_END, dateStart));
+        Date date = new Date();
+        try {
+            date = DATE_FORMAT.parse(dateText.trim());
+        } catch (ParseException e1) {
+            // Not parsable at all; just leave it at null
+        }
 
-		int linkStart = htmlItem.indexOf(LINK, nameStart) + LINK.length();
-		String link = htmlItem.substring(linkStart, htmlItem.indexOf(LINK_END, linkStart));
+        int linkStart = htmlItem.indexOf(LINK, nameStart) + LINK.length();
+        String link = htmlItem.substring(linkStart, htmlItem.indexOf(LINK_END, linkStart));
 
-		int commentsStart = htmlItem.indexOf(COMMENTS, linkStart) + COMMENTS.length();
+        int commentsStart = htmlItem.indexOf(COMMENTS, linkStart) + COMMENTS.length();
 
-		int sizeStart = htmlItem.indexOf(SIZE, commentsStart) + SIZE.length();
-		String size = htmlItem.substring(sizeStart, htmlItem.indexOf(SIZE_END, sizeStart));
+        int sizeStart = htmlItem.indexOf(SIZE, commentsStart) + SIZE.length();
+        String size = htmlItem.substring(sizeStart, htmlItem.indexOf(SIZE_END, sizeStart));
 
-		int seedersStart = htmlItem.indexOf(SEEDERS, sizeStart) + SEEDERS.length();
-		int seeders = 0;
-		if (seedersStart >= 0) {
-			try {
-				String seedersText = htmlItem.substring(seedersStart, htmlItem.indexOf(SEEDERS_END, seedersStart));
-				seeders = Integer.parseInt(seedersText);
-			} catch (Exception e) {
-				// Number of seeders not found; ignore
-			}
-		}
+        int seedersStart = htmlItem.indexOf(SEEDERS, sizeStart) + SEEDERS.length();
+        int seeders = 0;
+        if (seedersStart >= 0) {
+            try {
+                String seedersText = htmlItem.substring(seedersStart, htmlItem.indexOf(SEEDERS_END, seedersStart));
+                seeders = Integer.parseInt(seedersText);
+            } catch (Exception e) {
+                // Number of seeders not found; ignore
+            }
+        }
 
-		int leechersStart = htmlItem.indexOf(LEECHERS, seedersStart) + LEECHERS.length();
-		int leechers = 0;
-		if (leechersStart >= 0) {
-			try {
-				String leechersText = htmlItem.substring(leechersStart, htmlItem.indexOf(LEECHERS_END, leechersStart));
-				leechers = Integer.parseInt(leechersText);
-			} catch (Exception e) {
-				// Number of seeders not found; ignore
-			}
-		}
+        int leechersStart = htmlItem.indexOf(LEECHERS, seedersStart) + LEECHERS.length();
+        int leechers = 0;
+        if (leechersStart >= 0) {
+            try {
+                String leechersText = htmlItem.substring(leechersStart, htmlItem.indexOf(LEECHERS_END, leechersStart));
+                leechers = Integer.parseInt(leechersText);
+            } catch (Exception e) {
+                // Number of seeders not found; ignore
+            }
+        }
 
-		return new SearchResult(name, link, details, size, date, seeders, leechers);
+        return new SearchResult(name, link, details, size, date, seeders, leechers);
 
-	}
+    }
 
-	@Override
-	public String buildRssFeedUrlFromSearch(SharedPreferences prefs, String query, SortOrder order) {
-		// TorrentLeech doesn't support RSS feed-based searches
-		return null;
-	}
+    @Override
+    public String buildRssFeedUrlFromSearch(SharedPreferences prefs, String query, SortOrder order) {
+        // TorrentLeech doesn't support RSS feed-based searches
+        return null;
+    }
 
-	@Override
-	public String getSiteName() {
-		return "TorrentLeech";
-	}
+    @Override
+    public String getSiteName() {
+        return "TorrentLeech";
+    }
 
-	public AuthType getAuthType() {
-		return AuthType.USERNAME;
-	}
+    public AuthType getAuthType() {
+        return AuthType.USERNAME;
+    }
 
-	public String[] getRequiredCookies() {
-		return null;
-	}
+    public String[] getRequiredCookies() {
+        return null;
+    }
 
 }

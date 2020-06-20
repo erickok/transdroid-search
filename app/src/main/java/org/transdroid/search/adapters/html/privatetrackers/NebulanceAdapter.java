@@ -6,10 +6,10 @@ import android.content.SharedPreferences;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
 import org.jsoup.select.Elements;
-import org.transdroid.search.adapters.html.AbstractHtmlAdapter;
 import org.transdroid.search.SearchResult;
 import org.transdroid.search.SortOrder;
 import org.transdroid.search.TorrentSite;
+import org.transdroid.search.adapters.html.AbstractHtmlAdapter;
 import org.transdroid.util.DateUtils;
 
 import java.io.UnsupportedEncodingException;

@@ -1,7 +1,6 @@
 package org.alexd.jsonrpc;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
+import android.util.Log;
 
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
@@ -18,111 +17,95 @@ import org.apache.http.util.EntityUtils;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import android.util.Log;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 /**
  * Implementation of JSON-RPC over HTTP/POST
  */
-public class JSONRPCThreadedHttpClient extends JSONRPCThreadedClient
-{
+public class JSONRPCThreadedHttpClient extends JSONRPCThreadedClient {
 
-	/*
-	 * HttpClient to issue the HTTP/POST request
-	 */
-	private HttpClient httpClient;
-	/*
-	 * Service URI
-	 */
-	private String serviceUri;
-	
-	// HTTP 1.0
-	private static final ProtocolVersion PROTOCOL_VERSION = new ProtocolVersion("HTTP", 1, 0);
-	
- 	/**
-	 * Construct a JsonRPCClient with the given httpClient and service uri
-	 *
-     * @param client
-     *            httpClient to use
-	 * @param uri
-	 *            uri of the service
-	 */
-	public JSONRPCThreadedHttpClient(HttpClient cleint, String uri){
-		httpClient = cleint;
-		serviceUri = uri;
-	}
-	
-	/**
-	 * Construct a JsonRPCClient with the given service uri
-	 * 
-	 * @param uri
-	 *            uri of the service
-	 */
-	public JSONRPCThreadedHttpClient(String uri)
-	{
-		this(new DefaultHttpClient(), uri);
-	}
+    // HTTP 1.0
+    private static final ProtocolVersion PROTOCOL_VERSION = new ProtocolVersion("HTTP", 1, 0);
+    /*
+     * HttpClient to issue the HTTP/POST request
+     */
+    private HttpClient httpClient;
+    /*
+     * Service URI
+     */
+    private String serviceUri;
 
-	protected JSONObject doJSONRequest(JSONObject jsonRequest) throws JSONRPCException
-	{
-		
-		if(_debug){
-			Log.d(JSONRPCThreadedHttpClient.class.toString(), "Request: " + jsonRequest.toString());
-		}
-		// Create HTTP/POST request with a JSON entity containing the request
-		HttpPost request = new HttpPost(serviceUri);
-		HttpParams params = new BasicHttpParams();
-		HttpConnectionParams.setConnectionTimeout(params, getConnectionTimeout());
-		HttpConnectionParams.setSoTimeout(params, getSoTimeout());
-		HttpProtocolParams.setVersion(params, PROTOCOL_VERSION);
-		request.setParams(params);
+    /**
+     * Construct a JsonRPCClient with the given httpClient and service uri
+     *
+     * @param client httpClient to use
+     * @param uri    uri of the service
+     */
+    public JSONRPCThreadedHttpClient(HttpClient cleint, String uri) {
+        httpClient = cleint;
+        serviceUri = uri;
+    }
 
-		HttpEntity entity;
-		try
-		{
-			entity = new JSONEntity(jsonRequest);
-		}
-		catch (UnsupportedEncodingException e1)
-		{
-			throw new JSONRPCException("Unsupported encoding", e1);
-		}
-		request.setEntity(entity);
+    /**
+     * Construct a JsonRPCClient with the given service uri
+     *
+     * @param uri uri of the service
+     */
+    public JSONRPCThreadedHttpClient(String uri) {
+        this(new DefaultHttpClient(), uri);
+    }
 
-		try
-		{
-			// Execute the request and try to decode the JSON Response
-			long t = System.currentTimeMillis();
-			HttpResponse response = httpClient.execute(request);
-			t = System.currentTimeMillis() - t;
-			String responseString = EntityUtils.toString(response.getEntity());
-			
-			if(_debug){
-				Log.d(JSONRPCThreadedHttpClient.class.toString(), "Response: " + responseString);
-			}
-			
-			responseString = responseString.trim();
-			JSONObject jsonResponse = new JSONObject(responseString);
-			// Check for remote errors
-			// JSON-RPC 2.0
-			if (jsonResponse.has("error"))
-			{
-				Object jsonError = jsonResponse.get("error");
-				if (!jsonError.equals(null))
-					throw new JSONRPCException(jsonResponse.get("error"));
-			}
-			return jsonResponse; // JSON-RPC 1.0
-		}
-		// Underlying errors are wrapped into a JSONRPCException instance
-		catch (ClientProtocolException e)
-		{
-			throw new JSONRPCException("HTTP error", e);
-		}
-		catch (IOException e)
-		{
-			throw new JSONRPCException("IO error", e);
-		}
-		catch (JSONException e)
-		{
-			throw new JSONRPCException("Invalid JSON response", e);
-		}
-	}
+    protected JSONObject doJSONRequest(JSONObject jsonRequest) throws JSONRPCException {
+
+        if (_debug) {
+            Log.d(JSONRPCThreadedHttpClient.class.toString(), "Request: " + jsonRequest.toString());
+        }
+        // Create HTTP/POST request with a JSON entity containing the request
+        HttpPost request = new HttpPost(serviceUri);
+        HttpParams params = new BasicHttpParams();
+        HttpConnectionParams.setConnectionTimeout(params, getConnectionTimeout());
+        HttpConnectionParams.setSoTimeout(params, getSoTimeout());
+        HttpProtocolParams.setVersion(params, PROTOCOL_VERSION);
+        request.setParams(params);
+
+        HttpEntity entity;
+        try {
+            entity = new JSONEntity(jsonRequest);
+        } catch (UnsupportedEncodingException e1) {
+            throw new JSONRPCException("Unsupported encoding", e1);
+        }
+        request.setEntity(entity);
+
+        try {
+            // Execute the request and try to decode the JSON Response
+            long t = System.currentTimeMillis();
+            HttpResponse response = httpClient.execute(request);
+            t = System.currentTimeMillis() - t;
+            String responseString = EntityUtils.toString(response.getEntity());
+
+            if (_debug) {
+                Log.d(JSONRPCThreadedHttpClient.class.toString(), "Response: " + responseString);
+            }
+
+            responseString = responseString.trim();
+            JSONObject jsonResponse = new JSONObject(responseString);
+            // Check for remote errors
+            // JSON-RPC 2.0
+            if (jsonResponse.has("error")) {
+                Object jsonError = jsonResponse.get("error");
+                if (!jsonError.equals(null))
+                    throw new JSONRPCException(jsonResponse.get("error"));
+            }
+            return jsonResponse; // JSON-RPC 1.0
+        }
+        // Underlying errors are wrapped into a JSONRPCException instance
+        catch (ClientProtocolException e) {
+            throw new JSONRPCException("HTTP error", e);
+        } catch (IOException e) {
+            throw new JSONRPCException("IO error", e);
+        } catch (JSONException e) {
+            throw new JSONRPCException("Invalid JSON response", e);
+        }
+    }
 }

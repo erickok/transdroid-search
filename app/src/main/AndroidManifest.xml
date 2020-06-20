@@ -1,72 +1,71 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- 
+<?xml version="1.0" encoding="utf-8"?><!--
 /*
- *	This file is part of Transdroid Torrent Search 
+ *	This file is part of Transdroid Torrent Search
  *	<http://code.google.com/p/transdroid-search/>
- *	
- *	Transdroid Torrent Search is free software: you can redistribute 
- *	it and/or modify it under the terms of the GNU Lesser General 
- *	Public License as published by the Free Software Foundation, 
- *	either version 3 of the License, or (at your option) any later 
+ *
+ *	Transdroid Torrent Search is free software: you can redistribute
+ *	it and/or modify it under the terms of the GNU Lesser General
+ *	Public License as published by the Free Software Foundation,
+ *	either version 3 of the License, or (at your option) any later
  *	version.
- *	
- *	Transdroid Torrent Search is distributed in the hope that it will 
- *	be useful, but WITHOUT ANY WARRANTY; without even the implied 
- *	warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+ *
+ *	Transdroid Torrent Search is distributed in the hope that it will
+ *	be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *	warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *	See the GNU Lesser General Public License for more details.
  *
- *	You should have received a copy of the GNU Lesser General Public 
+ *	You should have received a copy of the GNU Lesser General Public
  *	License along with Transdroid.  If not, see <http://www.gnu.org/licenses/>.
  */
  -->
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-	xmlns:tools="http://schemas.android.com/tools"
-	package="org.transdroid.search">
+    xmlns:tools="http://schemas.android.com/tools"
+    package="org.transdroid.search">
 
-	<uses-sdk />
-	<uses-permission android:name="android.permission.INTERNET" />
+    <uses-sdk />
+    <uses-permission android:name="android.permission.INTERNET" />
 
-	<application
-		android:allowBackup="false"
-		android:icon="@drawable/ic_launcher"
-		android:label="Torrent Search (by Transdroid)"
-		android:description="@string/app_description"
-		android:theme="@style/Theme.Transdroid.Search">
+    <application
+        android:allowBackup="false"
+        android:description="@string/app_description"
+        android:icon="@drawable/ic_launcher"
+        android:label="Torrent Search (by Transdroid)"
+        android:theme="@style/Theme.Transdroid.Search">
 
-		<uses-library
-			android:name="org.apache.http.legacy"
-			android:required="false" />
+        <uses-library
+            android:name="org.apache.http.legacy"
+            android:required="false" />
 
-		<provider
-			android:name="org.transdroid.search.TorrentSitesProvider"
-			android:authorities="org.transdroid.search.torrentsitesprovider"
-			android:exported="true"
-			tools:ignore="ExportedContentProvider" />
+        <provider
+            android:name="org.transdroid.search.TorrentSitesProvider"
+            android:authorities="org.transdroid.search.torrentsitesprovider"
+            android:exported="true"
+            tools:ignore="ExportedContentProvider" />
 
-		<provider
-			android:name="org.transdroid.search.TorrentSearchProvider"
-			android:authorities="org.transdroid.search.torrentsearchprovider"
-			android:exported="true"
-			tools:ignore="ExportedContentProvider" />
+        <provider
+            android:name="org.transdroid.search.TorrentSearchProvider"
+            android:authorities="org.transdroid.search.torrentsearchprovider"
+            android:exported="true"
+            tools:ignore="ExportedContentProvider" />
 
-		<activity
-			android:name=".gui.SettingsActivity"
-			android:label="@string/pref_settingslabel"
-			android:noHistory="true">
-			<intent-filter>
-				<action android:name="android.intent.action.MAIN" />
-				<category android:name="android.intent.category.LAUNCHER" />
-			</intent-filter>
-		</activity>
+        <activity
+            android:name=".gui.SettingsActivity"
+            android:label="@string/pref_settingslabel"
+            android:noHistory="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
 
-		<!--activity
-			android:name=".gui.SettingsActivityCompat"
-			android:label="@string/pref_settingslabel" />
+        <!--activity
+            android:name=".gui.SettingsActivityCompat"
+            android:label="@string/pref_settingslabel" />
 
-		<activity
-			android:name=".gui.SettingsActivityModern"
-			android:label="@string/pref_settingslabel" /-->
+        <activity
+            android:name=".gui.SettingsActivityModern"
+            android:label="@string/pref_settingslabel" /-->
 
-	</application>
+    </application>
 
-</manifest> 
+</manifest>

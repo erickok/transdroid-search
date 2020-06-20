@@ -20,6 +20,7 @@ package org.transdroid.search.adapters.privatetrackers;
 
 import android.content.SharedPreferences;
 
+import org.alexd.jsonrpc.JSONRPCClient;
 import org.alexd.jsonrpc.JSONRPCException;
 import org.alexd.jsonrpc.JSONRPCParams;
 import org.json.JSONException;
@@ -29,8 +30,6 @@ import org.transdroid.search.SearchResult;
 import org.transdroid.search.SortOrder;
 import org.transdroid.search.TorrentSite;
 import org.transdroid.search.gui.SettingsHelper;
-
-import org.alexd.jsonrpc.JSONRPCClient;
 import org.transdroid.util.FileSizeConverter;
 
 import java.io.BufferedInputStream;
@@ -52,131 +51,127 @@ import javax.security.auth.login.LoginException;
  */
 public class BTNAdapter implements ISearchAdapter {
 
-	private static final String API_URL = "http://api.broadcasthe.net";
-	private static final String THETVDB_BASE_URL = "http://thetvdb.com/?tab=series&id=";
-	private static final String API_SEARCH = "getTorrents";
+    private static final String API_URL = "http://api.broadcasthe.net";
+    private static final String THETVDB_BASE_URL = "http://thetvdb.com/?tab=series&id=";
+    private static final String API_SEARCH = "getTorrents";
 
-	@Override
-	public List<SearchResult> search(SharedPreferences prefs, String query, SortOrder order, int maxResults) throws Exception {
+    @Override
+    public List<SearchResult> search(SharedPreferences prefs, String query, SortOrder order, int maxResults) throws Exception {
 
-		String apikey = SettingsHelper.getSiteToken(prefs, TorrentSite.BTN);
+        String apikey = SettingsHelper.getSiteToken(prefs, TorrentSite.BTN);
 
-		if (apikey == null)
-			throw new LoginException("The BTN user API key was not provided, please configure BTN site settings");
+        if (apikey == null)
+            throw new LoginException("The BTN user API key was not provided, please configure BTN site settings");
 
-		// Try and get the search results - if we can't, assume invalid API key
-		JSONObject apiSearchResults;
-		try {
-			// Generous time-out for mobile connections
-			JSONRPCClient client = JSONRPCClient.create(API_URL, JSONRPCParams.Versions.VERSION_1);
-			client.setConnectionTimeout(10000);
-			client.setSoTimeout(10000);
-			apiSearchResults = (JSONObject) client.call(API_SEARCH, apikey, query, maxResults);
-		}
-		catch (JSONRPCException e) {
-			throw new LoginException("The BTN user API key was invalid, please check your entry");
-		}
+        // Try and get the search results - if we can't, assume invalid API key
+        JSONObject apiSearchResults;
+        try {
+            // Generous time-out for mobile connections
+            JSONRPCClient client = JSONRPCClient.create(API_URL, JSONRPCParams.Versions.VERSION_1);
+            client.setConnectionTimeout(10000);
+            client.setSoTimeout(10000);
+            apiSearchResults = (JSONObject) client.call(API_SEARCH, apikey, query, maxResults);
+        } catch (JSONRPCException e) {
+            throw new LoginException("The BTN user API key was invalid, please check your entry");
+        }
 
-		List<SearchResult> results = new ArrayList<>();
-		try {
-			JSONObject apiSearchResultsTorrents = apiSearchResults.getJSONObject("torrents");
-			Iterator<String> searchResultSetKeys = apiSearchResultsTorrents.keys();
-			while (searchResultSetKeys.hasNext())
-			{
-				String resultKey = searchResultSetKeys.next();
-				try {
-					JSONObject resultEntry = apiSearchResultsTorrents.getJSONObject(resultKey);
+        List<SearchResult> results = new ArrayList<>();
+        try {
+            JSONObject apiSearchResultsTorrents = apiSearchResults.getJSONObject("torrents");
+            Iterator<String> searchResultSetKeys = apiSearchResultsTorrents.keys();
+            while (searchResultSetKeys.hasNext()) {
+                String resultKey = searchResultSetKeys.next();
+                try {
+                    JSONObject resultEntry = apiSearchResultsTorrents.getJSONObject(resultKey);
 
-					String name = resultEntry.optString("ReleaseName");
-					String series = resultEntry.optString("Series");
-					String groupName = resultEntry.optString("GroupName");
-					String resolution = resultEntry.optString("Resolution");
-					String source = resultEntry.optString("Source");
-					String codec = resultEntry.optString("Codec");
-					String link = resultEntry.getString("DownloadURL");
-					String tvdbID = resultEntry.optString("TvdbID");
-					String size = FileSizeConverter.getSize(resultEntry.getLong("Size"));
-					Date date = new Date(resultEntry.getLong("Time") * 1000);
-					int seeders = resultEntry.getInt("Seeders");
-					int leechers = resultEntry.getInt("Leechers");
+                    String name = resultEntry.optString("ReleaseName");
+                    String series = resultEntry.optString("Series");
+                    String groupName = resultEntry.optString("GroupName");
+                    String resolution = resultEntry.optString("Resolution");
+                    String source = resultEntry.optString("Source");
+                    String codec = resultEntry.optString("Codec");
+                    String link = resultEntry.getString("DownloadURL");
+                    String tvdbID = resultEntry.optString("TvdbID");
+                    String size = FileSizeConverter.getSize(resultEntry.getLong("Size"));
+                    Date date = new Date(resultEntry.getLong("Time") * 1000);
+                    int seeders = resultEntry.getInt("Seeders");
+                    int leechers = resultEntry.getInt("Leechers");
 
-					// Ensure we have a title, in case the torrent has no release name
-					if (name.equals(""))
-					{
-						StringBuilder sb = new StringBuilder();
-						sb.append(series);
-						if (!sb.toString().equals(""))
-							sb.append(".");
-						sb.append(groupName);
-						if (!sb.toString().equals(""))
-							sb.append(".");
-						sb.append(resolution);
-						if (!sb.toString().equals(""))
-							sb.append(".");
-						sb.append(source);
-						if (!sb.toString().equals(""))
-							sb.append(".");
-						sb.append(codec);
-						if (!sb.toString().equals(""))
-							name = sb.toString();
+                    // Ensure we have a title, in case the torrent has no release name
+                    if (name.equals("")) {
+                        StringBuilder sb = new StringBuilder();
+                        sb.append(series);
+                        if (!sb.toString().equals(""))
+                            sb.append(".");
+                        sb.append(groupName);
+                        if (!sb.toString().equals(""))
+                            sb.append(".");
+                        sb.append(resolution);
+                        if (!sb.toString().equals(""))
+                            sb.append(".");
+                        sb.append(source);
+                        if (!sb.toString().equals(""))
+                            sb.append(".");
+                        sb.append(codec);
+                        if (!sb.toString().equals(""))
+                            name = sb.toString();
 
-						name = name.replace(" ", ".");
-					}
+                        name = name.replace(" ", ".");
+                    }
 
-					String details = "";
-					if (tvdbID != null)
-						details = THETVDB_BASE_URL + tvdbID;
+                    String details = "";
+                    if (tvdbID != null)
+                        details = THETVDB_BASE_URL + tvdbID;
 
-					results.add(
-						new SearchResult(name, link, details, size, date, seeders, leechers)
-					);
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-			}
+                    results.add(
+                            new SearchResult(name, link, details, size, date, seeders, leechers)
+                    );
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
+            }
 
-			if (order == SortOrder.BySeeders)
-			{
-				 Collections.sort(results, new TorrentSeedsComparator());
-			}
-		} catch (JSONException e) {
-			e.printStackTrace();
-		}
-		return results;
+            if (order == SortOrder.BySeeders) {
+                Collections.sort(results, new TorrentSeedsComparator());
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+        return results;
 
-	}
+    }
 
-	@Override
-	public InputStream getTorrentFile(SharedPreferences prefs, String link) throws Exception {
-		URL url = new URL(link);
-		URLConnection urlConnection = url.openConnection();
-		return new BufferedInputStream(urlConnection.getInputStream());
-	}
+    @Override
+    public InputStream getTorrentFile(SharedPreferences prefs, String link) throws Exception {
+        URL url = new URL(link);
+        URLConnection urlConnection = url.openConnection();
+        return new BufferedInputStream(urlConnection.getInputStream());
+    }
 
-	@Override
-	public String buildRssFeedUrlFromSearch(SharedPreferences prefs, String query, SortOrder order) {
-		// Not implemented
-		return null;
-	}
+    @Override
+    public String buildRssFeedUrlFromSearch(SharedPreferences prefs, String query, SortOrder order) {
+        // Not implemented
+        return null;
+    }
 
-	@Override
-	public String getSiteName() {
-		return "BTN";
-	}
+    @Override
+    public String getSiteName() {
+        return "BTN";
+    }
 
-	@Override
-	public AuthType getAuthType() {
-		return AuthType.TOKEN;
-	}
+    @Override
+    public AuthType getAuthType() {
+        return AuthType.TOKEN;
+    }
 
-	public String[] getRequiredCookies() {
-		return null;
-	}
+    public String[] getRequiredCookies() {
+        return null;
+    }
 
-	static class TorrentSeedsComparator implements Comparator<SearchResult> {
-		public int compare(SearchResult tor1, SearchResult tor2) {
-			return tor2.getSeeds() - tor1.getSeeds();
-		}
-	}
+    static class TorrentSeedsComparator implements Comparator<SearchResult> {
+        public int compare(SearchResult tor1, SearchResult tor2) {
+            return tor2.getSeeds() - tor1.getSeeds();
+        }
+    }
 
 }

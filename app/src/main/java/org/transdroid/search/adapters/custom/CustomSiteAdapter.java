@@ -19,6 +19,7 @@
 package org.transdroid.search.adapters.custom;
 
 import android.util.Log;
+
 import org.ifies.android.sax.Item;
 import org.ifies.android.sax.RssParser;
 import org.transdroid.search.SearchResult;

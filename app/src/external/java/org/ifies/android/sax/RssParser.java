@@ -22,189 +22,192 @@ import javax.xml.parsers.SAXParser;
 import javax.xml.parsers.SAXParserFactory;
 
 public class RssParser extends DefaultHandler {
-	public RssParser(String url) {
-		this.urlString = url;
-		this.text = new StringBuilder();
-	}
+    private String urlString;
+    private Channel channel;
+    private StringBuilder text;
+    private Item item;
+    private boolean imgStatus;
 
-	/**
-	 * Returns the feed as a RssFeed, which is a ListArray
-	 * @return RssFeed rssFeed
-	 */
-	public Channel getChannel() {
-		return (this.channel);
-	}
+    public RssParser(String url) {
+        this.urlString = url;
+        this.text = new StringBuilder();
+    }
 
-	public void parse() throws ParserConfigurationException, SAXException, IOException {
+    /**
+     * Returns the feed as a RssFeed, which is a ListArray
+     *
+     * @return RssFeed rssFeed
+     */
+    public Channel getChannel() {
+        return (this.channel);
+    }
 
-		HttpClient httpclient = initialise();
-		HttpResponse result = httpclient.execute(new HttpGet(urlString));
-		//FileInputStream urlInputStream = new FileInputStream("/sdcard/rsstest2.txt");
-		SAXParserFactory spf = SAXParserFactory.newInstance();
-		if (spf != null) {
-			SAXParser sp = spf.newSAXParser();
-			sp.parse(result.getEntity().getContent(), this);
-		}
+    public void parse() throws ParserConfigurationException, SAXException, IOException {
 
-	}
+        HttpClient httpclient = initialise();
+        HttpResponse result = httpclient.execute(new HttpGet(urlString));
+        //FileInputStream urlInputStream = new FileInputStream("/sdcard/rsstest2.txt");
+        SAXParserFactory spf = SAXParserFactory.newInstance();
+        if (spf != null) {
+            SAXParser sp = spf.newSAXParser();
+            sp.parse(result.getEntity().getContent(), this);
+        }
 
-	/**
-	 * Instantiates an HTTP client that can be used for all requests.
-	 */
-	protected HttpClient initialise() {
-		return HttpHelper.buildDefaultSearchHttpClient(false);
-	}
+    }
 
-	/**
-	 * By default creates a standard Item (with title, description and links), which may to overriden to add more data.
-	 * @return A possibly decorated Item instance
-	 */
-	protected Item createNewItem() {
-		return new Item();
-	}
+    /**
+     * Instantiates an HTTP client that can be used for all requests.
+     */
+    protected HttpClient initialise() {
+        return HttpHelper.buildDefaultSearchHttpClient(false);
+    }
 
-	public void startElement(String uri, String localName, String qName, Attributes attributes) {
+    /**
+     * By default creates a standard Item (with title, description and links), which may to overriden to add more data.
+     *
+     * @return A possibly decorated Item instance
+     */
+    protected Item createNewItem() {
+        return new Item();
+    }
 
-		/** First lets check for the channel */
-		if (localName.equalsIgnoreCase("channel")) {
-			this.channel = new Channel();
-		}
+    public void startElement(String uri, String localName, String qName, Attributes attributes) {
 
-		/** Now lets check for an item */
-		if (localName.equalsIgnoreCase("item") && (this.channel != null)) {
-			this.item = createNewItem();
-			this.channel.addItem(this.item);
-		}
+        /** First lets check for the channel */
+        if (localName.equalsIgnoreCase("channel")) {
+            this.channel = new Channel();
+        }
 
-		/** Now lets check for an image */
-		if (localName.equalsIgnoreCase("image") && (this.channel != null)) {
-			this.imgStatus = true;
-		}
+        /** Now lets check for an item */
+        if (localName.equalsIgnoreCase("item") && (this.channel != null)) {
+            this.item = createNewItem();
+            this.channel.addItem(this.item);
+        }
 
-		/** Checking for a enclosure */
-		if (localName.equalsIgnoreCase("enclosure")) {
-			/** Lets check we are in an item */
-			if (this.item != null && attributes != null && attributes.getLength() > 0) {
-				if (attributes.getValue("url") != null) {
-					this.item.setEnclosureUrl(parseLink(attributes.getValue("url")));
-				}
-				if (attributes.getValue("type") != null) {
-					this.item.setEnclosureType(attributes.getValue("type"));
-				}
-				if (attributes.getValue("length") != null) {
-					this.item.setEnclosureLength(Long.parseLong(attributes.getValue("length")));
-				}
-			}
-		}
+        /** Now lets check for an image */
+        if (localName.equalsIgnoreCase("image") && (this.channel != null)) {
+            this.imgStatus = true;
+        }
 
-	}
+        /** Checking for a enclosure */
+        if (localName.equalsIgnoreCase("enclosure")) {
+            /** Lets check we are in an item */
+            if (this.item != null && attributes != null && attributes.getLength() > 0) {
+                if (attributes.getValue("url") != null) {
+                    this.item.setEnclosureUrl(parseLink(attributes.getValue("url")));
+                }
+                if (attributes.getValue("type") != null) {
+                    this.item.setEnclosureType(attributes.getValue("type"));
+                }
+                if (attributes.getValue("length") != null) {
+                    this.item.setEnclosureLength(Long.parseLong(attributes.getValue("length")));
+                }
+            }
+        }
 
-	/**
-	 * This is where we actually parse for the elements contents
-	 */
-	public void endElement(String uri, String localName, String qName) {
-		/** Check we have an RSS Feed */
-		if (this.channel == null) {
-			return;
-		}
+    }
 
-		/** Check are at the end of an item */
-		if (localName.equalsIgnoreCase("item")) {
-			this.item = null;
-		}
+    /**
+     * This is where we actually parse for the elements contents
+     */
+    public void endElement(String uri, String localName, String qName) {
+        /** Check we have an RSS Feed */
+        if (this.channel == null) {
+            return;
+        }
 
-		/** Check we are at the end of an image */
-		if (localName.equalsIgnoreCase("image")) {
-			this.imgStatus = false;
-		}
+        /** Check are at the end of an item */
+        if (localName.equalsIgnoreCase("item")) {
+            this.item = null;
+        }
 
-		/** Now we need to parse which title we are in */
-		if (localName.equalsIgnoreCase("title")) {
-			/** We are an item, so we set the item title */
-			if (this.item != null) {
-				this.item.setTitle(this.text.toString().trim());
-				/** We are in an image */
-			} else {
-				this.channel.setTitle(this.text.toString().trim());
-			}
-		}
+        /** Check we are at the end of an image */
+        if (localName.equalsIgnoreCase("image")) {
+            this.imgStatus = false;
+        }
 
-		/** Now we are checking for a link */
-		if (localName.equalsIgnoreCase("link")) {
-			/** Check we are in an item **/
-			if (this.item != null) {
-				this.item.setLink(parseLink(this.text.toString()));
-				/** Check we are in an image */
-			} else if (this.imgStatus) {
-				this.channel.setImage(parseLink(this.text.toString()));
-				/** Check we are in a channel */
-			} else {
-				this.channel.setLink(parseLink(this.text.toString()));
-			}
-		}
+        /** Now we need to parse which title we are in */
+        if (localName.equalsIgnoreCase("title")) {
+            /** We are an item, so we set the item title */
+            if (this.item != null) {
+                this.item.setTitle(this.text.toString().trim());
+                /** We are in an image */
+            } else {
+                this.channel.setTitle(this.text.toString().trim());
+            }
+        }
 
-		/** Checking for a description */
-		if (localName.equalsIgnoreCase("description")) {
-			/** Lets check we are in an item */
-			if (this.item != null) {
-				this.item.setDescription(this.text.toString().trim());
-				/** Lets check we are in the channel */
-			} else {
-				this.channel.setDescription(this.text.toString().trim());
-			}
-		}
+        /** Now we are checking for a link */
+        if (localName.equalsIgnoreCase("link")) {
+            /** Check we are in an item **/
+            if (this.item != null) {
+                this.item.setLink(parseLink(this.text.toString()));
+                /** Check we are in an image */
+            } else if (this.imgStatus) {
+                this.channel.setImage(parseLink(this.text.toString()));
+                /** Check we are in a channel */
+            } else {
+                this.channel.setLink(parseLink(this.text.toString()));
+            }
+        }
 
-		/** Checking for a pubdate */
-		if (localName.equalsIgnoreCase("pubDate")) {
-			/** Lets check we are in an item */
-			if (this.item != null) {
-				try {
-					this.item.setPubdate(new Date(Date.parse(this.text.toString().trim())));
-				} catch (Exception e) {
-					// Date is malformed (not parsable by Date.parse)
-				}
-				/** Lets check we are in the channel */
-			} else {
-				try {
-					this.channel.setPubDate(new Date(Date.parse(this.text.toString().trim())));
-				} catch (Exception e) {
-					// Date is malformed (not parsable by Date.parse)
-				}
-			}
-		}
+        /** Checking for a description */
+        if (localName.equalsIgnoreCase("description")) {
+            /** Lets check we are in an item */
+            if (this.item != null) {
+                this.item.setDescription(this.text.toString().trim());
+                /** Lets check we are in the channel */
+            } else {
+                this.channel.setDescription(this.text.toString().trim());
+            }
+        }
 
-		/** Check for the category */
-		if (localName.equalsIgnoreCase("category") && (this.item != null)) {
-			this.channel.addCategory(this.text.toString().trim());
-		}
+        /** Checking for a pubdate */
+        if (localName.equalsIgnoreCase("pubDate")) {
+            /** Lets check we are in an item */
+            if (this.item != null) {
+                try {
+                    this.item.setPubdate(new Date(Date.parse(this.text.toString().trim())));
+                } catch (Exception e) {
+                    // Date is malformed (not parsable by Date.parse)
+                }
+                /** Lets check we are in the channel */
+            } else {
+                try {
+                    this.channel.setPubDate(new Date(Date.parse(this.text.toString().trim())));
+                } catch (Exception e) {
+                    // Date is malformed (not parsable by Date.parse)
+                }
+            }
+        }
 
-		if (this.item != null)
-			addAdditionalData(localName, this.item, this.text.toString());
+        /** Check for the category */
+        if (localName.equalsIgnoreCase("category") && (this.item != null)) {
+            this.channel.addCategory(this.text.toString().trim());
+        }
 
-		this.text.setLength(0);
-	}
+        if (this.item != null)
+            addAdditionalData(localName, this.item, this.text.toString());
 
-	/**
-	 * May be overridden to add additional data from tags that are not standard in RSS. Not used by this default RSS style parser.
-	 * @param localName The tag name
-	 * @param item The Item we are currently parsing
-	 * @param text The new text content
-	 */
-	protected void addAdditionalData(String localName, Item item, String text) {
-	}
+        this.text.setLength(0);
+    }
 
-	public void characters(char[] ch, int start, int length) {
-		this.text.append(ch, start, length);
-	}
+    /**
+     * May be overridden to add additional data from tags that are not standard in RSS. Not used by this default RSS style parser.
+     *
+     * @param localName The tag name
+     * @param item      The Item we are currently parsing
+     * @param text      The new text content
+     */
+    protected void addAdditionalData(String localName, Item item, String text) {
+    }
 
-	private String parseLink(String string) {
-		return string.trim();
-	}
+    public void characters(char[] ch, int start, int length) {
+        this.text.append(ch, start, length);
+    }
 
-	private String urlString;
-	private Channel channel;
-	private StringBuilder text;
-	private Item item;
-	private boolean imgStatus;
+    private String parseLink(String string) {
+        return string.trim();
+    }
 
 }

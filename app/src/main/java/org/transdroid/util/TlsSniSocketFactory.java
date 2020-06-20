@@ -46,68 +46,68 @@ import javax.net.ssl.SSLSocket;
  */
 public class TlsSniSocketFactory implements LayeredSocketFactory {
 
-	private final static HostnameVerifier hostnameVerifier = new StrictHostnameVerifier();
+    private final static HostnameVerifier hostnameVerifier = new StrictHostnameVerifier();
 
-	public TlsSniSocketFactory() {
-	}
+    public TlsSniSocketFactory() {
+    }
 
-	// Plain TCP/IP (layer below TLS)
+    // Plain TCP/IP (layer below TLS)
 
-	@Override
-	public Socket connectSocket(Socket s, String host, int port, InetAddress localAddress, int localPort, HttpParams params) {
-		return null;
-	}
+    @Override
+    public Socket connectSocket(Socket s, String host, int port, InetAddress localAddress, int localPort, HttpParams params) {
+        return null;
+    }
 
-	@Override
-	public Socket createSocket() {
-		return null;
-	}
+    @Override
+    public Socket createSocket() {
+        return null;
+    }
 
-	@Override
-	public boolean isSecure(Socket s) throws IllegalArgumentException {
-		if (s instanceof SSLSocket) {
-			return s.isConnected();
-		}
-		return false;
-	}
+    @Override
+    public boolean isSecure(Socket s) throws IllegalArgumentException {
+        if (s instanceof SSLSocket) {
+            return s.isConnected();
+        }
+        return false;
+    }
 
-	// TLS layer
+    // TLS layer
 
-	@Override
-	@TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
-	public Socket createSocket(Socket plainSocket, String host, int port, boolean autoClose) throws IOException {
-		if (autoClose) {
-			// we don't need the plainSocket
-			plainSocket.close();
-		}
+    @Override
+    @TargetApi(Build.VERSION_CODES.JELLY_BEAN_MR1)
+    public Socket createSocket(Socket plainSocket, String host, int port, boolean autoClose) throws IOException {
+        if (autoClose) {
+            // we don't need the plainSocket
+            plainSocket.close();
+        }
 
-		SSLCertificateSocketFactory sslSocketFactory = (SSLCertificateSocketFactory) SSLCertificateSocketFactory.getDefault(0);
+        SSLCertificateSocketFactory sslSocketFactory = (SSLCertificateSocketFactory) SSLCertificateSocketFactory.getDefault(0);
 
-		// create and connect SSL socket, but don't do hostname/certificate verification yet
-		SSLSocket ssl = (SSLSocket) sslSocketFactory.createSocket(InetAddress.getByName(host), port);
+        // create and connect SSL socket, but don't do hostname/certificate verification yet
+        SSLSocket ssl = (SSLSocket) sslSocketFactory.createSocket(InetAddress.getByName(host), port);
 
-		// enable TLSv1.1/1.2 if available
-		ssl.setEnabledProtocols(ssl.getSupportedProtocols());
+        // enable TLSv1.1/1.2 if available
+        ssl.setEnabledProtocols(ssl.getSupportedProtocols());
 
-		// set up SNI before the handshake
-		if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
-			sslSocketFactory.setHostname(ssl, host);
-		} else {
-			try {
-				java.lang.reflect.Method setHostnameMethod = ssl.getClass().getMethod("setHostname", String.class);
-				setHostnameMethod.invoke(ssl, host);
-			} catch (Exception e) {
-				Log.d(TlsSniSocketFactory.class.getSimpleName(), "SNI not usable: " + e);
-			}
-		}
+        // set up SNI before the handshake
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR1) {
+            sslSocketFactory.setHostname(ssl, host);
+        } else {
+            try {
+                java.lang.reflect.Method setHostnameMethod = ssl.getClass().getMethod("setHostname", String.class);
+                setHostnameMethod.invoke(ssl, host);
+            } catch (Exception e) {
+                Log.d(TlsSniSocketFactory.class.getSimpleName(), "SNI not usable: " + e);
+            }
+        }
 
-		// verify hostname and certificate
-		SSLSession session = ssl.getSession();
-		if (!hostnameVerifier.verify(host, session)) {
-			throw new SSLPeerUnverifiedException("Cannot verify hostname: " + host);
-		}
+        // verify hostname and certificate
+        SSLSession session = ssl.getSession();
+        if (!hostnameVerifier.verify(host, session)) {
+            throw new SSLPeerUnverifiedException("Cannot verify hostname: " + host);
+        }
 
-		return ssl;
-	}
+        return ssl;
+    }
 
 }

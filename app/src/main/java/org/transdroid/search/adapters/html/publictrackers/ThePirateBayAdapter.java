@@ -37,92 +37,93 @@ import java.util.regex.Pattern;
 
 /**
  * An adapter that provides access to The Pirate Bay torrent searches by parsing the raw HTML output.
+ *
  * @author Eric Kok
  */
 public class ThePirateBayAdapter extends AbstractHtmlAdapter {
 
-	private static final String DOMAIN = "https://thepiratebay-org.prox.fun";
-	private static final String QUERYURL = DOMAIN + "/search/%1$s/0/%2$s/0";
-	private static final String SORT_COMPOSITE = "3";
-	private static final String SORT_SEEDS = "7";
-	private static final Pattern PATTERN_DESCRIPTION = Pattern.compile("^Uploaded ([^,]+), Size ([^,]+),.*");
+    private static final String DOMAIN = "https://thepiratebay-org.prox.fun";
+    private static final String QUERYURL = DOMAIN + "/search/%1$s/0/%2$s/0";
+    private static final String SORT_COMPOSITE = "3";
+    private static final String SORT_SEEDS = "7";
+    private static final Pattern PATTERN_DESCRIPTION = Pattern.compile("^Uploaded ([^,]+), Size ([^,]+),.*");
 
-	@Override
-	protected String getSearchUrl(SharedPreferences prefs, String query, SortOrder order, int maxResults) throws UnsupportedEncodingException {
-		return String.format(QUERYURL, URLEncoder.encode(query, "UTF-8"), (order == SortOrder.BySeeders ? SORT_SEEDS : SORT_COMPOSITE));
-	}
+    private static Date parseDate(String dateString) {
+        try {
+            dateString = dateString.replace("&nbsp;", " ");
+            final Calendar calendar = Calendar.getInstance();
+            final String[] split = dateString.split(" ");
+            final String[] split1 = split[0].split("-");
+            final String[] split2 = split[1].split(":");
+            if (split2.length == 2) {
+                calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(split2[0]));
+                calendar.set(Calendar.MINUTE, Integer.parseInt(split2[1]));
+                if (split[0].equals("Y-day")) {
+                    calendar.add(Calendar.DAY_OF_MONTH, -1);
+                } else if (!split[0].equals("Today")) {
+                    calendar.set(Calendar.MONTH, Integer.parseInt(split1[0]) - 1);
+                    calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(split1[1]));
+                }
+            } else {
+                calendar.set(Calendar.YEAR, Integer.parseInt(split[1]));
+                calendar.set(Calendar.MONTH, Integer.parseInt(split1[0]) - 1);
+                calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(split1[1]));
+            }
+            return calendar.getTime();
+        } catch (RuntimeException e) {
+            return null;
+        }
+    }
 
-	@Override
-	protected Elements selectTorrentElements(Document document) {
-		return document.select("table[id=searchResult] > tbody > tr");
-	}
+    @Override
+    protected String getSearchUrl(SharedPreferences prefs, String query, SortOrder order, int maxResults) throws UnsupportedEncodingException {
+        return String.format(QUERYURL, URLEncoder.encode(query, "UTF-8"), (order == SortOrder.BySeeders ? SORT_SEEDS : SORT_COMPOSITE));
+    }
 
-	@Override
-	protected SearchResult buildSearchResult(Element torrentElement) {
-		final Elements linkElement = torrentElement.select("a.detLink");
-		final String title = linkElement.text();
-		final String torrentUrl = torrentElement.select("a[href^=magnet:]").attr("href");
-		final String detailsUrl = DOMAIN + linkElement.attr("href");
+    @Override
+    protected Elements selectTorrentElements(Document document) {
+        return document.select("table[id=searchResult] > tbody > tr");
+    }
 
-		final String description = torrentElement.select("font.detDesc").text();
-		final Matcher matcher = PATTERN_DESCRIPTION.matcher(description);
-		final Date added;
-		final String size;
-		if (matcher.matches()) {
-			added = parseDate(matcher.group(1));
-			size = matcher.group(2);
-		} else {
-			added = null;
-			size = "";
-		}
+    @Override
+    protected SearchResult buildSearchResult(Element torrentElement) {
+        final Elements linkElement = torrentElement.select("a.detLink");
+        final String title = linkElement.text();
+        final String torrentUrl = torrentElement.select("a[href^=magnet:]").attr("href");
+        final String detailsUrl = DOMAIN + linkElement.attr("href");
 
-		final Elements children = torrentElement.children();
-		final int numChildren = children.size();
+        final String description = torrentElement.select("font.detDesc").text();
+        final Matcher matcher = PATTERN_DESCRIPTION.matcher(description);
+        final Date added;
+        final String size;
+        if (matcher.matches()) {
+            added = parseDate(matcher.group(1));
+            size = matcher.group(2);
+        } else {
+            added = null;
+            size = "";
+        }
 
-		final int seeds = Integer.parseInt(children.get(numChildren - 2).text());
-		final int leechers = Integer.parseInt(children.get(numChildren - 1).text());
-		return new SearchResult(title, torrentUrl, detailsUrl, size, added, seeds, leechers);
-	}
+        final Elements children = torrentElement.children();
+        final int numChildren = children.size();
 
-	@Override
-	protected TorrentSite getTorrentSite() {
-		return TorrentSite.ThePirateBay;
-	}
+        final int seeds = Integer.parseInt(children.get(numChildren - 2).text());
+        final int leechers = Integer.parseInt(children.get(numChildren - 1).text());
+        return new SearchResult(title, torrentUrl, detailsUrl, size, added, seeds, leechers);
+    }
 
-	@Override
-	public String buildRssFeedUrlFromSearch(SharedPreferences prefs, String query, SortOrder order) {
-		return null;
-	}
+    @Override
+    protected TorrentSite getTorrentSite() {
+        return TorrentSite.ThePirateBay;
+    }
 
-	@Override
-	public String getSiteName() {
-		return "The Pirate Bay (proxied)";
-	}
+    @Override
+    public String buildRssFeedUrlFromSearch(SharedPreferences prefs, String query, SortOrder order) {
+        return null;
+    }
 
-	private static Date parseDate(String dateString) {
-		try {
-			dateString = dateString.replace("&nbsp;", " ");
-			final Calendar calendar = Calendar.getInstance();
-			final String[] split = dateString.split(" ");
-			final String[] split1 = split[0].split("-");
-			final String[] split2 = split[1].split(":");
-			if (split2.length == 2) {
-				calendar.set(Calendar.HOUR_OF_DAY, Integer.parseInt(split2[0]));
-				calendar.set(Calendar.MINUTE, Integer.parseInt(split2[1]));
-				if (split[0].equals("Y-day")) {
-					calendar.add(Calendar.DAY_OF_MONTH, -1);
-				} else if (!split[0].equals("Today")) {
-					calendar.set(Calendar.MONTH, Integer.parseInt(split1[0]) - 1);
-					calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(split1[1]));
-				}
-			} else {
-				calendar.set(Calendar.YEAR, Integer.parseInt(split[1]));
-				calendar.set(Calendar.MONTH, Integer.parseInt(split1[0]) - 1);
-				calendar.set(Calendar.DAY_OF_MONTH, Integer.parseInt(split1[1]));
-			}
-			return calendar.getTime();
-		} catch (RuntimeException e) {
-			return null;
-		}
-	}
+    @Override
+    public String getSiteName() {
+        return "The Pirate Bay (proxied)";
+    }
 }

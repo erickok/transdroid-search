@@ -1,19 +1,19 @@
 /*
- *	This file is part of Transdroid Torrent Search 
+ *	This file is part of Transdroid Torrent Search
  *	<http://code.google.com/p/transdroid-search/>
- *	
- *	Transdroid Torrent Search is free software: you can redistribute 
- *	it and/or modify it under the terms of the GNU Lesser General 
- *	Public License as published by the Free Software Foundation, 
- *	either version 3 of the License, or (at your option) any later 
+ *
+ *	Transdroid Torrent Search is free software: you can redistribute
+ *	it and/or modify it under the terms of the GNU Lesser General
+ *	Public License as published by the Free Software Foundation,
+ *	either version 3 of the License, or (at your option) any later
  *	version.
- *	
- *	Transdroid Torrent Search is distributed in the hope that it will 
- *	be useful, but WITHOUT ANY WARRANTY; without even the implied 
- *	warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  
+ *
+ *	Transdroid Torrent Search is distributed in the hope that it will
+ *	be useful, but WITHOUT ANY WARRANTY; without even the implied
+ *	warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *	See the GNU Lesser General Public License for more details.
- *	
- *	You should have received a copy of the GNU Lesser General Public 
+ *
+ *	You should have received a copy of the GNU Lesser General Public
  *	License along with Transdroid.  If not, see <http://www.gnu.org/licenses/>.
  */
 package org.transdroid.util;
@@ -42,124 +42,124 @@ import java.util.zip.GZIPInputStream;
 
 /**
  * Provides a set of general helper methods that can be used in web-based communication.
+ *
  * @author erickok
  */
 public class HttpHelper {
 
-	public static DefaultHttpClient buildDefaultSearchHttpClient(boolean ignoreSslIssues) {
+    /**
+     * HTTP request interceptor to allow for GZip-encoded data transfer
+     */
+    public static HttpRequestInterceptor gzipRequestInterceptor = (request, context) -> {
+        if (!request.containsHeader("Accept-Encoding")) {
+            request.addHeader("Accept-Encoding", "gzip");
+        }
+    };
+    /**
+     * HTTP response interceptor that decodes GZipped data
+     */
+    public static HttpResponseInterceptor gzipResponseInterceptor = (response, context) -> {
+        HttpEntity entity = response.getEntity();
+        Header ceheader = entity.getContentEncoding();
+        if (ceheader != null) {
+            HeaderElement[] codecs = ceheader.getElements();
+            for (HeaderElement codec : codecs) {
 
-		SchemeRegistry registry = new SchemeRegistry();
-		registry.register(new Scheme("http", new PlainSocketFactory(), 80));
-		registry.register(new Scheme("https", ignoreSslIssues ? new IgnoreTlsSniSocketFactory() : new TlsSniSocketFactory(), 443));
+                if (codec.getName().equalsIgnoreCase("gzip")) {
+                    response.setEntity(new GzipDecompressingEntity(response.getEntity()));
+                    return;
+                }
+            }
+        }
+    };
 
-		HttpParams httpparams = new BasicHttpParams();
-		HttpConnectionParams.setConnectionTimeout(httpparams, 30000);
-		HttpConnectionParams.setSoTimeout(httpparams, 30000);
-		DefaultHttpClient httpclient = new DefaultHttpClient(new ThreadSafeClientConnManager(httpparams, registry), httpparams);
+    public static DefaultHttpClient buildDefaultSearchHttpClient(boolean ignoreSslIssues) {
 
-		httpclient.addRequestInterceptor(HttpHelper.gzipRequestInterceptor);
-		httpclient.addResponseInterceptor(HttpHelper.gzipResponseInterceptor);
+        SchemeRegistry registry = new SchemeRegistry();
+        registry.register(new Scheme("http", new PlainSocketFactory(), 80));
+        registry.register(new Scheme("https", ignoreSslIssues ? new IgnoreTlsSniSocketFactory() : new TlsSniSocketFactory(), 443));
 
-		return httpclient;
+        HttpParams httpparams = new BasicHttpParams();
+        HttpConnectionParams.setConnectionTimeout(httpparams, 30000);
+        HttpConnectionParams.setSoTimeout(httpparams, 30000);
+        DefaultHttpClient httpclient = new DefaultHttpClient(new ThreadSafeClientConnManager(httpparams, registry), httpparams);
 
-	}
+        httpclient.addRequestInterceptor(HttpHelper.gzipRequestInterceptor);
+        httpclient.addResponseInterceptor(HttpHelper.gzipResponseInterceptor);
 
-	/**
-	 * HTTP request interceptor to allow for GZip-encoded data transfer
-	 */
-	public static HttpRequestInterceptor gzipRequestInterceptor = (request, context) -> {
-		if (!request.containsHeader("Accept-Encoding")) {
-			request.addHeader("Accept-Encoding", "gzip");
-		}
-	};
+        return httpclient;
 
-	/**
-	 * HTTP response interceptor that decodes GZipped data
-	 */
-	public static HttpResponseInterceptor gzipResponseInterceptor = (response, context) -> {
-		HttpEntity entity = response.getEntity();
-		Header ceheader = entity.getContentEncoding();
-		if (ceheader != null) {
-			HeaderElement[] codecs = ceheader.getElements();
-			for (HeaderElement codec : codecs) {
+    }
 
-				if (codec.getName().equalsIgnoreCase("gzip")) {
-					response.setEntity(new GzipDecompressingEntity(response.getEntity()));
-					return;
-				}
-			}
-		}
-	};
+    /*
+     * To convert the InputStream to String we use the BufferedReader.readLine()
+     * method. We iterate until the BufferedReader return null which means
+     * there's no more data to read. Each line will appended to a StringBuilder
+     * and returned as String.
+     *
+     * Taken from http://senior.ceng.metu.edu.tr/2009/praeda/2009/01/11/a-simple-restful-client-at-android/
+     */
+    public static String convertStreamToString(InputStream is, String encoding) throws UnsupportedEncodingException {
+        InputStreamReader isr;
+        if (encoding != null) {
+            isr = new InputStreamReader(is, encoding);
+        } else {
+            isr = new InputStreamReader(is);
+        }
+        BufferedReader reader = new BufferedReader(isr);
+        StringBuilder sb = new StringBuilder();
 
-	/**
-	 * HTTP entity wrapper to decompress GZipped HTTP responses
-	 */
-	private static class GzipDecompressingEntity extends HttpEntityWrapper {
+        String line;
+        try {
+            while ((line = reader.readLine()) != null) {
+                sb.append(line).append("\n");
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        } finally {
+            try {
+                is.close();
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        return sb.toString();
+    }
 
-		public GzipDecompressingEntity(final HttpEntity entity) {
-			super(entity);
-		}
+    public static String convertStreamToString(InputStream is) {
+        try {
+            return convertStreamToString(is, null);
+        } catch (UnsupportedEncodingException e) {
+            // Since this is going to use the default encoding, it is never going to crash on an UnsupportedEncodingException
+            e.printStackTrace();
+            return null;
+        }
+    }
 
-		@Override
-		public InputStream getContent() throws IOException, IllegalStateException {
+    /**
+     * HTTP entity wrapper to decompress GZipped HTTP responses
+     */
+    private static class GzipDecompressingEntity extends HttpEntityWrapper {
 
-			// the wrapped entity's getContent() decides about repeatability
-			InputStream wrappedin = wrappedEntity.getContent();
+        public GzipDecompressingEntity(final HttpEntity entity) {
+            super(entity);
+        }
 
-			return new GZIPInputStream(wrappedin);
-		}
+        @Override
+        public InputStream getContent() throws IOException, IllegalStateException {
 
-		@Override
-		public long getContentLength() {
-			// length of ungzipped content is not known
-			return -1;
-		}
+            // the wrapped entity's getContent() decides about repeatability
+            InputStream wrappedin = wrappedEntity.getContent();
 
-	}
+            return new GZIPInputStream(wrappedin);
+        }
 
-	/*
-	 * To convert the InputStream to String we use the BufferedReader.readLine()
-	 * method. We iterate until the BufferedReader return null which means
-	 * there's no more data to read. Each line will appended to a StringBuilder
-	 * and returned as String.
-	 *
-	 * Taken from http://senior.ceng.metu.edu.tr/2009/praeda/2009/01/11/a-simple-restful-client-at-android/
-	 */
-	public static String convertStreamToString(InputStream is, String encoding) throws UnsupportedEncodingException {
-		InputStreamReader isr;
-		if (encoding != null) {
-			isr = new InputStreamReader(is, encoding);
-		} else {
-			isr = new InputStreamReader(is);
-		}
-		BufferedReader reader = new BufferedReader(isr);
-		StringBuilder sb = new StringBuilder();
+        @Override
+        public long getContentLength() {
+            // length of ungzipped content is not known
+            return -1;
+        }
 
-		String line;
-		try {
-			while ((line = reader.readLine()) != null) {
-				sb.append(line).append("\n");
-			}
-		} catch (IOException e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				is.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-		}
-		return sb.toString();
-	}
-
-	public static String convertStreamToString(InputStream is) {
-		try {
-			return convertStreamToString(is, null);
-		} catch (UnsupportedEncodingException e) {
-			// Since this is going to use the default encoding, it is never going to crash on an UnsupportedEncodingException
-			e.printStackTrace();
-			return null;
-		}
-	}
+    }
 
 }

@@ -18,15 +18,10 @@
  */
 package org.transdroid.search.adapters.privatetrackers;
 
-import java.io.InputStream;
-import java.net.URLEncoder;
-import java.security.InvalidParameterException;
-import java.text.*;
-import java.util.*;
+import android.content.SharedPreferences;
 
-import javax.security.auth.login.LoginException;
-
-import org.apache.http.*;
+import org.apache.http.HttpResponse;
+import org.apache.http.HttpStatus;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
@@ -42,210 +37,220 @@ import org.transdroid.search.TorrentSite;
 import org.transdroid.search.gui.SettingsHelper;
 import org.transdroid.util.HttpHelper;
 
-import android.content.SharedPreferences;
+import java.io.InputStream;
+import java.net.URLEncoder;
+import java.security.InvalidParameterException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.List;
+import java.util.Locale;
+
+import javax.security.auth.login.LoginException;
 
 /**
  * An adapter that provides access to AsiaTorrents searches by parsing the raw HTML output.
  */
 public class AsiaTorrentsAdapter implements ISearchAdapter {
 
-	private static final String LOGIN_USER = "uid";
-	private static final String LOGIN_PASS = "pwd";
-	private static final String LOGINURL = "http://www.asiatorrents.me/index.php?page=login";
-	private static final String QUERYURL = "http://www.asiatorrents.me/index.php?page=torrents&search=%1$s";
-	private static final int CONNECTION_TIMEOUT = 8000;
-	private final SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
+    private static final String LOGIN_USER = "uid";
+    private static final String LOGIN_PASS = "pwd";
+    private static final String LOGINURL = "http://www.asiatorrents.me/index.php?page=login";
+    private static final String QUERYURL = "http://www.asiatorrents.me/index.php?page=torrents&search=%1$s";
+    private static final int CONNECTION_TIMEOUT = 8000;
+    private final SimpleDateFormat df = new SimpleDateFormat("dd/MM/yyyy", Locale.US);
 
-	private DefaultHttpClient prepareRequest(SharedPreferences prefs) throws Exception {
+    private DefaultHttpClient prepareRequest(SharedPreferences prefs) throws Exception {
 
-		String username = SettingsHelper.getSiteUser(prefs, TorrentSite.AsiaTorrents);
-		String password = SettingsHelper.getSitePass(prefs, TorrentSite.AsiaTorrents);
-		if (username == null || password == null) {
-			throw new InvalidParameterException("No username or password was provided, while this is required for this private site.");
-		}
+        String username = SettingsHelper.getSiteUser(prefs, TorrentSite.AsiaTorrents);
+        String password = SettingsHelper.getSitePass(prefs, TorrentSite.AsiaTorrents);
+        if (username == null || password == null) {
+            throw new InvalidParameterException("No username or password was provided, while this is required for this private site.");
+        }
 
-		// Setup request using GET
-		HttpParams httpparams = new BasicHttpParams();
-		HttpConnectionParams.setConnectionTimeout(httpparams, CONNECTION_TIMEOUT);
-		HttpConnectionParams.setSoTimeout(httpparams, CONNECTION_TIMEOUT);
-		DefaultHttpClient httpclient = new DefaultHttpClient(httpparams);
+        // Setup request using GET
+        HttpParams httpparams = new BasicHttpParams();
+        HttpConnectionParams.setConnectionTimeout(httpparams, CONNECTION_TIMEOUT);
+        HttpConnectionParams.setSoTimeout(httpparams, CONNECTION_TIMEOUT);
+        DefaultHttpClient httpclient = new DefaultHttpClient(httpparams);
 
-		// First log in
-		HttpPost loginPost = new HttpPost(LOGINURL);
-		loginPost.setEntity(new UrlEncodedFormEntity(Arrays.asList(
-				new BasicNameValuePair(LOGIN_USER, username),
-				new BasicNameValuePair(LOGIN_PASS, password))));
-		HttpResponse loginResult = httpclient.execute(loginPost);
-		if (loginResult.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
-			// Failed to sign in
-			throw new LoginException("Login failure for AsiaTorrents with user " + username);
-		}
+        // First log in
+        HttpPost loginPost = new HttpPost(LOGINURL);
+        loginPost.setEntity(new UrlEncodedFormEntity(Arrays.asList(
+                new BasicNameValuePair(LOGIN_USER, username),
+                new BasicNameValuePair(LOGIN_PASS, password))));
+        HttpResponse loginResult = httpclient.execute(loginPost);
+        if (loginResult.getStatusLine().getStatusCode() != HttpStatus.SC_OK) {
+            // Failed to sign in
+            throw new LoginException("Login failure for AsiaTorrents with user " + username);
+        }
 
-		return httpclient;
+        return httpclient;
 
-	}
+    }
 
-	@Override
-	public List<SearchResult> search(SharedPreferences prefs, String query, SortOrder order, int maxResults) throws Exception {
+    @Override
+    public List<SearchResult> search(SharedPreferences prefs, String query, SortOrder order, int maxResults) throws Exception {
 
-		DefaultHttpClient httpclient = prepareRequest(prefs);
+        DefaultHttpClient httpclient = prepareRequest(prefs);
 
-		// Build a search request parameters
-		String encodedQuery;
-		encodedQuery = URLEncoder.encode(query, "UTF-8");
+        // Build a search request parameters
+        String encodedQuery;
+        encodedQuery = URLEncoder.encode(query, "UTF-8");
 
-		final String url = String.format(QUERYURL, encodedQuery/*, (order == SortOrder.BySeeders ? SORT_SEEDS : SORT_COMPOSITE)*/);
+        final String url = String.format(QUERYURL, encodedQuery/*, (order == SortOrder.BySeeders ? SORT_SEEDS : SORT_COMPOSITE)*/);
 
-		// Start synchronous search
+        // Start synchronous search
 
-		// Make request
-		HttpGet httpget = new HttpGet(url);
-		HttpResponse response = httpclient.execute(httpget);
+        // Make request
+        HttpGet httpget = new HttpGet(url);
+        HttpResponse response = httpclient.execute(httpget);
 
-		// Read HTML response
-		InputStream instream = response.getEntity().getContent();
-		String html = HttpHelper.convertStreamToString(instream);
-		instream.close();
-		return parseHtml(html, maxResults);
+        // Read HTML response
+        InputStream instream = response.getEntity().getContent();
+        String html = HttpHelper.convertStreamToString(instream);
+        instream.close();
+        return parseHtml(html, maxResults);
 
-	}
+    }
 
-	@Override
-	public InputStream getTorrentFile(SharedPreferences prefs, String url) throws Exception {
+    @Override
+    public InputStream getTorrentFile(SharedPreferences prefs, String url) throws Exception {
 
-		// Provide an authenticated file handle to the requested url
-		DefaultHttpClient httpclient = prepareRequest(prefs);
-		HttpResponse response = httpclient.execute(new HttpGet(url));
-		return response.getEntity().getContent();
+        // Provide an authenticated file handle to the requested url
+        DefaultHttpClient httpclient = prepareRequest(prefs);
+        HttpResponse response = httpclient.execute(new HttpGet(url));
+        return response.getEntity().getContent();
 
-	}
+    }
 
-	protected List<SearchResult> parseHtml(String html, int maxResults) throws Exception {
+    protected List<SearchResult> parseHtml(String html, int maxResults) throws Exception {
 
-		try {
+        try {
 
-			// Texts to find subsequently
-			final String RESULTS = "<td align=\"center\" width=\"20\" class=\"header\">Dl</td>";
-			final String TORRENT = "<td class=\"lista\" valign=\"middle\" onMouseOver=";
+            // Texts to find subsequently
+            final String RESULTS = "<td align=\"center\" width=\"20\" class=\"header\">Dl</td>";
+            final String TORRENT = "<td class=\"lista\" valign=\"middle\" onMouseOver=";
 
-			// Parse the search results from HTML by looking for the identifying texts
-			List<SearchResult> results = new ArrayList<>();
-			//if (html.indexOf(NOMATCH) >= 0)
-				//return results; // Success, but no result for this query
-			int resultsStart = html.indexOf(RESULTS) + RESULTS.length();
-			android.util.Log.d("resultsStart", "" + resultsStart);
+            // Parse the search results from HTML by looking for the identifying texts
+            List<SearchResult> results = new ArrayList<>();
+            //if (html.indexOf(NOMATCH) >= 0)
+            //return results; // Success, but no result for this query
+            int resultsStart = html.indexOf(RESULTS) + RESULTS.length();
+            android.util.Log.d("resultsStart", "" + resultsStart);
 
-			int torStart = html.indexOf(TORRENT, resultsStart);
-			android.util.Log.d("torStart", "" + torStart);
-			while (torStart >= 0 && results.size() < maxResults) {
-				int nextTorrentIndex = html.indexOf(TORRENT, torStart + TORRENT.length());
-				if (nextTorrentIndex >= 0) {
-					results.add(parseHtmlItem(html.substring(torStart + TORRENT.length(), nextTorrentIndex)));
-				} else {
-					results.add(parseHtmlItem(html.substring(torStart + TORRENT.length())));
-				}
-				torStart = nextTorrentIndex;
-			}
-			return results;
+            int torStart = html.indexOf(TORRENT, resultsStart);
+            android.util.Log.d("torStart", "" + torStart);
+            while (torStart >= 0 && results.size() < maxResults) {
+                int nextTorrentIndex = html.indexOf(TORRENT, torStart + TORRENT.length());
+                if (nextTorrentIndex >= 0) {
+                    results.add(parseHtmlItem(html.substring(torStart + TORRENT.length(), nextTorrentIndex)));
+                } else {
+                    results.add(parseHtmlItem(html.substring(torStart + TORRENT.length())));
+                }
+                torStart = nextTorrentIndex;
+            }
+            return results;
 
-		} catch (OutOfMemoryError e) {
-			throw new Exception(e);
-		} catch (Exception e) {
-			throw new Exception(e);
-		}
-	}
+        } catch (OutOfMemoryError e) {
+            throw new Exception(e);
+        } catch (Exception e) {
+            throw new Exception(e);
+        }
+    }
 
-	private SearchResult parseHtmlItem(String htmlItem) {
+    private SearchResult parseHtmlItem(String htmlItem) {
 
-		// Texts to find subsequently
-		final String DETAILS_START = "<a href=\"";
-		final String DETAILS_END = "\"";
-		final String NAME_START = "\">";
-		final String NAME_END = "</a>";
-		final String LINK = "<a href=\"download.php";
-		final String LINK_END = "\">";
-		final String DATE_TAG_START = "<td align=\"center\" width=\"85\" class=\"lista\"";
-		final String DATE_START = "\">";
-		final String DATE_END = "</td>";
-		final String SIZE = "\">";
-		final String SIZE_END = "</td>";
-		final String SEEDERS = "title=\"Click here to view peers details\">";
-		final String SEEDERS_END = "</a></td>";
-		final String LEECHERS = "title=\"Click here to view peers details\">";
-		final String LEECHERS_END = "</a></td>";
-		final String prefix = "http://asiatorrents.me/";
+        // Texts to find subsequently
+        final String DETAILS_START = "<a href=\"";
+        final String DETAILS_END = "\"";
+        final String NAME_START = "\">";
+        final String NAME_END = "</a>";
+        final String LINK = "<a href=\"download.php";
+        final String LINK_END = "\">";
+        final String DATE_TAG_START = "<td align=\"center\" width=\"85\" class=\"lista\"";
+        final String DATE_START = "\">";
+        final String DATE_END = "</td>";
+        final String SIZE = "\">";
+        final String SIZE_END = "</td>";
+        final String SEEDERS = "title=\"Click here to view peers details\">";
+        final String SEEDERS_END = "</a></td>";
+        final String LEECHERS = "title=\"Click here to view peers details\">";
+        final String LEECHERS_END = "</a></td>";
+        final String prefix = "http://asiatorrents.me/";
 
-		int detailsStart = htmlItem.indexOf(DETAILS_START) + DETAILS_START.length();
-		String details = htmlItem.substring(detailsStart, htmlItem.indexOf(DETAILS_END, detailsStart));
-		details = prefix + details.replace("&amp;", "&");
+        int detailsStart = htmlItem.indexOf(DETAILS_START) + DETAILS_START.length();
+        String details = htmlItem.substring(detailsStart, htmlItem.indexOf(DETAILS_END, detailsStart));
+        details = prefix + details.replace("&amp;", "&");
 
-		int nameStart = htmlItem.indexOf(NAME_START) + NAME_START.length();
-		nameStart = htmlItem.indexOf(NAME_START, nameStart) + NAME_START.length();
-		String name = htmlItem.substring(nameStart, htmlItem.indexOf(NAME_END, nameStart));
-		int logoStart = name.indexOf(" &nbsp;");
-		if (logoStart > 0)
-			name = name.substring(0, logoStart);
+        int nameStart = htmlItem.indexOf(NAME_START) + NAME_START.length();
+        nameStart = htmlItem.indexOf(NAME_START, nameStart) + NAME_START.length();
+        String name = htmlItem.substring(nameStart, htmlItem.indexOf(NAME_END, nameStart));
+        int logoStart = name.indexOf(" &nbsp;");
+        if (logoStart > 0)
+            name = name.substring(0, logoStart);
 
-		int linkStart = htmlItem.indexOf(LINK, nameStart) + DETAILS_START.length();
-		String link = htmlItem.substring(linkStart, htmlItem.indexOf(LINK_END, linkStart));
-		link = prefix + link.replace("&amp;", "&");
+        int linkStart = htmlItem.indexOf(LINK, nameStart) + DETAILS_START.length();
+        String link = htmlItem.substring(linkStart, htmlItem.indexOf(LINK_END, linkStart));
+        link = prefix + link.replace("&amp;", "&");
 
-		int dateStart = htmlItem.indexOf(DATE_TAG_START, linkStart) + DATE_TAG_START.length();
-		dateStart = htmlItem.indexOf(DATE_START, dateStart) + DATE_START.length();
-		String dateText = htmlItem.substring(dateStart, htmlItem.indexOf(DATE_END, dateStart));
-		Date date = null;
-		try {
-			date = df.parse(dateText);
-		} catch (java.text.ParseException e) {
-			// Not parsable; just leave it at null
-		}
+        int dateStart = htmlItem.indexOf(DATE_TAG_START, linkStart) + DATE_TAG_START.length();
+        dateStart = htmlItem.indexOf(DATE_START, dateStart) + DATE_START.length();
+        String dateText = htmlItem.substring(dateStart, htmlItem.indexOf(DATE_END, dateStart));
+        Date date = null;
+        try {
+            date = df.parse(dateText);
+        } catch (java.text.ParseException e) {
+            // Not parsable; just leave it at null
+        }
 
-		int sizeStart = htmlItem.indexOf(SIZE, dateStart) + SIZE.length();
-		String size = htmlItem.substring(sizeStart, htmlItem.indexOf(SIZE_END, sizeStart));
+        int sizeStart = htmlItem.indexOf(SIZE, dateStart) + SIZE.length();
+        String size = htmlItem.substring(sizeStart, htmlItem.indexOf(SIZE_END, sizeStart));
 
-		int seedersStart = htmlItem.indexOf(SEEDERS, sizeStart) + SEEDERS.length();
-		int seeders = 0;
-		if (seedersStart >= 0) {
-			try {
-				String seedersText = htmlItem.substring(seedersStart, htmlItem.indexOf(SEEDERS_END, seedersStart));
-				seeders = Integer.parseInt(seedersText);
-			} catch (Exception e) {
-				// Number of seeders not found; ignore
-			}
-		}
+        int seedersStart = htmlItem.indexOf(SEEDERS, sizeStart) + SEEDERS.length();
+        int seeders = 0;
+        if (seedersStart >= 0) {
+            try {
+                String seedersText = htmlItem.substring(seedersStart, htmlItem.indexOf(SEEDERS_END, seedersStart));
+                seeders = Integer.parseInt(seedersText);
+            } catch (Exception e) {
+                // Number of seeders not found; ignore
+            }
+        }
 
-		int leechersStart = htmlItem.indexOf(LEECHERS, seedersStart) + LEECHERS.length();
-		int leechers = 0;
-		if (leechersStart >= 0) {
-			try {
-				String leechersText = htmlItem.substring(leechersStart, htmlItem.indexOf(LEECHERS_END, leechersStart));
-				leechers = Integer.parseInt(leechersText);
-			} catch (Exception e) {
-				// Number of seeders not found; ignore
-			}
-		}
+        int leechersStart = htmlItem.indexOf(LEECHERS, seedersStart) + LEECHERS.length();
+        int leechers = 0;
+        if (leechersStart >= 0) {
+            try {
+                String leechersText = htmlItem.substring(leechersStart, htmlItem.indexOf(LEECHERS_END, leechersStart));
+                leechers = Integer.parseInt(leechersText);
+            } catch (Exception e) {
+                // Number of seeders not found; ignore
+            }
+        }
 
-		return new SearchResult(name, link, details, size, date, seeders, leechers);
+        return new SearchResult(name, link, details, size, date, seeders, leechers);
 
-	}
+    }
 
-	@Override
-	public String buildRssFeedUrlFromSearch(SharedPreferences prefs, String query, SortOrder order) {
-		// AsiaTorrents doesn't support RSS feed-based searches
-		return null;
-	}
+    @Override
+    public String buildRssFeedUrlFromSearch(SharedPreferences prefs, String query, SortOrder order) {
+        // AsiaTorrents doesn't support RSS feed-based searches
+        return null;
+    }
 
-	@Override
-	public String getSiteName() {
-		return "AsiaTorrents";
-	}
+    @Override
+    public String getSiteName() {
+        return "AsiaTorrents";
+    }
 
-	public AuthType getAuthType() {
-		return AuthType.USERNAME;
-	}
+    public AuthType getAuthType() {
+        return AuthType.USERNAME;
+    }
 
-	public String[] getRequiredCookies() {
-		return null;
-	}
+    public String[] getRequiredCookies() {
+        return null;
+    }
 
 }
