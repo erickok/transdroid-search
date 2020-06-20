@@ -1,14 +1,20 @@
 transdroid-search
 =================
 
-Transdroid Torrent Search is an Android application that provides torrent search results to other Android apps by exposing `ContentProvider`s. Originally part of [Transdroid](http://www.transdroid.org), it now supplies torrent links for 15+ public and private torrent sites to various torrent-related Android applications.
+Transdroid Torrent Search is an Android application that provides torrent search results to other Android apps by exposing `ContentProvider`s. Originally part of [Transdroid](https://www.transdroid.org/), it now supplies torrent links for 15+ public and private torrent sites to various torrent-related Android applications.
 
-The latest .apk is available via [transdroid.org/latest-search](http://transdroid.org/latest-search) and code is available under the Lesser GPL v3 license.
+The latest .apk is available via [transdroid.org/latest-search](https://transdroid.org/latest-search) and code is available under the Lesser GPL v3 license.
 
-<a href="https://transdroid.org/lastest" target="_blank">
-<img src="https://transdroid.org/images/getontransdroid.png" alt="Get it on transdroid.org" height="80"/></a>
+<a href="https://transdroid.org/latest-search">
+    <img src="https://transdroid.org/images/getontransdroid.png"
+    alt="Get it on transdroid.org"
+    height="80">
+</a>
 <a href="https://f-droid.org/packages/org.transdroid.search/">
-<img src="https://f-droid.org/badge/get-it-on.png" alt="Get it on F-Droid" height="80"></a>
+    <img src="https://fdroid.gitlab.io/artwork/badge/get-it-on.png"
+    alt="Get it on F-Droid"
+    height="80">
+</a>
 
 Usage
 =====
@@ -75,19 +81,19 @@ License
 =======
 
     Copyright 2010-2019 Eric Kok et al.
-    
-    Transdroid Torrent Search is free software: you can redistribute 
-    it and/or modify it under the terms of the GNU Lesser General 
-    Public License as published by the Free Software Foundation, 
-    either version 3 of the License, or (at your option) any later 
+
+    Transdroid Torrent Search is free software: you can redistribute
+    it and/or modify it under the terms of the GNU Lesser General
+    Public License as published by the Free Software Foundation,
+    either version 3 of the License, or (at your option) any later
     version.
 
-    Transdroid Torrent Search is distributed in the hope that it will 
-    be useful, but WITHOUT ANY WARRANTY; without even the implied 
+    Transdroid Torrent Search is distributed in the hope that it will
+    be useful, but WITHOUT ANY WARRANTY; without even the implied
     warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
     See the GNU Lesser General Public License for more details.
-    
-    You should have received a copy of the GNU Lesser General Public 
+
+    You should have received a copy of the GNU Lesser General Public
     License along with Transdroid.  If not, see <http://www.gnu.org/licenses/>.
 
 Some code/libraries are used in the project:
