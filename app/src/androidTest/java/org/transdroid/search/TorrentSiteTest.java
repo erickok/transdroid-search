@@ -122,8 +122,7 @@ public class TorrentSiteTest {
 
     @Test
     public void search_Yts() throws Exception {
-        // TODO re-enable when back up
-        // searchSite(TorrentSite.Yts);
+        searchSite(TorrentSite.Yts);
     }
 
     private void searchSite(TorrentSite torrentSite) throws Exception {

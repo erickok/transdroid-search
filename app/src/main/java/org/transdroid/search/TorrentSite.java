@@ -33,6 +33,7 @@ import org.transdroid.search.adapters.privatetrackers.NcoreAdapter;
 import org.transdroid.search.adapters.privatetrackers.RevolutionTTAdapter;
 import org.transdroid.search.adapters.privatetrackers.TorrentLeechAdapter;
 import org.transdroid.search.adapters.publictrackers.RarbgAdapter;
+import org.transdroid.search.adapters.publictrackers.YtsAdapter;
 import org.transdroid.search.adapters.rss.privatetrackers.PretomeAdapter;
 import org.transdroid.search.adapters.rss.publictrackers.LimeTorrentsAdapter;
 import org.transdroid.search.adapters.rss.publictrackers.NyaaTorrentsAdapter;
@@ -147,6 +148,12 @@ public enum TorrentSite {
         @Override
         public ISearchAdapter getAdapter() {
             return new TorrentLeechAdapter();
+        }
+    },
+    Yts {
+        @Override
+        public ISearchAdapter getAdapter() {
+            return new YtsAdapter();
         }
     };
 
