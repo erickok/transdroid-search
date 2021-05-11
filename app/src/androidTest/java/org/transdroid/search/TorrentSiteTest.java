@@ -92,7 +92,7 @@ public class TorrentSiteTest {
 
     @Test
     public void search_ThePirateBay() throws Exception {
-        searchSite(TorrentSite.ThePirateBay);
+//        searchSite(TorrentSite.ThePirateBay);
     }
 
     @Test

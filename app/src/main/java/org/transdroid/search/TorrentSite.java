@@ -114,12 +114,12 @@ public enum TorrentSite {
             return new NebulanceAdapter();
         }
     },
-    ThePirateBay {
-        @Override
-        public ISearchAdapter getAdapter() {
-            return new ThePirateBayAdapter();
-        }
-    },
+//    ThePirateBay {
+//        @Override
+//        public ISearchAdapter getAdapter() {
+//            return new ThePirateBayAdapter();
+//        }
+//    },
     Pretome {
         @Override
         public ISearchAdapter getAdapter() {

@@ -42,7 +42,7 @@ import java.util.regex.Pattern;
  */
 public class ThePirateBayAdapter extends AbstractHtmlAdapter {
 
-    private static final String DOMAIN = "https://thepiratebay-org.prox.fun";
+    private static final String DOMAIN = "https://pirateproxy.surf";
     private static final String QUERYURL = DOMAIN + "/search/%1$s/0/%2$s/0";
     private static final String SORT_COMPOSITE = "3";
     private static final String SORT_SEEDS = "7";
@@ -114,7 +114,7 @@ public class ThePirateBayAdapter extends AbstractHtmlAdapter {
 
     @Override
     protected TorrentSite getTorrentSite() {
-        return TorrentSite.ThePirateBay;
+        return null;//TorrentSite.ThePirateBay;
     }
 
     @Override
