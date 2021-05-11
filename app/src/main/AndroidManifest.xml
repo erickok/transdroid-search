@@ -30,7 +30,9 @@
         android:description="@string/app_description"
         android:icon="@drawable/ic_launcher"
         android:label="Torrent Search (by Transdroid)"
-        android:theme="@style/Theme.Transdroid.Search">
+        android:theme="@style/Theme.Transdroid.Search"
+        android:usesCleartextTraffic="true"
+        tools:ignore="UnusedAttribute">
 
         <uses-library
             android:name="org.apache.http.legacy"
@@ -57,14 +59,6 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-
-        <!--activity
-            android:name=".gui.SettingsActivityCompat"
-            android:label="@string/pref_settingslabel" />
-
-        <activity
-            android:name=".gui.SettingsActivityModern"
-            android:label="@string/pref_settingslabel" /-->
 
     </application>
 
