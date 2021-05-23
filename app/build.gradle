@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 android {
     compileSdkVersion 30
-    buildToolsVersion "29.0.3"
+    buildToolsVersion "30.0.2"
 
     defaultConfig {
         applicationId "org.transdroid.search"
@@ -19,10 +19,17 @@ android {
 
     signingConfigs {
         releaseConfig {
-            keyAlias 'erickok'
-            keyPassword ''
-            storeFile file('../../erickok.keystore')
-            storePassword ''
+            def propsFile = rootProject.file('keystore.properties')
+            def configName = 'releaseConfig'
+
+            if (propsFile.exists() && android.signingConfigs.hasProperty(configName)) {
+                def props = new Properties()
+                props.load(new FileInputStream(propsFile))
+                keyAlias = props['keyAlias']
+                storeFile = file(props['storeFile'])
+                keyPassword = props['keyPassword']
+                storePassword = props['storePassword']
+            }
         }
     }
 
