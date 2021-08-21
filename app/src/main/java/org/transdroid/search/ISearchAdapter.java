@@ -90,6 +90,7 @@ public interface ISearchAdapter {
     enum AuthType {
         NONE,
         TOKEN,
+        TOKEN_AND_UID,
         USERNAME,
         COOKIES,
         CUSTOM

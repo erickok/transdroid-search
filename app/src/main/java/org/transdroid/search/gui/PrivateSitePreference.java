@@ -51,7 +51,7 @@ public class PrivateSitePreference extends DialogPreference {
 
     private final Pair<String, ISearchAdapter> torrentSite;
     private final AuthType authType;
-    private EditText userEdit, passEdit, tokenEdit;
+    private EditText userEdit, passEdit, tokenEdit, uidEdit;
     private Map<String, EditText> cookieEdits;
 
     PrivateSitePreference(Context context, int sortOrder, Pair<String, ISearchAdapter> torrentSite) {
@@ -65,6 +65,10 @@ public class PrivateSitePreference extends DialogPreference {
         switch (authType) {
             case TOKEN:
                 setDialogLayoutResource(R.layout.dialog_token);
+                setDialogTitle(R.string.pref_token);
+                break;
+            case TOKEN_AND_UID:
+                setDialogLayoutResource(R.layout.dialog_token_and_uid);
                 setDialogTitle(R.string.pref_token);
                 break;
             case USERNAME:
@@ -112,6 +116,13 @@ public class PrivateSitePreference extends DialogPreference {
                 // Show token for easy modification
                 tokenEdit.setText(prefs.getString(SettingsHelper.PREF_SITE_TOKEN + torrentSite.first, ""));
                 break;
+            case TOKEN_AND_UID:
+                tokenEdit = dialog.findViewById(R.id.token);
+                uidEdit = dialog.findViewById(R.id.uid);
+                // Show token and uid for easy modification
+                tokenEdit.setText(prefs.getString(SettingsHelper.PREF_SITE_TOKEN + torrentSite.first, ""));
+                uidEdit.setText(prefs.getString(SettingsHelper.PREF_SITE_USER_ID + torrentSite.first, ""));
+                break;
             case USERNAME:
                 userEdit = dialog.findViewById(R.id.username);
                 passEdit = dialog.findViewById(R.id.password);
@@ -141,6 +152,10 @@ public class PrivateSitePreference extends DialogPreference {
                 case TOKEN:
                     persistToken();
                     break;
+                case TOKEN_AND_UID:
+                    persistToken();
+                    persistUserId();
+                    break;
                 case USERNAME:
                     persistUserAndPass();
                     break;
@@ -157,6 +172,15 @@ public class PrivateSitePreference extends DialogPreference {
             token = null;
         Editor edit = PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
         edit.putString(SettingsHelper.PREF_SITE_TOKEN + torrentSite.first, token);
+        edit.apply();
+    }
+
+    private void persistUserId() {
+        String uid = uidEdit.getText().toString();
+        if (TextUtils.isEmpty(uid))
+            uid = null;
+        Editor edit = PreferenceManager.getDefaultSharedPreferences(getContext()).edit();
+        edit.putString(SettingsHelper.PREF_SITE_USER_ID + torrentSite.first, uid);
         edit.apply();
     }
 
