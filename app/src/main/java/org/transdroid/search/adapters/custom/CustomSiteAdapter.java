@@ -26,6 +26,7 @@ import org.transdroid.search.SearchResult;
 import org.transdroid.search.SortOrder;
 import org.transdroid.search.adapters.rss.RssFeedSearchAdapter;
 import org.transdroid.util.FileSizeConverter;
+import org.xml.sax.Attributes;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
@@ -102,6 +103,29 @@ public class CustomSiteAdapter extends RssFeedSearchAdapter {
         @Override
         protected Item createNewItem() {
             return new CustomSiteItem();
+        }
+
+        @Override
+        protected void addAdditionalData(String localName, String qName, Attributes attributes, Item item) {
+            CustomSiteItem theItem = (CustomSiteItem) item;
+
+            if (qName.equalsIgnoreCase("torznab:attr")
+                    && attributes != null && attributes.getLength() > 0) {
+                long asNumber = 0;
+                try {
+                    if (attributes.getValue("value") != null) {
+                        asNumber = Long.parseLong(attributes.getValue("value"));
+                    }
+                } catch (NumberFormatException ignored) {
+                }
+
+                if (attributes.getValue("name").equalsIgnoreCase("seeders")) {
+                    theItem.seeders = (int) asNumber;
+                }
+                if (attributes.getValue("name").equalsIgnoreCase("peers")) {
+                    theItem.leechers = (int) asNumber;
+                }
+            }
         }
 
         @Override
