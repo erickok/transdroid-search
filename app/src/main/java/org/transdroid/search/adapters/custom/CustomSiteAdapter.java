@@ -79,7 +79,7 @@ public class CustomSiteAdapter extends RssFeedSearchAdapter {
         CustomSiteItem theItem = (CustomSiteItem) item;
         return new SearchResult(
                 item.getTitle(),
-                item.getEnclosureUrl(),
+                item.getTheLink(),
                 theItem.detailsLink,
                 FileSizeConverter.getSize(theItem.size),
                 item.getPubdate(),

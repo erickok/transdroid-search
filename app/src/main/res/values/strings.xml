@@ -14,7 +14,8 @@
     <string name="pref_token">Site token</string>
     <string name="pref_hint_username">Username</string>
     <string name="pref_hint_password">Password</string>
-    <string name="pref_hint_token">API/session token</string>
+    <string name="pref_hint_token">API Token (passkey)</string>
+    <string name="pref_hint_uid">User ID (not Username)</string>
     <string name="pref_hint_name">(Optional) name</string>
     <string name="pref_hint_url_explanation">Link to the RSS feed, including any access token, where \u0025s will be replaced by the search string, e.g.\nhttps://site.com/torrents?q=\u0025</string>
     <string name="pref_hint_url">URL</string>

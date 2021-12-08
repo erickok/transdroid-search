@@ -47,6 +47,7 @@ public class SettingsHelper {
     static final String PREF_SITE_COOKIE = "pref_key_cookie_";
     static final String PREF_SITE_CUSTOM_NAME = "pref_key_custom_name_";
     static final String PREF_SITE_CUSTOM_URL = "pref_key_custom_url_";
+    static final String PREF_SITE_USER_ID = "pref_key_user_id_";
     private static final String CODE_PREFIX_CUSTOM = "custom_";
 
     public static ISearchAdapter getSiteByCode(SharedPreferences prefs, String code) {
@@ -89,6 +90,9 @@ public class SettingsHelper {
                 return prefs.getBoolean(PREF_SITE_ENABLED + siteCode, false);
             case TOKEN:
                 return prefs.getString(PREF_SITE_TOKEN + siteCode, null) != null;
+            case TOKEN_AND_UID:
+                return prefs.getString(PREF_SITE_TOKEN + siteCode, null) != null
+                        && prefs.getString(PREF_SITE_USER_ID + siteCode, null) != null;
             case USERNAME:
                 return prefs.getString(PREF_SITE_USER + siteCode, null) != null
                         && prefs.getString(PREF_SITE_PASS + siteCode, null) != null;
@@ -138,6 +142,10 @@ public class SettingsHelper {
      */
     public static String getSiteToken(SharedPreferences prefs, TorrentSite site) {
         return prefs.getString(PREF_SITE_TOKEN + site.name(), null);
+    }
+
+    public static String getSiteUserId(SharedPreferences prefs, TorrentSite site) {
+        return prefs.getString(PREF_SITE_USER_ID + site.name(), null);
     }
 
     public static void setSiteCookie(Editor editor, String siteCode, String name, String value) {
