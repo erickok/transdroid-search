@@ -53,7 +53,8 @@
         <activity
             android:name=".gui.SettingsActivity"
             android:label="@string/pref_settingslabel"
-            android:noHistory="true">
+            android:noHistory="true"
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
