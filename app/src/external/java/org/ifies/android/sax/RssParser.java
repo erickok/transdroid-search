@@ -105,6 +105,9 @@ public class RssParser extends DefaultHandler {
             }
         }
 
+        if (this.item != null)
+            addAdditionalData(localName, qName, attributes, this.item);
+
     }
 
     /**
@@ -194,6 +197,19 @@ public class RssParser extends DefaultHandler {
 
     /**
      * May be overridden to add additional data from tags that are not standard in RSS. Not used by this default RSS style parser.
+     * Executed on start element
+     *
+     * @param localName  The tag name
+     * @param qName      The tag name
+     * @param attributes The attributes attached to the element
+     * @param item       The Item we are currently parsing
+     */
+    protected void addAdditionalData(String localName, String qName, Attributes attributes, Item item) {
+    }
+
+    /**
+     * May be overridden to add additional data from tags that are not standard in RSS. Not used by this default RSS style parser.
+     * Executed on end element
      *
      * @param localName The tag name
      * @param item      The Item we are currently parsing
