@@ -23,7 +23,6 @@ import android.content.SharedPreferences;
 import org.transdroid.search.adapters.html.privatetrackers.AudioBookTorrentsAdapter;
 import org.transdroid.search.adapters.html.privatetrackers.MoreThanTvAdapter;
 import org.transdroid.search.adapters.html.privatetrackers.NebulanceAdapter;
-import org.transdroid.search.adapters.html.publictrackers.ThePirateBayAdapter;
 import org.transdroid.search.adapters.privatetrackers.AsiaTorrentsAdapter;
 import org.transdroid.search.adapters.privatetrackers.BTNAdapter;
 import org.transdroid.search.adapters.privatetrackers.DanishbitsAdapter;
@@ -38,7 +37,6 @@ import org.transdroid.search.adapters.rss.privatetrackers.IPTorrentsAdapter;
 import org.transdroid.search.adapters.rss.privatetrackers.PretomeAdapter;
 import org.transdroid.search.adapters.rss.publictrackers.LimeTorrentsAdapter;
 import org.transdroid.search.adapters.rss.publictrackers.NyaaTorrentsAdapter;
-import org.transdroid.search.adapters.rss.publictrackers.TorrentDownloadsAdapter;
 
 import java.io.InputStream;
 import java.util.List;
@@ -137,12 +135,6 @@ public enum TorrentSite {
         @Override
         public ISearchAdapter getAdapter() {
             return new RarbgAdapter();
-        }
-    },
-    TorrentDownloads {
-        @Override
-        public ISearchAdapter getAdapter() {
-            return new TorrentDownloadsAdapter();
         }
     },
     TorrentLeech {
