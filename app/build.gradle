@@ -7,8 +7,8 @@ android {
         applicationId "org.transdroid.search"
         minSdkVersion 14
         targetSdkVersion 31
-        versionCode 37
-        versionName "4.2"
+        versionCode 38
+        versionName "4.3"
         testInstrumentationRunner 'androidx.test.runner.AndroidJUnitRunner'
     }
 
