@@ -35,7 +35,7 @@ import java.net.URLEncoder;
  */
 public class TorrentDownloadsAdapter extends RssFeedSearchAdapter {
 
-    private static final String DOMAIN = "https://torrentdownloads.unblocker.cc";
+    private static final String DOMAIN = "https://www.torrentdownloads.me";
 
     protected SearchResult fromRssItemToSearchResult(Item item) throws UnsupportedEncodingException {
         // Direct .torrent file download in style http://www.torrentdownloads.me/torrent/<id>/<title>
