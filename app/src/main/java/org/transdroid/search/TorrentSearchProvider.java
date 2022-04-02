@@ -203,7 +203,7 @@ public class TorrentSearchProvider extends ContentProvider {
                 for (StackTraceElement stack : e.getStackTrace()) {
                     Log.d(TorrentSearchProvider.class.getName(), stack.toString());
                 }
-                throw new RuntimeException(e.toString());
+                throw new RuntimeException(e);
             }
 
         }
