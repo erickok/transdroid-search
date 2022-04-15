@@ -58,7 +58,7 @@ import javax.xml.parsers.SAXParserFactory;
 public class IPTorrentsAdapter extends RssFeedSearchAdapter {
 
     // String.format(FORMATTED_URI, uid, token, query);
-    private static String FORMATTED_URI = "https://iptorrents.com/t.rss?u=%s;tp=%s;48;20;100;101;68;22;99;5;65;download;q=%s";
+    private static String FORMATTED_URI = "https://ipt.beelyrics.net/t.rss?u=%s;tp=%s;48;20;100;101;68;22;99;5;65;download;q=%s";
 
     // Fri, 20 Aug 2021 21:59:14 +0000
     private static final DateFormat DATE_FORMAT = new SimpleDateFormat("EEE, dd MMM yyyy HH:mm:ss Z", Locale.US);

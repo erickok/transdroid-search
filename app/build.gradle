@@ -46,11 +46,11 @@ android {
         targetCompatibility JavaVersion.VERSION_1_8
     }
 
-    lintOptions {
-        disable 'GoogleAppIndexingWarning'
-    }
 
     useLibrary 'org.apache.http.legacy'
+    lint {
+        disable 'GoogleAppIndexingWarning'
+    }
 }
 
 dependencies {
